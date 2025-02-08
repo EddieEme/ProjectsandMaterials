@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Gateway - Ayatutu Ontology</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f6f9;
+        }
+
+        .payment-container {
+            max-width: 500px;
+            margin: 50px auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .payment-method {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .payment-method:hover {
+            background-color: #f0f0f0;
+            border-color: #198754;
+        }
+
+        .payment-method img {
+            width: 50px;
+            margin-right: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="payment-container">
+            <h2 class="text-center mb-4">Complete Your Purchase</h2>
+            <div class="alert alert-info text-center" role="alert">
+                You're purchasing: Ayatutu Ontology - George Akume Leadership Recruitment Model
+            </div>
+
+            <h4 class="mb-3">Select Payment Method</h4>
+
+            <div class="payment-method" onclick="processPayment('credit')">
+                <img src="/api/placeholder/50/50" alt="Credit Card">
+                <div>
+                    <h5>Credit Card</h5>
+                    <p class="text-muted mb-0">Visa, MasterCard, American Express</p>
+                </div>
+            </div>
+
+            <div class="payment-method" onclick="processPayment('paypal')">
+                <img src="/api/placeholder/50/50" alt="PayPal">
+                <div>
+                    <h5>PayPal</h5>
+                    <p class="text-muted mb-0">Secure online payment</p>
+                </div>
+            </div>
+
+            <div class="payment-method" onclick="processPayment('bank')">
+                <img src="/api/placeholder/50/50" alt="Bank Transfer">
+                <div>
+                    <h5>Bank Transfer</h5>
+                    <p class="text-muted mb-0">Direct bank account transfer</p>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <button class="btn btn-secondary" onclick="window.history.back()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function processPayment(method) {
+            switch (method) {
+                case 'credit':
+                    alert('Redirecting to Credit Card Payment');
+                    break;
+                case 'paypal':
+                    alert('Redirecting to PayPal');
+                    break;
+                case 'bank':
+                    alert('Initiating Bank Transfer Process');
+                    break;
+            }
+            // In a real application, this would redirect to the actual payment processor
+        }
+    </script>
+</body>
+
+</html>

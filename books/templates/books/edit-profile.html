@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile & Settings</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+    <!-- Navigation (Common across all pages) -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">Marketplace</a>
+            <div class="d-flex align-items-center">
+                <div class="dropdown">
+                    <button
+                        class="btn btn-link text-dark text-decoration-none dropdown-toggle d-flex align-items-center"
+                        type="button" data-bs-toggle="dropdown">
+                        <img src="/api/placeholder/40/40" class="rounded-circle me-2" width="40" height="40"
+                            alt="Profile">
+                        <span>John Doe</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="view-profile.html">View Profile</a></li>
+                        <li><a class="dropdown-item" href="edit-profile.html">Edit Profile</a></li>
+                        <li><a class="dropdown-item" href="settings.html">Settings</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="#">Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <!-- Edit Profile Page -->
+    <div class="container py-4" id="edit-profile">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title mb-4">Edit Profile</h5>
+                <form>
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <img src="/api/placeholder/200/200" class="img-fluid rounded-circle mb-3"
+                                    alt="Profile Picture">
+                                <div class="d-grid">
+                                    <button class="btn btn-outline-primary mb-2">Change Picture</button>
+                                    <button class="btn btn-outline-danger">Remove Picture</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-9">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">First Name</label>
+                                    <input type="text" class="form-control" value="John">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Last Name</label>
+                                    <input type="text" class="form-control" value="Doe">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" value="john@example.com">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Phone</label>
+                                <input type="tel" class="form-control" value="+1 234 567 8900">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Bio</label>
+                                <textarea class="form-control"
+                                    rows="4">I'm a digital content creator specializing in educational materials and programming tutorials.</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-secondary" onclick="window.history.back()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

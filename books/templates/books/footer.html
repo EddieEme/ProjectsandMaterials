@@ -1,0 +1,41 @@
+{% block content %}
+<style>
+     .footer-section {
+      background-color: #2d2d2d;
+      color: #fff;
+      padding: 4rem 2rem 2rem;
+      text-align: center;
+      margin-top: 2rem;
+      
+  }
+</style>
+{% load static %}
+<footer class="footer-section">
+        <h2 class="footer-title">SUBSCRIBE TO OUR NEWSLETTER</h2>
+        <p class="footer-description">
+            Aenean ultricies iaculis cursus. Mauris enim tellus, finibus in felis a, sollicitudin
+            iaculis dolor. Donec sollicitudin orci id efficitur dapibus.
+        </p>
+    
+        <form class="newsletter-form" id="newsletterForm">
+            <input type="email" class="newsletter-input" placeholder="Enter Your Email Address" required>
+            <button type="submit" class="newsletter-button">Subscribe</button>
+        </form>
+    
+        <div class="footer-logo">
+            <img src="{% static 'books/images/hero_image.jpg' %}" alt="eREADERS - Electronic Book Template">
+        </div>
+    
+        <div class="social-links">
+            <a href="#" class="social-link" aria-label="Facebook">f</a>
+            <a href="#" class="social-link" aria-label="LinkedIn">in</a>
+            <a href="#" class="social-link" aria-label="Twitter">t</a>
+            <a href="#" class="social-link" aria-label="Pinterest">p</a>
+            <a href="#" class="social-link" aria-label="Google+">g+</a>
+        </div>
+    
+        <div class="footer-copyright">
+            © 2025, All Right Reserved - by <a href="#">Emrisolution</a>
+        </div>
+    </footer>
+    {% endblock %}

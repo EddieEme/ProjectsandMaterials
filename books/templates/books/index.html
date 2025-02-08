@@ -1,0 +1,338 @@
+{% extends "books/base.html" %}
+{% block content %}
+{% load static %}
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-text" data-aos="fade-right">
+                <h1>The Best <span>Books</span></h1>
+                <h2>Sale up to 30% off</h2>
+                <p>Quisque ultricies luctus nisi non dapibus. Nullam efficitur lorem non libe blandit, non rhoncus
+                    libero tristique.</p>
+                <a href="#" class="buy-btn">Buy Now</a>
+            </div>
+            <!-- <div class="book-preview" data-aos="fade-left">
+                <img src="/images/hero_image.jpg" alt="Corporate Book Cover">
+            </div> -->
+        </div>
+    </section>
+    <section class="stats-section">
+        <div class="stats-container">
+            <div class="stat-item" data-aos="fade-up" data-aos-delay="100">
+                <i class="fas fa-file-alt stat-icon"></i>
+                <div class="stat-number">1200</div>
+                <div class="stat-label">Pages</div>
+            </div>
+            <div class="stat-item" data-aos="fade-up" data-aos-delay="200">
+                <i class="fas fa-book-open stat-icon"></i>
+                <div class="stat-number">45</div>
+                <div class="stat-label">Chapters</div>
+            </div>
+            <div class="stat-item" data-aos="fade-up" data-aos-delay="300">
+                <i class="fas fa-download stat-icon"></i>
+                <div class="stat-number">3550</div>
+                <div class="stat-label">Downloads</div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Showcase Section -->
+    <section class="showcase-section">
+        <div class="showcase-container">
+            <div class="showcase-text" data-aos="fade-right">
+                <h2>LEARN <span>HOW TO WORK</span> FROM HOME OR ANY WHERE ELSE IN WORLD</h2>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam tristique erat accumsan eros mattis aliquam.
+                    Praesent non accumsan mauris, non maximus libero. Vestibulu scelerisque enim turpis. Duis justo ante,
+                    aliquam ac tempus et, porta vitae leo. Moi sed diam pharetra eros maximus porttitor et in tellus.</p>
+                <p>Ut porta massa in risus maximus, eget sodales massa malesuada. Fusce et neque aliquet, mollis tellus ut,
+                    rutrum nunc.</p>
+                <a href="#" class="get-started-btn">
+                    Get Started Now
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            <div class="showcase-image" data-aos="fade-left">
+                <img src="{% static 'books/images/hero_image.jpg' %}" alt="Laptop Mockup">
+            </div>
+        </div>
+    </section>
+    <section class="services-section">
+        <div class="services-header" data-aos="fade-up">
+            <h2>OUR FEATURED SERVICES</h2>
+            <p>Large online bookstores offer used books for sale, too. Individuals wishing to sell their used Books</p>
+        </div>
+        <div class="services-grid">
+            <div class="service-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="service-icon">
+                    <i class="fas fa-pencil-alt"></i>
+                </div>
+                <h3 class="service-title">1. Hire a writer</h3>
+                <p class="service-text">Quisque ultricies luctus amnisl non dapib us ulla efficitur loo non libe blandit, non rhons luctus</p>
+            </div>
+    
+            <div class="service-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="service-icon">
+                    <i class="fas fa-lightbulb"></i>
+                </div>
+                <h3 class="service-title">2. Data analysis</h3>
+                <p class="service-text">Quisque ultricies luctus amnisl non dapib us ulla efficitur loo non libe blandit,
+                    non rhons luctus</p>
+            </div>
+    
+            <div class="service-card" data-aos="fade-up" data-aos-delay="300">
+                <div class="service-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3 class="service-title">3. Tutorials</h3>
+                <p class="service-text">Quisque ultricies luctus amnisl non dapib us ulla efficitur loo non libe blandit,
+                    non rhons luctus</p>
+            </div>
+    
+            <div class="service-card" data-aos="fade-up" data-aos-delay="400">
+                <div class="service-icon">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <h3 class="service-title">4. Thesis/dissertations</h3>
+                <p class="service-text">Quisque ultricies luctus amnisl non dapib us ulla efficitur loo non libe blandit,
+                    non rhons luctus</p>
+            </div>
+    
+            <div class="service-card" data-aos="fade-up" data-aos-delay="500">
+                <div class="service-icon">
+                    <i class="fas fa-download"></i>
+                </div>
+                <h3 class="service-title">5. Download projects</h3>
+                <p class="service-text">Quisque ultricies luctus amnisl non dapib us ulla efficitur loo non libe blandit,
+                    non rhons luctus</p>
+            </div>
+    
+            <div class="service-card" data-aos="fade-up" data-aos-delay="600">
+                <div class="service-icon">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+                <h3 class="service-title">6. Publish Project</h3>
+                <p class="service-text">Quisque ultricies luctus amnisl non dapib us ulla efficitur loo non libe blandit,
+                    non rhons luctus</p>
+            </div>
+        </div>
+    </section>
+    <!-- Courses Section -->
+    <section class="research-section">
+        <div class="container">
+            <h2 class="research-title">TOP DEPARMENTS PROJECTS</h2>
+    
+            <div class="row g-4"  >
+                <!-- Row 1 -->
+                <div class="col-md-6 col-lg-3" data-aos="fade-left" data-aos-delay="50">
+                    <div class="field-card">
+                        <h3 class="field-title">
+                            <i class="fa-solid fa-book-open"></i>
+                            Agriculture
+                        </h3>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3" data-aos="fade-left" data-aos-delay="100">
+                    <div class="field-card">
+                        <h3 class="field-title">
+                            <i class="fa-solid fa-book-open"></i>
+                            Arts & Humanities
+                        </h3>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3" data-aos="fade-left" data-aos-delay="150">
+                    <div class="field-card">
+                        <h3 class="field-title">
+                            <i class="fa-solid fa-book-open"></i>
+                            Education
+                        </h3>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3" data-aos="fade-left" data-aos-delay="200">
+                    <div class="field-card">
+                        <h3 class="field-title">
+                            <i class="fa-solid fa-book-open"></i>
+                            Engineering
+                        </h3>
+                    </div>
+                </div>
+    
+                <!-- Row 2 -->
+                <div class="col-md-6 col-lg-3" data-aos="fade-left" data-aos-delay="250">
+                    <div class="field-card">
+                        <h3 class="field-title">
+                            <i class="fa-solid fa-book-open"></i>
+                            Environmental & Physical Sciences
+                        </h3>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3" data-aos="fade-left" data-aos-delay="250">
+                    <div class="field-card">
+                        <h3 class="field-title">
+                            <i class="fa-solid fa-book-open"></i>
+                            Fiction
+                        </h3>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3" data-aos="fade-left" data-aos-delay="300">
+                    <div class="field-card">
+                        <h3 class="field-title">
+                            <i class="fa-solid fa-book-open"></i>
+                            General
+                        </h3>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3" data-aos="fade-left" data-aos-delay="350">
+                    <div class="field-card">
+                        <h3 class="field-title">
+                            <i class="fa-solid fa-book-open"></i>
+                            Law
+                        </h3>
+                    </div>
+                </div>
+    
+                <!-- Row 3 -->
+                <div class="col-md-6 col-lg-3" data-aos="fade-left" data-aos-delay="400">
+                    <div class="field-card">
+                        <h3 class="field-title">
+                            <i class="fa-solid fa-book-open"></i>
+                            Medical & Health Sciences
+                        </h3>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3" data-aos="fade-left" data-aos-delay="400">
+                    <div class="field-card">
+                        <h3 class="field-title">
+                            <i class="fa-solid fa-book-open"></i>
+                            Natural & Applied Sciences
+                        </h3>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3" data-aos="fade-left" data-aos-delay="400">
+                    <div class="field-card">
+                        <h3 class="field-title">
+                            <i class="fa-solid fa-book-open"></i>
+                            Social & Management Sciences
+                        </h3>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3" data-aos="fade-left" data-aos-delay="400">
+                    <div class="field-card">
+                        <h3 class="field-title">
+                            <i class="fa-solid fa-book-open"></i>
+                            Technology
+                        </h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- News Section -->
+    <section class="news-section">
+        <div class="container">
+            <h2 class="section-title">OUR LATEST TUTORIALS</h2>
+            <p class="section-subtitle">Unlock the Secrets to Mastering Project Writing!<b></b> provide expert-led video tutorials designed to help you craft outstanding project reports with clarity and precision.</p>
+    
+            <div class="row" id="videoContainer">
+                <div class="loading-spinner">
+                    Loading videos...
+                </div>
+            </div>
+            <div class="row justify-content-center mt-4">
+                <div class="col-md-4 text-center">
+                    <a href="https://youtube.com/@project-and-materials?si=NyNDsJsYO15p1xfH" class="btn btn-primary">
+                        View More News
+                        <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="about-section">
+        <div class="about-header" data-aos="fade-up">
+            <h2>ABOUT  <span class="highlight">PROJECTSANDMATERIALS</span></h2>
+        </div>
+    
+        <div class="about-content">
+            <div class="about-image" data-aos="fade-right">
+               <img src="{% static 'books/images/hero_image.jpg' %}" alt="Author">
+                <!-- <img src="/images/heropage.jpeg" alt="Corporate Headline" class="corporate-badge"> -->
+            </div>
+    
+            <div class="about-text" data-aos="fade-left">
+                <p class="about-quote">Do you want to be even more successful? Learn to love learn and growth. The more
+                    efort you put into improving your skills, the bigger the payoff you will get.</p>
+    
+                <div class="about-description">
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent accusa sit amet risus sed auctor.
+                        Ut non imperdiet quam. Nullam sed lacus ut mior nare consectetur id sed urna. Praesent vestibulum
+                        eget ant nec seper ull corper sodales tortor vel mattis.</p>
+                    <p>Nam ut egestas nibh. Phasellus sollicitudin tempus neque quis gravida. Aenean a eros at ex pharetra
+                        suscipit. Proin iaculis ipsum ac ullamcorper pre tium. Morbi ut leo eu felis commodo porta.</p>
+                </div>
+    
+                <div class="author-signature">
+                    <img src="/api/placeholder/200/60" alt="Author Signature">
+                </div>
+    
+                <div class="social-links">
+                    <a href="#" class="social-link facebook">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="social-link twitter">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="social-link pinterest">
+                        <i class="fab fa-pinterest-p"></i>
+                    </a>
+                    <a href="#" class="social-link google">
+                        <i class="fab fa-google-plus-g"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="testimonials-section">
+        <div class="testimonials-header">
+            <div class="title-icon"></div>
+            <h2 class="testimonials-title">WHAT PEOPLE SAY</h2>
+        </div>
+    
+        <div class="testimonials-container">
+            <div class="testimonial-slide active">
+                <!-- <div class="testimonial-image">
+                    <img src="/images/heropage.jpeg" alt="Ryan Pittman">
+                </div> -->
+                <div class="testimonial-content">
+                    <h3 class="testimonial-author">RYAN PITTMAN</h3>
+                    <p class="testimonial-position">FASHION DESIGNER</p>
+                    <p class="testimonial-text">"Ut porta massa in risus maximus, egets oda les massa malesuada. Fusce et
+                        neq ue aliq uet, mollis tellus ut, rutrum nunc. Cras congue ma gna"</p>
+                </div>
+            </div>
+    
+            <div class="testimonial-slide">
+                <!-- <div class="testimonial-image">
+                    <img src="/images/hero_image.jpg" alt="Jane Smith">
+                </div> -->
+                <div class="testimonial-content">
+                    <h3 class="testimonial-author">JANE SMITH</h3>
+                    <p class="testimonial-position">ART DIRECTOR</p>
+                    <p class="testimonial-text">"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
+                        tempor incididunt ut labore et dolore magna aliqua."</p>
+                </div>
+            </div>
+    
+            <button class="slider-nav prev-slide">&larr;</button>
+            <button class="slider-nav next-slide">&rarr;</button>
+        </div>
+    
+        <div class="slider-dots">
+            <span class="dot active"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+        </div>
+    </section>
+    {% include "books/footer.html" %}
+
+   {% endblock %}

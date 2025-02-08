@@ -1,0 +1,438 @@
+{% extends 'books/base.html' %}
+    <style>
+        .nav-tabs .nav-link {
+            color: #333;
+            border: none;
+            padding: 10px 20px;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: #198754;
+            border-bottom: 2px solid #198754;
+            background: none;
+        }
+
+        .tab-content>.tab-pane {
+            display: none;
+        }
+
+        .tab-content>.tab-pane.active {
+            display: block;
+        }
+
+        .related-work {
+            padding: 15px;
+            border: 1px solid #dee2e6;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .add-review-section {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .document-details {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .ayatutu-definition {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .generated-words {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+
+
+        .no-select {
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            cursor: default;
+        }
+
+        .document-details span{
+            text-transform:initial;
+            text-transform: lowercase;
+            font-style: italic;
+        }
+
+        /* Prevent screenshot/saving */
+        #documentModal {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .modal-body {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        /* Watermark effect */
+        .watermarked {
+            position: relative;
+        }
+        .watermarked::before {
+            content: "CONFIDENTIAL";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 40px;
+            color: rgba(255,0,0,0.1);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+    </style>
+{% block content %}
+    <div class="container mt-4" style="margin-top: 5.5rem !important;">
+        <h1 class="h2 mb-4">AYATUTU ONTOLOGY - The George Akume Leadership Recruitment Model</h1>
+
+        <div class="row">
+            <div class="col-md-8">
+                <!-- Navigation Tabs -->
+                <ul class="nav nav-tabs mb-4" id="paperTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="overview-tab" data-bs-toggle="tab"
+                            data-bs-target="#overview" type="button" role="tab">Overview</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews"
+                            type="button" role="tab">Reviews</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="citations-tab" data-bs-toggle="tab" data-bs-target="#citations"
+                            type="button" role="tab">Cite Work</button>
+                    </li>
+                </ul>
+
+                <!-- Tab Content -->
+                <div class="tab-content" id="paperTabsContent">
+                    <!-- Overview Tab -->
+                    <div class="tab-pane fade show active" id="overview" role="tabpanel" >
+                        <div class="content mb-4">
+                            <p class="lead">The Nigerian state has failed from a formerly epistemic purity of the past
+                                and that there is the conflict of "truth" and "facts" as opposed to disencrypted fake
+                                news. Poor leadership recruitment process has aided corruption and instilled the culture
+                                of falsehood and fake news.</p>
+                            <p>It has created a huge gap between the anticipated gains of democracy and democracy
+                                dividends on ground. This paper argues that the masses in Nigeria are like boats on the
+                                volatile sea without a leadership guide and that, democratic consolidation in Nigeria
+                                suffers too often because of the problem of failure of leadership.</p>
+                                <div class="container col-md-6 mt-5 align-items-center">
+                                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#documentModal">
+                                        Preview Document
+                                    </button>
+                                </div>
+                        </div>
+                       
+
+                        <!-- Document Modal -->
+                        <div class="modal fade" id="documentModal" tabindex="-1">
+                            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                                <div class="modal-content no-select watermarked">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Ayatutu Ontology Document</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="document-content">
+                                            <h3>The George Akume Leadership Recruitment Model</h3>
+                                        
+                                            <p>The Nigerian state has failed from a formerly epistemic purity of the past and that there is the conflict of
+                                                "truth" and "facts" as opposed to disencrypted fake news. Poor leadership recruitment process has aided
+                                                corruption and instilled the culture of falsehood and fake news.</p>
+                                        
+                                            <p>It has created a huge gap between the anticipated gains of democracy and democracy dividends on ground. This
+                                                paper argues that the masses in Nigeria are like boats on the volatile sea without a leadership guide and that,
+                                                democratic consolidation in Nigeria suffers too often because of the problem of failure of leadership.</p>
+                                        
+                                            <h4>Key Observations</h4>
+                                            <ul>
+                                                <li>Leadership recruitment process has been compromised</li>
+                                                <li>Democratic institutions are weakened by poor leadership selection</li>
+                                                <li>The gap between democratic promises and reality continues to widen</li>
+                                            </ul>
+                                        
+                                            <p>The ontology proposed in this paper seeks to address these fundamental challenges by reimagining the leadership
+                                                recruitment model. It emphasizes the need for a more transparent, merit-based approach to selecting political
+                                                leaders.</p>
+                                        
+                                            <h4>Proposed Solutions</h4>
+                                            <ol>
+                                                <li>Implement rigorous candidate screening processes</li>
+                                                <li>Establish clear leadership competency frameworks</li>
+                                                <li>Create accountability mechanisms for political candidates</li>
+                                            </ol>
+                                        
+                                            <p>By addressing these critical areas, the Ayatutu Ontology aims to transform the current leadership paradigm and
+                                                restore faith in democratic governance.</p>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Close</button>
+                                      <a type="button" class="btn btn-success" id="downloadBtn" href="{% url 'books:buyorsubscribe' %}">
+                                            <i class="fas fa-download"></i>Download
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ayatutu Ontology Definition -->
+                        <div class="ayatutu-definition">
+                            <h3 class="mb-3">Definition of Ayatutu Ontology</h3>
+                            <p>Ayatutu Ontology refers to the conceptual framework and model developed in the paper,
+                                which examines the leadership recruitment process in Nigeria. It aims to analyze the
+                                factors that have led to the deterioration of democratic consolidation and the
+                                "anticipated gains of democracy" in the country. The ontology provides a critical
+                                appraisal of the leadership system and proposes a reformatting of the leadership
+                                recruitment model to allow for better democratic governance.</p>
+                        </div>
+
+
+                        <!-- Ayatutu Ontology Word Generator -->
+                        <div class="ayatutu-definition">
+                            <h3 class="mb-3">50 Words Related to Ayatutu Ontology</h3>
+                            <div class="generated-words" id="generated-words"></div>
+                            <button class="btn btn-success mt-3" onclick="generateWords()">Generate New Words</button>
+                        </div>
+                    </div>
+
+                    <!-- Reviews Tab -->
+                    <div class="tab-pane fade" id="reviews" role="tabpanel">
+                        
+
+                        <!-- Existing Reviews -->
+                        <div class="review-card mb-3">
+                            <div class="review-header">
+                                <div>
+                                    <h5>Excellent Analysis of Leadership Challenges</h5>
+                                    <div class="text-muted">by John Doe</div>
+                                </div>
+                                <div class="review-score text-success">5.0</div>
+                            </div>
+                            <div class="review-content">
+                                This paper provides a comprehensive and insightful analysis of the leadership
+                                recruitment challenges in Nigeria. The author's use of the Ayatutu Ontology framework
+                                offers a unique perspective on the deterioration of democratic consolidation. I found
+                                the proposed reforms to the leadership system to be well-reasoned and practical. A
+                                must-read for anyone interested in Nigerian politics and governance.
+                            </div>
+                        </div>
+
+                        <div class="review-card mb-3">
+                            <div class="review-header">
+                                <div>
+                                    <h5>Thought-Provoking and Relevant</h5>
+                                    <div class="text-muted">by Jane Smith</div>
+                                </div>
+                                <div class="review-score text-success">4.8</div>
+                            </div>
+                            <div class="review-content">
+                                The Ayatutu Ontology paper tackles a critical issue that has plagued Nigeria for far too
+                                long - the failure of leadership and its impact on the country's democratic progress.
+                                The author's deep dive into the leadership recruitment process and the proposed
+                                solutions are both timely and necessary. This work should be required reading for
+                                policymakers, academics, and anyone concerned about the future of Nigeria.
+                            </div>
+                        </div>
+
+
+                        <div class="review-header">
+                            <button class="btn btn-success" data-bs-toggle="collapse" data-bs-target="#addReviewForm">Add Review</button>
+                        </div>
+                        
+                        <!-- Add Review Collapse -->
+                        <div class="collapse" id="addReviewForm">
+                            <div class="add-review-section">
+                                {% comment %} <h4 class="mb-3">Write a Review</h4> {% endcomment %}
+                                <form>
+                                    <div class="mb-3">
+                                        <label for="reviewTitle" class="form-label">Review Title</label>
+                                        <input type="text" class="form-control" id="reviewTitle" placeholder="Enter a title for your review">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="reviewScore" class="form-label">Overall Score</label>
+                                        <select class="form-select" id="reviewScore">
+                                            <option value="5">5 - Excellent</option>
+                                            <option value="4">4 - Very Good</option>
+                                            <option value="3">3 - Good</option>
+                                            <option value="2">2 - Fair</option>
+                                            <option value="1">1 - Poor</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="reviewContent" class="form-label">Your Review</label>
+                                        <textarea class="form-control" id="reviewContent" rows="5"
+                                            placeholder="Write your detailed review here"></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Submit Review</button>
+                                </form>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Citations Tab -->
+                    <div class="tab-pane fade" id="citations" role="tabpanel">
+                        <div class="citation-card">
+                            <h4 class="mb-3">Citation Information</h4>
+                            <div class="citation-content">
+                                <h5>Full Citation:</h5>
+                                <p>Akume, G. (2021). Ayatutu Ontology: The George Akume Leadership Recruitment Model.
+                                    African and General Studies, 40, 14858.</p>
+
+                                <h5 class="mt-3">Citation Formats:</h5>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <h6>APA</h6>
+                                        <pre
+                                            class="bg-light p-2">Akume, G. (2021). Ayatutu Ontology: The George Akume Leadership Recruitment Model. African and General Studies, 40, 14858.</pre>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h6>MLA</h6>
+                                        <pre
+                                            class="bg-light p-2">Akume, George. "Ayatutu Ontology: The George Akume Leadership Recruitment Model." African and General Studies, vol. 40, 2021, pp. 14858.</pre>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h6>Chicago</h6>
+                                        <pre
+                                            class="bg-light p-2">Akume, George. "Ayatutu Ontology: The George Akume Leadership Recruitment Model." African and General Studies 40 (2021): 14858.</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <!-- Existing sidebar content remains the same -->
+                <div class="document-details mb-4">
+                    <h4 class="mb-3">Document Details</h4>
+
+                    <div class="mb-3">
+                        <div class="field-label">BY:</div>
+                        <span class="text-success">ALLOY HUGH</span>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="field-label">FIELD:</div>
+                        <span>AND GENERAL STUDIES</span>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="field-label">TYPE:</div>
+                        <span>PAPER/ESSAY</span>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="field-label">PAGES:</div>
+                        <span>40 PAGES (14858 WORDS)</span>
+                    </div>
+                    <div class="mb-3">
+                        <div class="field-label">CHAPTERS:</div>
+                        <span>1 to 5 CHAPTERS</span>
+                    </div>
+
+                    <button class="btn btn-outline-secondary w-100 mb-2">Save</button>
+                    <button class="btn btn-outline-secondary w-100">Download</button>
+                </div>
+                <div class="related-works">
+                    <h4 class="mb-3">Related Works</h4>
+                    <div class="related-work">
+                        <h6>GIRL CHILD EDUCATION AT THE PRE-TERTIARY LEVEL IN THE BUNKPURUGU/YUNYOO DISTRICT: ISSUES,
+                            CHALLENGES AND THE
+                            WAY FORWARD</h6>
+                    </div>
+                    <div class="related-work">
+                        <h6>THE EFFECTS OF AGRICULTURAL MODERNISATION ON POVERTY REDUCTION: A CASE STUDY OF THE TONO
+                            IRRIGATION SCHEME
+                            IN THE KASSENA-NANKANA DISTRICT OF THE UPPER - EAST REGION OF GHANA</h6>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    {% include 'books/footer.html' %}
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function generateWords() {
+            const words = [
+                "Ayatutu", "Ontology", "Leadership", "Recruitment", "Democratic", "Consolidation", "Governance", "Epistemic", "Purity", "Disencrypted",
+                "Falsehood", "Dividends", "Volatile", "Strengthens", "Institutions", "Complementarity", "Reformatting", "Appraisal", "Anticipated",
+                "Deterioration", "Gains", "Rational", "Emotional", "Supremacist", "Solidarity", "Individuality", "Dependency", "Corruption", "Instilled"
+            ];
+
+            let generatedWords = '';
+            for (let i = 0; i < 50; i++) {
+                const randomIndex = Math.floor(Math.random() * words.length);
+                generatedWords += words[randomIndex] + ' ';
+            }
+
+            document.getElementById('generated-words').textContent = generatedWords.trim();
+        }
+
+        // Generate words on page load
+        generateWords();
+
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Prevent text selection
+            document.body.addEventListener('selectstart', function (e) {
+                e.preventDefault();
+            });
+
+            // Prevent right-click
+            //document.addEventListener('contextmenu', function (e) {
+            //    e.preventDefault();
+            //});
+
+            // Prevent screenshot (keyboard shortcuts)
+            document.addEventListener('keydown', function (e) {
+                // Prevent Print Screen, F12 (dev tools), and screenshot shortcuts
+                if (e.key === 'PrintScreen' ||
+                    (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+                    (e.ctrlKey && e.shiftKey && e.key === 'C') ||
+                    (e.ctrlKey && e.key === 'p')) {
+                    e.preventDefault();
+                }
+            });
+
+            // Download button handler
+            document.getElementById('downloadBtn').addEventListener('click', function () {
+                // Redirect to payment gateway or trigger download purchase
+                alert('Redirecting to purchase document...');
+            });
+        });
+    </script>
+{% endblock %}
