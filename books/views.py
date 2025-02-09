@@ -73,3 +73,16 @@ def login_home(request):
 
 
 
+def verification_already_done(request):
+    """Render the template for already verified users"""
+    return render(request, 'users/verification-already-done.html')
+
+def verification_error(request):
+    """Render the template for verification errors"""
+    return render(request, 'users/verification-error.html')
+
+def verification_success(request):
+    """Render the template for successful verification"""
+    return render(request, 'users/verification-success.html')
+
+

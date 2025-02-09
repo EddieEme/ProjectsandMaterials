@@ -1,8 +1,9 @@
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework import routers
-from users.views import *
+from users.views import UserViewSet, AuthViewSet, EmailVerificationView
 from . import views
+
 
 app_name = 'books'
 
@@ -31,19 +32,28 @@ web_urlpatterns = [
     path('login-subscription/', views.login_subscription, name='login-subscription'),
     path('login-buyorsubscribe/', views.login_buyorsubscribe, name='login-buyorsubscribe'),
     path('login-home/', views.login_home, name='login-home'),
-    path('verify-email/<uidb64>/<token>/', verify_email, name='verify-email'),
+    path('verify-email/<str:uidb64>/<str:token>/', EmailVerificationView.as_view(), name='verify-email'),
+    path('verification-success/', views.verification_success, name='verification-success'),
+    path('verification-error/', views.verification_error, name='verification-error'),
+    path('verification-already-done/', views.verification_already_done, name='verification-already-done'),
 ]
 
+# API authentication URLs
 auth_patterns = [
     path('api/auth/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/auth/resend-verification-email/', AuthViewSet.as_view({'post': 'resend_verification_email'}), name='resend-verification-email'),
+]
+
+# API ViewSet URLs
+api_urlpatterns = [
+    path('api/', include(router.urls)),  # API ViewSets
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),  # Browsable API auth
 ]
 
 # Combine all URL patterns
 urlpatterns = [
     *web_urlpatterns,  # Web pages
-    path('api/', include(router.urls)),  # API ViewSets
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),  # Browsable API auth
-    *auth_patterns,  # JWT login/logout endpoints
-
+    *auth_patterns,    # Authentication endpoints
+    *api_urlpatterns,  # API ViewSets
 ]
