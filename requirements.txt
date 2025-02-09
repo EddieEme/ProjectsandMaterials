@@ -21,3 +21,4 @@ sqlparse==0.5.3
 typing_extensions==4.12.2
 urllib3==2.2.3
 django-extensions==3.2.3
+djangorestframework-simplejwt==5.3.1
