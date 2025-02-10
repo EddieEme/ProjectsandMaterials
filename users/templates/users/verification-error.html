@@ -49,6 +49,6 @@
     <div class="container">
         <h1>❌ Verification Error</h1>
         <p>The verification link is invalid or has expired. Please request a new verification email.</p>
-        <a href="https://yourfrontend.com/resend-verification/" class="button">Resend Verification Email</a>
+        <a href="{% url 'books:resend-verification' %}" class="button">Resend Verification Email</a>
     </div>
 {% endblock %}
