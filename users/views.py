@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from rest_framework.authtoken.models import Token
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -273,6 +273,7 @@ class AuthViewSet(viewsets.GenericViewSet):
     
     
 class EmailVerificationView(APIView):
+    permission_classes = [AllowAny]
     def get(self, request, uidb64, token):
         try:
             # Decode UID (user ID)
@@ -295,7 +296,7 @@ class EmailVerificationView(APIView):
 
         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
             # Redirect to an error page for invalid links
-            return redirect('https://yourfrontend.com/verification-error/')
+            return redirect('books:verification-error')
         
         
 
