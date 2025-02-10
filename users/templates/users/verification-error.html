@@ -19,6 +19,7 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             max-width: 500px;
             width: 100%;
+            margin-top: 15%;
         }
         h1 {
             color: #dc3545;
@@ -48,6 +49,6 @@
     <div class="container">
         <h1>❌ Verification Error</h1>
         <p>The verification link is invalid or has expired. Please request a new verification email.</p>
-        <a href="https://yourfrontend.com/resend-verification/" class="button">Resend Verification Email</a>
+        <a href="{% url 'books:verification-error' %}" class="button">Resend Verification Email</a>
     </div>
 {% endblock %}
