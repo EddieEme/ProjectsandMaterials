@@ -273,6 +273,7 @@ class AuthViewSet(viewsets.GenericViewSet):
     
     
 class EmailVerificationView(APIView):
+    permission_classes = [AllowAny]
     def get(self, request, uidb64, token):
         try:
             # Decode UID (user ID)
