@@ -72,9 +72,19 @@ background-color: #bfc2b7;
     <!-- Custom JS -->
     <script>
         // Handle login form submission
-      document.getElementById('loginForm').addEventListener('submit', async function (e) {
-    e.preventDefault();
+document.addEventListener("DOMContentLoaded", function () {
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            await handleLogin();
+        });
+    } else {
+        console.error("Login form not found!");
+    }
+});
 
+async function handleLogin() {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     const loginUrl = '/api/auth/login/';
@@ -84,23 +94,23 @@ background-color: #bfc2b7;
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': getCSRFToken()  // Ensure CSRF protection
+                'X-CSRFToken': getCSRFToken()  
             },
             body: JSON.stringify({ email, password })
         });
 
         const data = await response.json();
+        console.log("Login Response:", data);
 
-        if (response.ok && data.tokens) {
-            // ✅ Save token immediately
-            localStorage.setItem('token', data.tokens.access);
+        if (response.ok && data.access) {
+            sessionStorage.setItem('token', data.access);
 
             // ✅ Test API request with Authorization header
             const profileResponse = await fetch('/api/users/me/', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${data.tokens.access}`
+                    'Authorization': `Bearer ${data.access}`
                 }
             });
 
@@ -109,10 +119,10 @@ background-color: #bfc2b7;
             if (profileResponse.ok) {
                 console.log("User Profile:", profileData);
                 alert('Login successful! Redirecting to dashboard...');
-                window.location.href = '/login-home/';  // Redirect after successful validation
+                window.location.replace("http://127.0.0.1:8000/login-home/");
             } else {
                 alert("Login failed. Could not fetch profile.");
-                localStorage.removeItem('token');  // Remove token if profile fetch fails
+                sessionStorage.removeItem('token');
             }
         } else {
             alert(data.detail || 'Login failed. Please check your credentials.');
@@ -121,19 +131,17 @@ background-color: #bfc2b7;
         console.error('Login error:', error);
         alert('An error occurred. Please try again.');
     }
-});
+}
 
-
-// Function to retrieve CSRF token from cookies
+// Retrieve CSRF token
 function getCSRFToken() {
     let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
+    if (document.cookie) {
         const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
+        for (let cookie of cookies) {
+            cookie = cookie.trim();
             if (cookie.startsWith('csrftoken=')) {
-                cookieValue = cookie.substring('csrftoken='.length, cookie.length);
-                break;
+                return cookie.substring('csrftoken='.length);
             }
         }
     }
