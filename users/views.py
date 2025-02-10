@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from rest_framework.authtoken.models import Token
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -208,14 +208,15 @@ class AuthViewSet(viewsets.GenericViewSet):
                 )
                 email.content_subtype = 'html'  # Set email content type to HTML
                 email.send()
+                
                 # Send the new verification email
-                send_mail(
-                    'Verify Your Email',
-                    f'Click the link to verify your email: {verification_link}',
-                    settings.DEFAULT_FROM_EMAIL,
-                    [user.email],
-                    fail_silently=False,
-                )
+                # send_mail(
+                #     'Verify Your Email',
+                #     f'Click the link to verify your email: {verification_link}',
+                #     settings.DEFAULT_FROM_EMAIL,
+                #     [user.email],
+                #     fail_silently=False,
+                # )
 
                 return Response({
                     'detail': 'Verification email sent successfully. Please check your email.'
@@ -229,47 +230,58 @@ class AuthViewSet(viewsets.GenericViewSet):
             
         @action(detail=False, methods=['post'])
         def login(self, request):
-                serializer = self.get_serializer(data=request.data)
-                serializer.is_valid(raise_exception=True)
-                data = serializer.validated_data
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            data = serializer.validated_data
 
-                user = authenticate(email=data['email'], password=data['password'])
+            user = authenticate(email=data['email'], password=data['password'])
 
-                if not user:
-                    return Response(
-                        {'detail': 'Invalid email or password'}, 
-                        status=status.HTTP_401_UNAUTHORIZED
-                    )
+            if not user:
+                logger.warning(f"Failed login attempt for email: {data['email']}")
+                return Response(
+                    {'detail': 'Invalid email or password'}, 
+                    status=status.HTTP_401_UNAUTHORIZED
+                )
 
-                if not user.is_active:
-                    return Response(
-                        {'detail': 'Account is disabled'}, 
-                        status=status.HTTP_403_FORBIDDEN
-                    )
+            if not user.is_active:
+                return Response(
+                    {'detail': 'Account is disabled'}, 
+                    status=status.HTTP_403_FORBIDDEN
+                )
 
-                # Generate JWT Tokens
-                refresh = RefreshToken.for_user(user)
+            # Generate JWT Tokens
+            refresh = RefreshToken.for_user(user)
 
-                return Response({
-                    'tokens': {
-                        'refresh': str(refresh),
-                        'access': str(refresh.access_token),
-                    },
-                    'user': {
-                        'id': user.id,
-                        'email': user.email,
-                        'first_name': user.first_name,
-                        'last_name': user.last_name,
-                        'profile': {
-                            'id': user.profile.id,
-                            'bio': user.profile.bio,
-                            'profession': user.profile.profession,
-                            'phone_number': user.profile.phone_number,
-                            'can_publish': user.profile.can_publish,
-                            'created_at': user.profile.created_at
-                        }
+            # Build response data
+            response_data = {
+                'tokens': {
+                    'refresh': str(refresh),
+                    'access': str(refresh.access_token),
+                },
+                'user': {
+                    'id': user.id,
+                    'email': user.email,
+                    'first_name': user.first_name,
+                    'last_name': user.last_name,
+                }
+            }
+
+            # Safely add profile data if it exists
+            try:
+                if hasattr(user, 'profile'):
+                    response_data['user']['profile'] = {
+                        'id': user.profile.id,
+                        'bio': user.profile.bio,
+                        'profession': user.profile.profession,
+                        'phone_number': user.profile.phone_number,
+                        'can_publish': user.profile.can_publish,
+                        'created_at': user.profile.created_at
                     }
-                }, status=status.HTTP_200_OK)
+            except Exception as e:
+                # Profile access failed, but we still want to log the user in
+                pass
+
+            return Response(response_data, status=status.HTTP_200_OK)
     
     
 class EmailVerificationView(APIView):
@@ -296,7 +308,7 @@ class EmailVerificationView(APIView):
 
         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
             # Redirect to an error page for invalid links
-            return redirect('https://yourfrontend.com/verification-error/')
+            return redirect('books:verification-error')
         
         
 

@@ -19,6 +19,7 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             max-width: 500px;
             width: 100%;
+            margin-top: 15%;
         }
         h1 {
             color: #28a745;
@@ -48,6 +49,6 @@
     <div class="container">
         <h1>🎉 Email Verified Successfully!</h1>
         <p>Your email has been verified. You can now log in to your account.</p>
-        <a href="https://yourfrontend.com/login/" class="button">Go to Login</a>
+        <a href="{% url 'books:user_login' %}" class="button">Go to Login</a>
     </div>
 {% endblock %}
