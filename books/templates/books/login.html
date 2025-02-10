@@ -1,4 +1,6 @@
 {% extends 'books/base.html' %}
+{% block link %}
+{% endblock %}
 {% block style %}   
 <style>
    .body {
@@ -119,7 +121,7 @@ async function handleLogin() {
             if (profileResponse.ok) {
                 console.log("User Profile:", profileData);
                 alert('Login successful! Redirecting to dashboard...');
-                window.location.replace("http://127.0.0.1:8000/login-home/");
+                window.location.replace("/login-home/");
             } else {
                 alert("Login failed. Could not fetch profile.");
                 sessionStorage.removeItem('token');
@@ -147,7 +149,6 @@ function getCSRFToken() {
     }
     return cookieValue;
 }
-
         // Placeholder functions for social login
         function loginWithGoogle() {
             alert('Redirecting to Google login...');
