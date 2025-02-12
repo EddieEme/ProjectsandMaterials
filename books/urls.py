@@ -18,6 +18,7 @@ web_urlpatterns = [
     path('projects/', views.projects, name='projects'),
     path('project-list/', views.projectList, name='project-list'),
     path('user_login/', views.user_login, name='user_login'),
+    path('logout/', views.user_logout, name='user_logout'),
     path('register/', views.register, name='register'),
     path('product-details/<int:id>/', views.product_details, name='product-details'),
     path('departments/', views.department, name='departments'),
