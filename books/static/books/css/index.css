@@ -70,17 +70,7 @@
       letter-spacing: var(--letter-spacing-wide);
   }
 
-.container, 
-.showcase-container,
-.services-grid,
-.about-section,
-.testimonials-container {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 15px;
-    box-sizing: border-box;
-}
+
 
   /* Navigation */
 .navbar {

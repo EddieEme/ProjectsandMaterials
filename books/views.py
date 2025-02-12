@@ -50,7 +50,7 @@ def user_login(request):
     return render(request, 'books/login.html')
 
 
-def user_logout(reguest):
+def user_logout(request):
     logout(request)
     return redirect('/')
 

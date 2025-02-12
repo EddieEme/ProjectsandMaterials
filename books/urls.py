@@ -3,6 +3,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework import routers
 from users.views import UserViewSet, AuthViewSet, EmailVerificationView
 from . import views
+from  books.api_views import MostViewedVideos
 
 
 app_name = 'books'
@@ -44,7 +45,9 @@ auth_patterns = [
     path('api/auth/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/auth/resend-verification-email/', AuthViewSet.as_view({'post': 'resend_verification_email'}), name='resend-verification-email'),
+    path('api/most-viewed-videos/<str:channel_id>/', MostViewedVideos.as_view(), name='most-viewed-videos'),
 ]
+
 
 # API ViewSet URLs
 api_urlpatterns = [
