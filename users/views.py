@@ -85,10 +85,11 @@ class UserViewSet(viewsets.ModelViewSet):
             status=status.HTTP_400_BAD_REQUEST
         )
 
+
 class AuthViewSet(viewsets.GenericViewSet):
-    permission_classes = [AllowAny]
-    serializer_class = LoginSerializer
-    
+    permission_classes = [AllowAny]  # Allow any user to access these endpoints
+    serializer_class = LoginSerializer  # Default serializer
+
     def get_serializer_class(self):
         """Return appropriate serializer for each action."""
         if self.action == 'register':
@@ -99,33 +100,36 @@ class AuthViewSet(viewsets.GenericViewSet):
 
     @action(detail=False, methods=['post'])
     def register(self, request):
+        """Register a new user."""
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
 
+        # Check if email already exists
         if User.objects.filter(email=data['email']).exists():
             return Response({'detail': 'Email already exists'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            # Create the user
-            user = User.objects.create_user(**data, is_active=False)  # Mark inactive until email verified
+            # Create the user (inactive until email is verified)
+            user = User.objects.create_user(**data, is_active=False)
 
             # Generate email verification token
-            uid = urlsafe_base64_encode(force_bytes(user.id))  # Use user ID
+            uid = urlsafe_base64_encode(force_bytes(user.id))
             token = default_token_generator.make_token(user)
 
+            # Build verification link
             verification_link = request.build_absolute_uri(
                 reverse('books:verify-email', kwargs={'uidb64': uid, 'token': token})
             )
-            
+
             # Render the email template
             email_subject = 'Verify Your Email Address'
             email_body = render_to_string('users/email_verification.html', {
                 'user': user,
                 'verification_link': verification_link,
             })
-            
-            
+
+            # Send the email
             email = EmailMessage(
                 email_subject,
                 email_body,
@@ -135,39 +139,128 @@ class AuthViewSet(viewsets.GenericViewSet):
             email.content_subtype = 'html'  # Set email content type to HTML
             email.send()
 
-            # Send verification email
-            send_mail(
-                'Verify Your Email',
-                f'Click the link to verify your email: {verification_link}',
-                settings.DEFAULT_FROM_EMAIL,
-                [data['email']],
-                fail_silently=False,
-            )
-
-            # Generate JWT tokens
+            # Generate JWT tokens (for immediate login after registration)
             refresh = RefreshToken.for_user(user)
 
-            return Response({
+            # Set tokens as HTTP-only cookies
+            response = Response({
                 'detail': 'User registered successfully. Please check your email for verification.',
-                'tokens': {
-                    'refresh': str(refresh),
-                    'access': str(refresh.access_token),
-                },
                 'user': {
                     'id': user.id,
                     'email': user.email,
                     'first_name': user.first_name,
-                    'last_name': user.last_name
+                    'last_name': user.last_name,
                 }
             }, status=status.HTTP_201_CREATED)
+
+            # Set access and refresh tokens as HTTP-only cookies
+            response.set_cookie(
+                key='access_token',
+                value=str(refresh.access_token),
+                httponly=True,
+                secure=True,  # Only send over HTTPS
+                samesite='Lax', # Prevent CSRF
+                max_age=timedelta(minutes=15).total_seconds(),  # Short-lived access token
+            )
+            response.set_cookie(
+                key='refresh_token',
+                value=str(refresh),
+                httponly=True,
+                secure=True,
+                samesite='Lax',
+                max_age=timedelta(days=7).total_seconds(),  # Longer-lived refresh token
+            )
+
+            return response
 
         except Exception as e:
             logger.error(f'Registration failed: {str(e)}')
             return Response({'detail': 'Registration failed. Please try again.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @action(detail=False, methods=['post'])
+    def login(self, request):
+        """Authenticate a user and return JWT tokens."""
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+
+        # Authenticate the user
+        user = authenticate(email=data['email'], password=data['password'])
+
+        if not user:
+            logger.warning(f"Failed login attempt for email: {data['email']}")
+            return Response({'detail': 'Invalid email or password'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        if not user.is_active:
+            return Response({'detail': 'Account is disabled'}, status=status.HTTP_403_FORBIDDEN)
+
+        # Generate JWT tokens
+        refresh = RefreshToken.for_user(user)
+
+        # Set tokens as HTTP-only cookies
+        response = Response({
+            'detail': 'Login successful',
+            'user': {
+                'id': user.id,
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+            }
+        }, status=status.HTTP_200_OK)
+
+        response.set_cookie(
+            key='access_token',
+            value=str(refresh.access_token),
+            httponly=True,
+            secure=True,
+            samesite='Lax',
+            max_age=timedelta(minutes=15).total_seconds(),  # Short-lived access token
+        )
+        response.set_cookie(
+            key='refresh_token',
+            value=str(refresh),
+            httponly=True,
+            secure=True,
+            samesite='Lax',
+            max_age=timedelta(days=7).total_seconds(),  # Longer-lived refresh token
+        )
+
+        return response
+
+    @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
+    def logout(self, request):
+        """Log out the user by clearing cookies."""
+        response = Response({'detail': 'Logout successful'}, status=status.HTTP_200_OK)
+        response.delete_cookie('access_token')
+        response.delete_cookie('refresh_token')
+        return response
+
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def me(self, request):
+        """Fetch the authenticated user's data."""
+        user = request.user
+        return Response({
+            'id': user.id,
+            'email': user.email,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+        })
+    
+    @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
+    def logout(self, request):
+        """
+        Log out the user by clearing JWT cookies.
+        """
+        response = Response({'detail': 'Logout successful'}, status=status.HTTP_200_OK)
         
+        # Clear access_token and refresh_token cookies
+        response.delete_cookie('access_token')
+        response.delete_cookie('refresh_token')
         
-        @action(detail=False, methods=['post'])
-        def resend_verification_email(self, request):
+        return response
+        
+    @action(detail=False, methods=['post'])
+    def resend_verification_email(self, request):
             email = request.data.get('email')
 
             if not email:
@@ -206,17 +299,9 @@ class AuthViewSet(viewsets.GenericViewSet):
                     settings.DEFAULT_FROM_EMAIL,
                     [user.email],
                 )
-                email.content_subtype = 'html'  # Set email content type to HTML
+                email.content_subtype = 'html'
                 email.send()
                 
-                # Send the new verification email
-                # send_mail(
-                #     'Verify Your Email',
-                #     f'Click the link to verify your email: {verification_link}',
-                #     settings.DEFAULT_FROM_EMAIL,
-                #     [user.email],
-                #     fail_silently=False,
-                # )
 
                 return Response({
                     'detail': 'Verification email sent successfully. Please check your email.'
@@ -224,64 +309,7 @@ class AuthViewSet(viewsets.GenericViewSet):
 
             except Exception as e:
                 logger.error(f'Failed to resend verification email: {str(e)}')
-                return Response({'detail': 'Failed to resend verification email. Please try again.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-            
-            
-        @action(detail=False, methods=['post'])
-        def login(self, request):
-            serializer = self.get_serializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            data = serializer.validated_data
-
-            user = authenticate(email=data['email'], password=data['password'])
-
-            if not user:
-                logger.warning(f"Failed login attempt for email: {data['email']}")
-                return Response(
-                    {'detail': 'Invalid email or password'}, 
-                    status=status.HTTP_401_UNAUTHORIZED
-                )
-
-            if not user.is_active:
-                return Response(
-                    {'detail': 'Account is disabled'}, 
-                    status=status.HTTP_403_FORBIDDEN
-                )
-
-            # Generate JWT Tokens
-            refresh = RefreshToken.for_user(user)
-
-            # Build response data
-            response_data = {
-                'tokens': {
-                    'refresh': str(refresh),
-                    'access': str(refresh.access_token),
-                },
-                'user': {
-                    'id': user.id,
-                    'email': user.email,
-                    'first_name': user.first_name,
-                    'last_name': user.last_name,
-                }
-            }
-
-            # Safely add profile data if it exists
-            try:
-                if hasattr(user, 'profile'):
-                    response_data['user']['profile'] = {
-                        'id': user.profile.id,
-                        'bio': user.profile.bio,
-                        'profession': user.profile.profession,
-                        'phone_number': user.profile.phone_number,
-                        'can_publish': user.profile.can_publish,
-                        'created_at': user.profile.created_at
-                    }
-            except Exception as e:
-                # Profile access failed, but we still want to log the user in
-                pass
-
-            return Response(response_data, status=status.HTTP_200_OK)
+                return Response({'detail': 'Failed to resend verification email. Please try again.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR) 
     
     
 class EmailVerificationView(APIView):

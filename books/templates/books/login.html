@@ -1,9 +1,10 @@
 {% extends 'books/base.html' %}
+{% load static %} 
 {% block link %}
-<script defer src="{% static 'books/js/login.js' %}"></script>
+<script src="{% static 'books/js/login.js' %}"  defer ></script>
 {% endblock %}
 {% block style %}  
-{% load static %} 
+
 <style>
    .body {
     background-color: #bfc2b7;
@@ -26,7 +27,28 @@
             width: 100%;
             margin-bottom: 10px;
         }
-    </style>
+
+        .flash-messages {
+    list-style: none;
+    padding: 0;
+}
+
+.flash-messages li {
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+}
+
+.flash-messages li.success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.flash-messages li.error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+</style>
 {% endblock %}
 {% block content %}
 <div class="body" style="
@@ -39,15 +61,23 @@ background-color: #bfc2b7;
     <!-- Login Container -->
     <div class="login-container">
         <h2 class="text-center mb-4">Login</h2>
+        {% if messages %}
+        <ul class="flash-messages">
+            {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
         <!-- Login Form -->
-        <form id="loginForm">
+        <form id="loginForm" method='post'>
+            {% csrf_token %}
             <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" required>
+                <label for="email" class="form-label" >Email</label>
+                <input type="email" name="email" class="form-control" id="email" required>
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" required>
+                <input type="password" name="password" class="form-control" id="password" required>
             </div>
             <button type="submit" class="btn btn-primary w-100">Login</button>
         </form>
@@ -55,17 +85,14 @@ background-color: #bfc2b7;
         <div class="social-login mt-4">
             <p class="text-center mb-3">Or login with:</p>
             <div class="social-btn">
-                <button class="btn btn-danger w-100" onclick="loginWithGoogle()">
+                <button class="btn btn-danger w-100"  id="googleLoginButton">
                     <i class="fab fa-google"></i> Google
-                </button>
-                <button class="btn btn-primary w-100 mt-2" onclick="loginWithFacebook()">
-                    <i class="fab fa-facebook"></i> Facebook
                 </button>
             </div>
         </div>
         <!-- Link to Registration Page -->
         <p class="text-center mt-4">
-            Don't have an account? <a href="register.html">Register here</a>
+            Don't have an account? <a href="{% url 'books:register' %}">Register here</a>
         </p>
     </div>
 </div>
@@ -76,4 +103,13 @@ background-color: #bfc2b7;
     <!-- Login JS -->
     {% comment %} <script src="{% static 'books/js/login.js' %}"></script> {% endcomment %}
     <!-- Custom JS -->
+    <script>
+        setTimeout(() => {
+        const flashMessages = document.querySelector('.flash-messages');
+        if (flashMessages) {
+            flashMessages.style.display = 'none';
+        }
+    }, 2000);
+    
+</script>
 {% endblock %}

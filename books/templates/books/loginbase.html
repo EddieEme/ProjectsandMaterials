@@ -27,74 +27,66 @@
 
   <body>
     <!-- Navigation -->
+     <!-- Include CSRF token -->
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}"> 
 
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-      <div class="container-fluid">
-        <a href="#" class="logo">
-          <img src="{% static '/books/images/logo.png' %}" alt="" />
-          <!-- <i class="fas fa-book-reader"></i> -->
-          <span></span>
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
-        <div class="container-fluid collapse navbar-collapse" id="navbarNavAltMarkup">
-          <div class="navbar-nav">
-            <a href="index.html">Home</a>
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Categories</a>
-              <ul class="dropdown-menu dropdown-menu-white">
-                <li>
-                  <a class="dropdown-item" href="project.html">Projects</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="#">Services</a>
-                </li>
-              </ul>
-            </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Resources</a>
-              <ul class="dropdown-menu dropdown-menu-white">
-                <li>
-                  <a class="dropdown-item" href="#">Tutorial Videos</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="#">Data analyis Tools</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="#">Plagarisim checker Tools</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="#">Blog</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="#">How it works</a>
-                </li>
-              </ul>
-            </li>
-            <a href="index.html">Subscription</a>
 
-            <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{user.first_name}}</a>
-              <ul class="dropdown-menu dropdown-menu-end">
-                <li>
-                  <a class="dropdown-item" href="view-profile.html">View Profile</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="edit-profile.html">Edit Profile</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="settings.html">Settings</a>
-                </li>
-                <li>
-                  <hr class="dropdown-divider" />
-                </li>
-                <li>
-                  <a class="dropdown-item" href="#">Logout</a>
-                </li>
-              </ul>
-            </li>
-          </div>
+<!-- Navigation -->
+     <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <img src="/path-to-your-logo.png" alt="Logo">
+                <span class="brand-title">Your Brand</span>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item nav-link">
+                        <a href="{% url 'books:home' %}">Home</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            Categories
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'books:projects' %}">Projects</a></li>
+                            <li><a class="dropdown-item" href="#">Services</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            Resources
+                        </a>
+                        <ul class="dropdown-menu">
+                             <li><a class="dropdown-item" href="#">Tutorial Videos</a></li>
+                            <li><a class="dropdown-item" href="#">Data analyis Tools</a></li>
+                            <li><a class="dropdown-item" href="#">Plagarisim checker Tools</a></li>
+                            <li><a class="dropdown-item" href="#">Blog</a></li>
+                            <li><a class="dropdown-item" href="#">How it works</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Subscription</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            Resources
+                        </a>
+                        <ul class="dropdown-menu">
+                             <li><a class="dropdown-item" href="#">View Profile</a></li>
+                            <li><a class="dropdown-item" href="#">Edit Profile</a></li>
+                            <li><a class="dropdown-item" href="#">Settings</a></li>
+                            <hr class="dropdown-divider" />
+                            <li><a class="dropdown-item" href="{% url 'books:user_logout' %}" id="logoutLink" >Logout</a></li>
+                        </ul>
+                      </li>
+                </ul>
+            </div>
         </div>
-      </div>
     </nav>
     {% block content %}
 
@@ -105,5 +97,6 @@
     <script src="{% static 'books/js/pagination.js' %}"></script>
     {% comment %} <script src="books/js/pagination.js"></script> {% endcomment %}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    {% comment %} <script src="{% static 'books/js/logout.js' %}"></script> {% endcomment %}
   </body>
 </html>
