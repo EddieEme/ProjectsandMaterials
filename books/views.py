@@ -59,7 +59,7 @@ def register(request):
     if request.method == "POST":
         email = request.POST.get("email")
         password = request.POST.get("password")
-        confirm_password = request.POST.get("cinfirm_password")
+        confirm_password = request.POST.get("confirm_password")
         first_name = request.POST.get("first_name")
         last_name = request.POST.get("last_name")
 
