@@ -173,7 +173,7 @@
     background: linear-gradient(
         rgba(0, 0, 0, 0.5),
         rgba(0, 0, 0, 0.5)
-    ), url('/static/books/images/heropage.jpeg');
+    ), url("/static/books/images/heropage.78f7d5ceb343.jpeg");
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
