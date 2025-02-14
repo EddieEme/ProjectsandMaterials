@@ -1,0 +1,110 @@
+{% load static %}
+<script src="{% static 'books/js/login.js' %}"  defer ></script>
+<style>
+   .body {
+    background-color: #bfc2b7;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+        .login-container {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .social-btn .btn {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .flash-messages {
+    list-style: none;
+    padding: 0;
+}
+
+.flash-messages li {
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+}
+
+.flash-messages li.success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.flash-messages li.error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+</style>
+
+
+
+<div class="body" style="
+background-color: #bfc2b7;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+">
+    <!-- Login Container -->
+    <div class="login-container">
+        <h2 class="text-center mb-4">Login</h2>
+        {% if messages %}
+        <ul class="flash-messages">
+            {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        <!-- Login Form -->
+        <form id="loginForm" method='post' >
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="email" class="form-label" >Email</label>
+                <input type="email" name="email" class="form-control" id="email" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" name="password" class="form-control" id="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+        </form>
+        <!-- Social Login Section -->
+        <div class="social-login mt-4">
+            <p class="text-center mb-3">Or login with:</p>
+            <div class="social-btn">
+                <button class="btn btn-danger w-100"  id="googleLoginButton">
+                    <i class="fab fa-google"></i> Google
+                </button>
+            </div>
+        </div>
+        <!-- Link to Registration Page -->
+        <p class="text-center mt-4">
+            Don't have an account? <a href="{% url 'books:register' %}">Register here</a>
+        </p>
+    </div>
+</div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Login JS -->
+    {% comment %} <script src="{% static 'books/js/login.js' %}"></script> {% endcomment %}
+    <!-- Custom JS -->
+    <script>
+        setTimeout(() => {
+        const flashMessages = document.querySelector('.flash-messages');
+        if (flashMessages) {
+            flashMessages.style.display = 'none';
+        }
+    }, 2000);
+    
+</script>

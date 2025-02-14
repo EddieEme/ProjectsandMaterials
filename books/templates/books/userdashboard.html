@@ -1,12 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Dashboard</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+{% extends 'books/loginbase.html' %}
+{% block style %}
     <style>
         .stats-card {
             transition: transform 0.2s;
@@ -20,38 +13,11 @@
             border-bottom: 3px solid #0d6efd;
         }
     </style>
-</head>
-
-<body class="bg-light">
+{% endblock %}
+{% block content %}
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="#">Marketplace</a>
-            <div class="d-flex align-items-center">
-                <div class="dropdown">
-                    <button
-                        class="btn btn-link text-dark text-decoration-none dropdown-toggle d-flex align-items-center"
-                        type="button" data-bs-toggle="dropdown">
-                        <img src="/api/placeholder/40/40" class="rounded-circle me-2" width="40" height="40"
-                            alt="Profile">
-                        <span>John Doe</span>
-                    </button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="view-profile.html">View Profile</a></li>
-                    <li><a class="dropdown-item" href="edit-profile.html">Edit Profile</a></li>
-                    <li><a class="dropdown-item" href="settings.html">Settings</a></li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    <li><a class="dropdown-item" href="#">Logout</a></li>
-                </ul>
-                </div>
-            </div>
-        </div>
-    </nav>
-
     <!-- Main Content -->
-    <div class="container py-4">
+    <div class="container py-4" style="margin-top:6.5rem !important;">
         <!-- Stats Cards -->
         <div class="row mb-4 g-3">
             <div class="col-md-3">
@@ -308,6 +274,4 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
-</body>
-
-</html>
+{% endblock %}

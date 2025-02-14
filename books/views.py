@@ -41,7 +41,7 @@ def user_login(request):
             return redirect('books:login-home')
         else:
             messages.error(request, "Invalid login credentials.")
-            return render(request, 'books/login.html')
+            return redirect('books:user_login')
 
     return render(request, 'books/login.html')
 
@@ -176,17 +176,29 @@ def login_home(request):
     return render(request, "books/login-index.html", context)
 
 
-
-def verification_already_done(request):
-    """Render the template for already verified users"""
-    return render(request, 'users/verification-already-done.html')
-
 def verification_error(request):
     """Render the template for verification errors"""
     return render(request, 'users/verification-error.html')
 
-def verification_success(request):
-    """Render the template for successful verification"""
-    return render(request, 'users/verification-success.html')
+@login_required(login_url='books:user_login')
+def login_product_details(request, id):
+    return render(request, 'books/login_product-details.html', {'id': id})
 
 
+@login_required(login_url='books:user_login')
+def user_settings(request):
+    return render(request, 'books/settings.html')
+
+
+@login_required(login_url='books:user_login')
+def user_dashboard(request):
+    return render(request, 'books/userdashboard.html')
+
+
+@login_required(login_url='books:user_login')
+def view_profile(request):
+    return render(request, 'books/view-profile.html')
+
+@login_required(login_url='books:user_login')
+def edit_profile(request):
+    return render(request, 'books/edit-profile.html')
