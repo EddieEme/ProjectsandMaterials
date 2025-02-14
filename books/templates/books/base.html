@@ -68,7 +68,7 @@
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Pricing</a>
+                        <a class="nav-link" href="{% url 'books:subscription' %}">Subscription</a>
                     </li>
                     <li class="nav-item">
                          <a class="nav-link" href="{% url 'books:user_login' %}">Login</a>
@@ -88,6 +88,7 @@
 
     <!-- AOS Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script src="{% static 'books/js/youtube.js' %}" defer></script>
     <script>
         // Initialize AOS
         AOS.init({
@@ -156,8 +157,6 @@
                 alert('Thank you for subscribing!');
             });
     </script>
-    {% comment %} <script src="new.js"></script> {% endcomment %}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
 </body>
 
 </html>

@@ -1,55 +1,77 @@
 {% extends 'books/base.html' %}
 {% block style %}  
     <style>
-         .container-body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+        .navbar {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
-        .error-container {
-            text-align: center;
-            background-color: #ffffff;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            max-width: 500px;
-            width: 100%;
-            margin-top: 15%;
+        .logo {
+            height: 30px;
         }
-        h1 {
-            color: #dc3545;
-            font-size: 24px;
-            margin-bottom: 20px;
+
+        .nav-links {
+            gap: 2rem;
         }
-        p {
-            color: #333333;
-            font-size: 16px;
-            margin-bottom: 20px;
-        }
-        .button {
-            display: inline-block;
-            padding: 10px 20px;
-            font-size: 16px;
-            color: #ffffff;
-            background-color: #007bff;
-            border-radius: 5px;
+
+        .nav-links a {
+            color: #333;
             text-decoration: none;
+            font-size: 0.9rem;
         }
-        .button:hover {
-            background-color: #0056b3;
+
+        .nav-links a:hover {
+            color: #007bff;
+        }
+
+        .toast {
+            min-width: 320px;
+        }
+
+        .toast-container {
+            margin-top: 4rem;
         }
     </style>
 {% endblock %}
 {% block content %}
-<div class="container-body">
-    <div class="error-container">
-        <h1>❌ Verification Error</h1>
-        <p>The verification link is invalid or has expired. Please request a new verification email.</p>
-        <a href="{% url 'books:verification-error' %}" class="button">Resend Verification Email</a>
+
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <strong class="me-auto text-danger">
+                    <i class="bi bi-x-circle me-2"></i>
+                    Verification Error
+                </strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                <p class="mb-3">The verification link is invalid or has expired. Please request a new verification email.</p>
+                <button class="btn btn-primary btn-sm" onclick="resendEmail()">Resend Verification Email</button>
+            </div>
+        </div>
     </div>
-</div>
+    {% include 'books/user-login.html'%}
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Initialize all toasts
+        document.addEventListener('DOMContentLoaded', function() {
+            var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+            var toastList = toastElList.map(function(toastEl) {
+                return new bootstrap.Toast(toastEl, {
+                    autohide: false
+                });
+            });
+            // Show the toast
+            toastList.forEach(toast => toast.show());
+        });
+
+        function resendEmail() {
+            // Add your email resend logic here
+            alert('Verification email resent. Please check your inbox.');
+            // Optionally hide the toast after resending
+            // bootstrap.Toast.getInstance(document.querySelector('.toast')).hide();
+        }
+    </script>
 {% endblock %}

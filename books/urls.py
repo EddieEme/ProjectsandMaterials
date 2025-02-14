@@ -35,9 +35,11 @@ web_urlpatterns = [
     path('login-buyorsubscribe/', views.login_buyorsubscribe, name='login-buyorsubscribe'),
     path('login-home/', views.login_home, name='login-home'),
     path('verify-email/<str:uidb64>/<str:token>/', EmailVerificationView.as_view(), name='verify-email'),
-    path('verification-success/', views.verification_success, name='verification-success'),
     path('verification-error/', views.verification_error, name='verification-error'),
-    path('verification-already-done/', views.verification_already_done, name='verification-already-done'),
+    path('user-settings/', views.user_settings, name='user-settings'),
+    path('user-dashboard/', views.user_dashboard, name='user-dashboard'),
+    path('view-profile/', views.view_profile, name='view-profile'),
+    path('edit-profile/', views.edit_profile, name='edit-profile'),
 ]
 
 # API authentication URLs

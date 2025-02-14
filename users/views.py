@@ -24,6 +24,7 @@ from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
+from django.contrib import messages
 
 from .serializers import *
 
@@ -326,12 +327,15 @@ class EmailVerificationView(APIView):
                     user.is_active = True
                     user.save()
                     # Redirect to a success page
-                    return redirect('books:verification-success')
+                    messages.success(request, "✅ Email Already Verified")
+                    return redirect('books:user_login')
                 else:
                     # Redirect to a page indicating the email is already verified
-                    return redirect('books:verification-already-done')
+                    messages.success(request, "Email Verified Successfully!")
+                    return redirect('books:user_login')
             else:
                 # Redirect to an error page for invalid tokens
+                messages.error(request, "The verification link is invalid or has expired. Please request a new verification email.")
                 return redirect('books:verification-error')
 
         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
