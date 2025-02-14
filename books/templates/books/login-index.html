@@ -1,6 +1,9 @@
 {% extends "books/loginbase.html" %}
-{% block content %}
 {% load static %}
+{% block link %}
+{% endblock %}
+{% block content %}
+
 
     <!-- Hero Section -->
     <section class="hero">
@@ -22,12 +25,10 @@
     <section class="showcase-section">
         <div class="showcase-container">
             <div class="showcase-text" data-aos="fade-right">
-                <h2>LEARN <span>HOW TO WORK</span> FROM HOME OR ANY WHERE ELSE IN WORLD</h2>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam tristique erat accumsan eros mattis aliquam.
-                    Praesent non accumsan mauris, non maximus libero. Vestibulu scelerisque enim turpis. Duis justo ante,
-                    aliquam ac tempus et, porta vitae leo. Moi sed diam pharetra eros maximus porttitor et in tellus.</p>
-                <p>Ut porta massa in risus maximus, eget sodales massa malesuada. Fusce et neque aliquet, mollis tellus ut,
-                    rutrum nunc.</p>
+                <h2>LEARN <span>HOW TO ACCESS</span> AND PUBLISH ACADEMIC RESEARCH FROM ANYWHERE IN THE WORLD</h2>
+                <p>Discover a vast collection of academic projects and research papers from renowned authors and 
+                    researchers. Our website provides a platform for users to access, download, 
+                    and publish academic research, facilitating collaboration and knowledge sharing among scholars worldwide.</p>
                 <a href="#" class="get-started-btn">
                     Get Started Now
                     <i class="fas fa-arrow-right"></i>
@@ -38,10 +39,10 @@
             </div>
         </div>
     </section>
-    <section class="services-section">
+     <section class="services-section">
         <div class="services-header" data-aos="fade-up">
             <h2>OUR FEATURED SERVICES</h2>
-            <p>Large online bookstores offer used books for sale, too. Individuals wishing to sell their used Books</p>
+            <p>Large online platforms for project materials also allow individuals to sell their used materials alongside new ones.</p>
         </div>
         <div class="services-grid">
             <div class="service-card" data-aos="fade-up" data-aos-delay="100">
@@ -49,7 +50,7 @@
                     <i class="fas fa-pencil-alt"></i>
                 </div>
                 <h3 class="service-title">1. Hire a writer</h3>
-                <p class="service-text">Quisque ultricies luctus amnisl non dapib us ulla efficitur loo non libe blandit, non rhons luctus</p>
+                <p class="service-text">Get professional writers to assist with essays, research papers, or projects tailored to your needs.</p>
             </div>
     
             <div class="service-card" data-aos="fade-up" data-aos-delay="200">
@@ -57,8 +58,7 @@
                     <i class="fas fa-lightbulb"></i>
                 </div>
                 <h3 class="service-title">2. Data analysis</h3>
-                <p class="service-text">Quisque ultricies luctus amnisl non dapib us ulla efficitur loo non libe blandit,
-                    non rhons luctus</p>
+                <p class="service-text">Expert help with data collection, analysis, and visualization to enhance the quality of your research.</p>
             </div>
     
             <div class="service-card" data-aos="fade-up" data-aos-delay="300">
@@ -66,8 +66,7 @@
                     <i class="fas fa-users"></i>
                 </div>
                 <h3 class="service-title">3. Tutorials</h3>
-                <p class="service-text">Quisque ultricies luctus amnisl non dapib us ulla efficitur loo non libe blandit,
-                    non rhons luctus</p>
+                <p class="service-text">Access step-by-step guides and learning materials to master project writing and academic research techniques.</p>
             </div>
     
             <div class="service-card" data-aos="fade-up" data-aos-delay="400">
@@ -75,8 +74,7 @@
                     <i class="fas fa-heart"></i>
                 </div>
                 <h3 class="service-title">4. Thesis/dissertations</h3>
-                <p class="service-text">Quisque ultricies luctus amnisl non dapib us ulla efficitur loo non libe blandit,
-                    non rhons luctus</p>
+                <p class="service-text">Comprehensive assistance with writing, editing, and formatting your thesis or dissertation for academic excellence.</p>
             </div>
     
             <div class="service-card" data-aos="fade-up" data-aos-delay="500">
@@ -84,8 +82,7 @@
                     <i class="fas fa-download"></i>
                 </div>
                 <h3 class="service-title">5. Download projects</h3>
-                <p class="service-text">Quisque ultricies luctus amnisl non dapib us ulla efficitur loo non libe blandit,
-                    non rhons luctus</p>
+                <p class="service-text">Explore and download ready-made academic projects to inspire or guide your research and writing efforts.</p>
             </div>
     
             <div class="service-card" data-aos="fade-up" data-aos-delay="600">
@@ -93,8 +90,7 @@
                     <i class="fas fa-briefcase"></i>
                 </div>
                 <h3 class="service-title">6. Publish Project</h3>
-                <p class="service-text">Quisque ultricies luctus amnisl non dapib us ulla efficitur loo non libe blandit,
-                    non rhons luctus</p>
+                <p class="service-text">Showcase your completed academic projects to a wider audience or for peer review and feedback.</p>
             </div>
         </div>
     </section>
@@ -241,19 +237,25 @@
             </div>
     
             <div class="about-text" data-aos="fade-left">
-                <p class="about-quote">Do you want to be even more successful? Learn to love learn and growth. The more
-                    efort you put into improving your skills, the bigger the payoff you will get.</p>
+                <p class="about-quote" style="text-align:justify;">Final-year student struggling 
+                    with your project or research paper? Our website offers 
+                    expert guidance and support to help you complete your work and meet the 
+                    highest academic standards with ease!</p>
     
-                <div class="about-description">
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent accusa sit amet risus sed auctor.
-                        Ut non imperdiet quam. Nullam sed lacus ut mior nare consectetur id sed urna. Praesent vestibulum
-                        eget ant nec seper ull corper sodales tortor vel mattis.</p>
-                    <p>Nam ut egestas nibh. Phasellus sollicitudin tempus neque quis gravida. Aenean a eros at ex pharetra
-                        suscipit. Proin iaculis ipsum ac ullamcorper pre tium. Morbi ut leo eu felis commodo porta.</p>
-                </div>
-    
-                <div class="author-signature">
-                    <img src="/api/placeholder/200/60" alt="Author Signature">
+                <div class="about-description" style="text-align:justify;" >
+                    <p> Also We provide top-notch academic writing services to help you achieve academic success. 
+                        Our team of expert writers and researchers are dedicated to delivering high-quality work 
+                        that meets your specific needs.</p>
+                    <h5>What We Offer</h5>
+                    <div class="waht-we-offer" style="padding-left:15px;">
+                        <li>Research proposal writing</li>
+                        <li>Literature review writing</li>
+                        <li>Methodology writing</li>
+                        <li>Data analysis and interpretation</li>
+                        <li>Results and discussion writing</li>
+                        <li>Conclusion and recommendation writing</li>
+                        <li>Editing and proofreading</li>
+                    </div>   
                 </div>
     
                 <div class="social-links">

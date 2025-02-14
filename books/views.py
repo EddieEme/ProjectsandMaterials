@@ -37,18 +37,13 @@ def user_login(request):
         user = authenticate(email=email, password=password)
 
         if user is not None:
-            if user.is_active:
-                login(request, user)
-                return redirect('books:login-home')
-            else:
-                messages.error(request, "Your account has not been activated yet.")
-                return render(request, 'books/login.html')
+            login(request, user)
+            return redirect('books:login-home')
         else:
             messages.error(request, "Invalid login credentials.")
             return render(request, 'books/login.html')
 
     return render(request, 'books/login.html')
-
 
 def user_logout(request):
     logout(request)

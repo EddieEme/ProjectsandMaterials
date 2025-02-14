@@ -1,12 +1,13 @@
 
 {% extends 'books/loginbase.html' %}
 {% load static %}
-{% block link %}
-<link href="{% static 'books/css/project.css' %}" rel="stylesheet"> {% endblock %}
+{% block link %}<link href="{% static 'books/css/project.css' %}" rel="stylesheet"> {% endblock %}
 
 {% block style %} 
 <style>
-
+a {
+    text-decoration: none;
+}
 </style>
 {% endblock %}
 {% block content %}
@@ -27,7 +28,7 @@
     
                 <h5 class="mb-3">CATEGORIES</h5>
                 <div class="categories">
-                    <a href="{% url 'books:login-departments' %}" class="category-item">
+                    <a href="{% url 'books:departments' %}" class="category-item">
                         <span>BUSINESS</span>
                         <span class="count">19</span>
                     </a>
@@ -61,7 +62,7 @@
                         </div>
                     </div>
                     <div class="col-lg-12 mb-4">
-                        <a href="{% url 'books:login-product-details' id=1 %}"><div class="card blog-card project-content">
+                        <a href="{% url 'books:product-details' id=1 %}"><div class="card blog-card project-content">
                             <!-- <img src="/api/placeholder/400/200" class="card-img-top" alt="Blog image"> -->
                             <div class="card-body">
                                 <span class="badge bg-primary mb-2">BUSINESS</span>

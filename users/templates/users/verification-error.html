@@ -1,17 +1,16 @@
 {% extends 'books/base.html' %}
 {% block style %}  
     <style>
-        body {
+         .container-body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
         }
-        .container {
+
+        .error-container {
             text-align: center;
             background-color: #ffffff;
             padding: 40px;
@@ -46,9 +45,11 @@
     </style>
 {% endblock %}
 {% block content %}
-    <div class="container">
+<div class="container-body">
+    <div class="error-container">
         <h1>❌ Verification Error</h1>
         <p>The verification link is invalid or has expired. Please request a new verification email.</p>
         <a href="{% url 'books:verification-error' %}" class="button">Resend Verification Email</a>
     </div>
+</div>
 {% endblock %}

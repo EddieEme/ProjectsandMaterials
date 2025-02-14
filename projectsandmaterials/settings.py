@@ -116,7 +116,7 @@ ACCOUNT_EMAIL_REQUIRED = True
 LOGIN_URL = 'books:user_login'
 ACCOUNT_SIGNUP_URL = 'books:register'
 
-SOCIALACCOUNT_LOGIN_ON_GET = True
+# SOCIALACCOUNT_LOGIN_ON_GET = True
 LOGIN_REDIRECT_URL = 'books:login-home'
 
 SIMPLE_JWT = {
