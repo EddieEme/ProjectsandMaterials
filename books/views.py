@@ -121,44 +121,50 @@ def product_details(request, id):
 def department(request):
     return render(request, 'books/department.html')
 
-
+@login_required(login_url='books:user_login')
 def buyorsubscribe(request):
     return render(request, 'books/buyorsubscribe.html')
+
+
+@login_required(login_url='books:user_login')
+def payment_checkout(request):
+    return render(request, 'books/paymentcheckout.html')
 
 def subscription(request):
     return render(request, 'books/subscription.html')
 
+@login_required(login_url='books:user_login')
 def payment_method(request):
     return render(request, 'books/payment-method.html')
 
 
 
 
-@login_required(login_url='books:login')
+@login_required(login_url='books:user_login')
 def login_projects(request):
     return render(request, 'books/login-project.html')
 
-@login_required(login_url='books:login') 
+@login_required(login_url='books:user_login') 
 def login_projectList(request):
     return render(request, 'books/login-list-project.html')
 
-@login_required(login_url='books:login')
+@login_required(login_url='books:user_login')
 def login_product_details(request, id):
     return render(request, 'books/login-product-details.html', {'id': id})
 
-@login_required(login_url='books:login')
+@login_required(login_url='books:user_login')
 def login_department(request):
     return render(request, 'books/login-department.html')
 
-@login_required(login_url='books:login')
+@login_required(login_url='books:user_login')
 def login_buyorsubscribe(request):
     return render(request, 'books/login-buyorsubscribe.html')
 
-@login_required(login_url='books:login')
+@login_required(login_url='books:user_login')
 def login_subscription(request):
     return render(request, 'books/login-subscription.html')
 
-@login_required(login_url='books:login')
+@login_required(login_url='books:user_login')
 def login_payment_method(request):
     return render(request, 'books/login-payment-method.html')
 
@@ -202,3 +208,4 @@ def view_profile(request):
 @login_required(login_url='books:user_login')
 def edit_profile(request):
     return render(request, 'books/edit-profile.html')
+

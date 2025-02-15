@@ -75,8 +75,9 @@ background-color: #bfc2b7;
                 <label for="email" class="form-label" >Email</label>
                 <input type="email" name="email" class="form-control" id="email" required>
             </div>
-            <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
+
+             <div class="mb-3">
+                <label for="password" class="form-label" >Password</label>
                 <input type="password" name="password" class="form-control" id="password" required>
             </div>
             <button type="submit" class="btn btn-primary w-100">Login</button>
@@ -94,6 +95,7 @@ background-color: #bfc2b7;
         <p class="text-center mt-4">
             Don't have an account? <a href="{% url 'books:register' %}">Register here</a>
         </p>
+        <p class="text-center mt-4"><a href="{% url 'users:password_reset' %}" style="color: black;">Forgot Password?</a></p>
     </div>
 </div>
 
@@ -110,6 +112,17 @@ background-color: #bfc2b7;
             flashMessages.style.display = 'none';
         }
     }, 4000);
+
+    document.getElementById('togglePassword').addEventListener('click', function() {
+      const passwordInput = document.getElementById('password');
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+
+      // Toggle the eye icon
+      const eyeIcon = this.querySelector('i');
+      eyeIcon.classList.toggle('bi-eye');
+      eyeIcon.classList.toggle('bi-eye-slash');
+    });
     
 </script>
 

@@ -28,14 +28,14 @@
     <!-- Navigation -->
      <!-- Include CSRF token -->
     <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}"> 
-   {% include 'books/pages/loginbase.html' %}
+   {% comment %} {% include 'books/pages/loginbase.html' %} {% endcomment %}
 
- {% comment %} <!-- Navigation -->
+ <!-- Navigation -->
      <nav class="navbar navbar-expand-lg">
         <div class="container">
             <a class="navbar-brand" href="#">
                 <img src="{% static 'books/images/brand.jpg' %}" alt="Logo">
-                <span class="brand-title">Your Brand</span>
+                {% comment %} <span class="brand-title">Your Brand</span> {% endcomment %}
             </a>
             
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -87,13 +87,13 @@
                 </ul>
             </div>
         </div>
-    </nav> {% endcomment %}
+    </nav>
     {% block content %}
 
     {% endblock %}
 
     <!-- AOS Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    
     
     {% comment %} <script src="{% static 'books/js/logout.js' %}"></script> {% endcomment %}
     <script src="{% static 'books/js/youtube.js' %}" defer></script>
