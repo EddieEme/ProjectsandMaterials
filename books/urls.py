@@ -24,6 +24,7 @@ web_urlpatterns = [
     path('product-details/<int:id>/', views.product_details, name='product-details'),
     path('departments/', views.department, name='departments'),
     path('payment-method/', views.payment_method, name='payment-method'),
+    path('payment-checkout/', views.payment_checkout, name='payment-checkout'),
     path('subscription/', views.subscription, name='subscription'),
     path('buyorsubscribe/', views.buyorsubscribe, name='buyorsubscribe'),
     path('login-projects/', views.login_projects, name='login-projects'),

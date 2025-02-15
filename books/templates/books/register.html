@@ -108,6 +108,7 @@
         <p class="text-center mt-4">
             Already have an account? <a href="{% url 'books:user_login' %}">Login here</a>
         </p>
+        <p class="text-center mt-4"><a href="{% url 'users:password_reset' %}" style="color: black;">Forgot Password?</a></p>
     </div>
 </div>
 
@@ -122,5 +123,16 @@
             flashMessages.style.display = 'none';
         }
     }, 2000);
+
+      document.getElementById('togglePassword').addEventListener('click', function() {
+      const passwordInput = document.getElementById('password');
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+
+      // Toggle the eye icon
+      const eyeIcon = this.querySelector('i');
+      eyeIcon.classList.toggle('bi-eye');
+      eyeIcon.classList.toggle('bi-eye-slash');
+    });
     
 {% endblock %}
