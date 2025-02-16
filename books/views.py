@@ -206,6 +206,37 @@ def view_profile(request):
     return render(request, 'books/view-profile.html')
 
 @login_required(login_url='books:user_login')
-def edit_profile(request):
-    return render(request, 'books/edit-profile.html')
+def update_profile(request):
+    user = request.user
+    profile = user.profile
 
+    if request.method == 'POST':
+        # Update user fields
+        user.first_name = request.POST.get('first_name', user.first_name)
+        user.last_name = request.POST.get('last_name', user.last_name)
+        user.email = request.POST.get('email', user.email)
+        user.save()
+
+        # Update profile fields
+        profile.profile_picture = request.POST.get('profile_picture', profile.profile_picture)
+        profile.bio = request.POST.get('bio', profile.bio)
+        profile.profession = request.POST.get('profession', profile.profession)
+        profile.phone_number = request.POST.get('phone_number', profile.phone_number)
+        profile.save()
+
+        messages.success(request, "Your profile has been updated successfully!")
+        return redirect('books:view_profile')  # Adjust this to your view name
+
+    # Pre-fill form data with current values
+    current_data = {
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+        'email': user.email,
+        'profile_picture': profile.profile_picture,
+        'bio': profile.bio,
+        'profession': profile.profession,
+        'phone_number': profile.phone_number,
+    }
+
+    context = {'user_data': current_data}
+    return render(request, 'books/edit-profile.html', context)
