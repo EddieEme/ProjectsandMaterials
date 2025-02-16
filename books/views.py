@@ -38,7 +38,7 @@ def user_login(request):
 
         if user is not None:
             login(request, user)
-            return redirect('books:login-home')
+            return redirect('books:user-dashboard')
         else:
             messages.error(request, "Invalid login credentials.")
             return redirect('books:user_login')
