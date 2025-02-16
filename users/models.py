@@ -42,11 +42,11 @@ class CustomUser(AbstractUser):
     
 class Profile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='profile')
-    profile_picture = models.URLField(blank=True, null=True)  # URL to profile picture
+    profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
     bio = models.TextField(blank=True, null=True) 
-    profession = models.CharField(max_length=100, blank=True, null=True)  # User's profession/occupation
-    phone_number = models.CharField(max_length=20, blank=True, null=True)  # Optional phone number
-    can_publish = models.BooleanField(default=False)  # Allow users to publish books if True
+    profession = models.CharField(max_length=100, blank=True, null=True)
+    phone_number = models.CharField(max_length=20, blank=True, null=True) 
+    can_publish = models.BooleanField(default=False)  
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
