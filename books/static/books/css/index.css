@@ -290,9 +290,10 @@
         padding-right: 0;
     }
 
-    .hero-text p {
+   .hero-text p {
         margin-left: auto;
         margin-right: auto;
+        font-size: 1rem;
     }
 
     .book-preview img {
@@ -383,7 +384,9 @@
  }
 
  @media (max-width: 768px) {
-
+     h2{
+        font-size:1.5rem;
+     }
      .showcase-container {
          flex-direction: column;
          text-align: center;
@@ -396,6 +399,10 @@
      .showcase-image {
          order: 2;
      }
+
+    .showcase-text h2 {
+    line-height: 1.2;
+      }
  }
 
 
@@ -477,6 +484,10 @@
       .services-grid {
           grid-template-columns: 1fr;
       }
+
+.services-header h2 {
+    font-size: 1.5rem;
+}
   }
 
 
