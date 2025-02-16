@@ -6,15 +6,23 @@
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title mb-4">Edit Profile</h5>
-                <form>
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
                     <div class="row mb-4">
                         <div class="col-md-3">
                             <div class="text-center">
-                                <img src="/api/placeholder/200/200" class="img-fluid rounded-circle mb-3"
-                                    alt="Profile Picture">
+                                {% if profile.profile_picture %}
+                                    <img src="{{ profile.profile_picture.url }}" class="img-fluid rounded-circle mb-3" alt="Profile Picture">
+                                {% else %}
+                                    <img src="{% static 'books/images/default_profile_image.jpg' %}" class="img-fluid rounded-circle mb-3" alt="Default Profile Picture">
+                                {% endif %}
+
+                                <div class="mb-3">
+                                    <label for="profile_picture" class="form-label fw-bold">Change Profile Picture</label>
+                                    <input type="file" class="form-control form-control-lg" id="profile_picture" name="profile_picture" accept="image/*">
+                                </div>
                                 <div class="d-grid">
-                                    <button class="btn btn-outline-primary mb-2">Change Picture</button>
-                                    <button class="btn btn-outline-danger">Remove Picture</button>
+                                    <button type="submit" class="btn btn-outline-danger">Remove Picture</button>
                                 </div>
                             </div>
                         </div>
@@ -22,25 +30,30 @@
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label class="form-label">First Name</label>
-                                    <input type="text" class="form-control" value="John">
+                                    <input type="text" class="form-control" name="first_name" value="{{ user.first_name }}">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Last Name</label>
-                                    <input type="text" class="form-control" value="Doe">
+                                    <input type="text" class="form-control" name="last_name" value="{{ user.last_name }}">
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" readonly value="{{ user.email }}">
+                                </div>
+                                 <div class="col-md-6">
+                                    <label class="form-label">profession</label>
+                                    <input type="profession" class="form-control" name="profession" value="{{ profile.profession }}">
                                 </div>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Email</label>
-                                <input type="email" class="form-control" value="john@example.com">
-                            </div>
-                            <div class="mb-3">
                                 <label class="form-label">Phone</label>
-                                <input type="tel" class="form-control" value="+1 234 567 8900">
+                                <input type="tel" class="form-control" name="phone_number" value="{{ profile.phone_number }}">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Bio</label>
-                                <textarea class="form-control"
-                                    rows="4">I'm a digital content creator specializing in educational materials and programming tutorials.</textarea>
+                                <textarea class="form-control" name="bio" rows="4">{{ profile.bio }}</textarea>
                             </div>
                         </div>
                     </div>
