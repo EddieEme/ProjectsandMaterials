@@ -1,41 +1,52 @@
-
-
 {% extends 'books/loginbase.html' %}
+{% load static %}
+{% block style %}
+<style>
+  
+    .img-fluid {
+        max-width:15% !important;
+    }
+
+</style>
+{% endblock %}
 {% block content %}
     <!-- View Profile Page -->
     <div class="container py-4" id="view-profile" style="margin-top:6.5rem !important;">
         <div class="card">
             <div class="card-body">
                 <div class="text-center mb-4">
-                    <img src="/api/placeholder/150/150" class="rounded-circle mb-3" alt="Profile Picture">
-                    <h4 class="mb-0">John Doe</h4>
-                    <p class="text-muted">Digital Content Creator</p>
+                    {% if profile.profile_picture %}
+                        <img src="{{ profile.profile_picture.url }}" class="img-fluid rounded-circle mb-3" alt="Profile Picture" style="max-width:15% !important;">
+                    {% else %}
+                        <img src="{% static 'books/images/default_profile_image.jpg' %}" class="img-fluid rounded-circle mb-3" alt="Default Profile Picture" style="max-width:15% !important;>
+                    {% endif %}
+                    <h4 class="mb-0">{{ user.first_name }} {{ user.last_name }}</h4>
+                    <p class="text-muted">{{ profile.profession|default:"Not specified" }}</p>
                 </div>
                 <div class="row justify-content-center">
                     <div class="col-md-8">
                         <div class="mb-4">
                             <h6 class="text-muted mb-2">Bio</h6>
-                            <p>I'm a digital content creator specializing in educational materials and programming
-                                tutorials.</p>
+                            <p>{{ profile.bio|default:"No bio provided" }}</p>
                         </div>
                         <div class="row mb-4">
                             <div class="col-md-6">
                                 <h6 class="text-muted mb-2">Email</h6>
-                                <p>john@example.com</p>
+                                <p>{{ user.email }}</p>
                             </div>
                             <div class="col-md-6">
                                 <h6 class="text-muted mb-2">Phone</h6>
-                                <p>+1 234 567 8900</p>
+                                <p>{{ profile.phone_number|default:"No phone number provided" }}</p>
                             </div>
                         </div>
                         <div class="row mb-4">
                             <div class="col-md-6">
                                 <h6 class="text-muted mb-2">Member Since</h6>
-                                <p>January 2023</p>
+                                <p>{{ user.date_joined|date:"F Y" }}</p>
                             </div>
                             <div class="col-md-6">
                                 <h6 class="text-muted mb-2">Total Products</h6>
-                                <p>12 Products</p>
+                                <p>12 Products</p> <!-- Replace with dynamic value if needed -->
                             </div>
                         </div>
                         <div class="text-center">

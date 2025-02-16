@@ -203,10 +203,16 @@ def user_dashboard(request):
 
 @login_required(login_url='books:user_login')
 def view_profile(request):
-    return render(request, 'books/view-profile.html')
+    user = request.user
+    profile = user.profile
 
-@login_required(login_url='books:user_login')
-def update_profile(request):
+    context = {
+        'user': user,          
+        'profile': profile,     
+    }
+    return render(request, 'books/view-profile.html', context)
+
+def edit_profile(request):
     user = request.user
     profile = user.profile
 
@@ -214,29 +220,21 @@ def update_profile(request):
         # Update user fields
         user.first_name = request.POST.get('first_name', user.first_name)
         user.last_name = request.POST.get('last_name', user.last_name)
-        user.email = request.POST.get('email', user.email)
         user.save()
 
         # Update profile fields
-        profile.profile_picture = request.POST.get('profile_picture', profile.profile_picture)
         profile.bio = request.POST.get('bio', profile.bio)
-        profile.profession = request.POST.get('profession', profile.profession)
         profile.phone_number = request.POST.get('phone_number', profile.phone_number)
+        profile.profession = request.POST.get('profession', profile.profession)
+
+        # Handle profile picture upload
+        if 'profile_picture' in request.FILES:
+            profile.profile_picture = request.FILES['profile_picture']
+
         profile.save()
 
         messages.success(request, "Your profile has been updated successfully!")
-        return redirect('books:view_profile')  # Adjust this to your view name
+        return redirect('books:view-profile')  # Adjust this to your actual view
 
-    # Pre-fill form data with current values
-    current_data = {
-        'first_name': user.first_name,
-        'last_name': user.last_name,
-        'email': user.email,
-        'profile_picture': profile.profile_picture,
-        'bio': profile.bio,
-        'profession': profile.profession,
-        'phone_number': profile.phone_number,
-    }
-
-    context = {'user_data': current_data}
-    return render(request, 'books/edit-profile.html', context)
+    # Pass profile and user data to the template
+    return render(request, 'books/edit-profile.html', {'profile': profile, 'user': user})
