@@ -1,4 +1,11 @@
 {% load static %}
+{% block style %}
+<style>
+    a {
+        text-decoration:none;
+    }
+</style>
+{% endblock %}
     <!-- Hero Section -->
     <section class="hero">
         <div class="hero-content">
@@ -95,15 +102,19 @@
     
             <div class="row g-4"  >
                 <!-- Row 1 -->
+                {% for category in categories %}
                 <div class="col-md-6 col-lg-3" data-aos="fade-left" data-aos-delay="50">
-                    <div class="field-card">
+                    <a href="{% url 'books:project-list' %}">
+                        <div class="field-card">
                         <h3 class="field-title">
                             <i class="fa-solid fa-book-open"></i>
-                            Agriculture
+                            {{category}}
                         </h3>
-                    </div>
+                        </div>
+                    </a>
                 </div>
-                <div class="col-md-6 col-lg-3" data-aos="fade-left" data-aos-delay="100">
+                {% endfor %}
+                {% comment %} <div class="col-md-6 col-lg-3" data-aos="fade-left" data-aos-delay="100">
                     <div class="field-card">
                         <h3 class="field-title">
                             <i class="fa-solid fa-book-open"></i>
@@ -194,7 +205,7 @@
                             Technology
                         </h3>
                     </div>
-                </div>
+                </div> {% endcomment %}
             </div>
         </div>
     </section>
