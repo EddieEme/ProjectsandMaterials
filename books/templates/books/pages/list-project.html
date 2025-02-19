@@ -1,117 +1,183 @@
 <style>
-        /* General Styles */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f9;
-            color: #333;
-        }
-    
+    /* General Styles */
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f9;
+        color: #333;
+    }
+
+    .list-head {
+        padding-top: 8rem;
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 2rem;
+        color: #007bff;
+    }
+
+    p {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    /* Search Bar */
+    .search-bar {
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .search-bar input {
+        width: 100%;
+        max-width: 400px;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1rem;
+    }
+
+    .search-bar input:focus {
+        outline: none;
+        border-color: #007bff;
+    }
+
+    /* Project List */
+    #project-list ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    #project-list li {
+        background: white;
+        margin: 10px 0;
+        padding: 15px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease-in-out;
+    }
+
+    #project-list li:hover {
+        transform: scale(1.02);
+    }
+
+    #project-list a {
+        text-decoration: none;
+        color: #333;
+        font-size: 18px;
+        display: block;
+        font-weight: bold;
+    }
+
+    /* Form Section */
+    form {
+        margin-bottom: 2rem;
+    }
+
+    .form-select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+    }
+
+    /* Mobile Responsive Adjustments */
+    @media (max-width: 768px) {
         .container {
-            padding: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
+            padding: 1rem;
         }
-    
+
         h1 {
-            text-align: center;
-            margin-bottom: 2rem;
-            color: #007bff;
+            font-size: 1.5rem;
         }
-    
-        /* Search Bar */
-        .search-bar {
-            margin-bottom: 2rem;
-            text-align: center;
-        }
-    
+
         .search-bar input {
-            width: 100%;
-            max-width: 400px;
-            padding: 0.75rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            font-size: 0.9rem;
+            padding: 0.6rem;
+        }
+
+        #project-list a {
             font-size: 1rem;
         }
-    
-        .search-bar input:focus {
-            outline: none;
-            border-color: #007bff;
+
+        .btn {
+            width: 100%;
+            padding: 0.5rem;
         }
-    
-        #project-list ul {
-    list-style: none;
-    padding: 0;
-}
 
-#project-list li {
-    background: white;
-    margin: 10px 0;
-    padding: 15px;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease-in-out;
-}
+        .form-select {
+            font-size: 0.9rem;
+            padding: 0.6rem;
+        }
+    }
+</style>
 
-#project-list li:hover {
-    transform: scale(1.02);
-}
-
-#project-list a {
-    text-decoration: none;
-    color: #333;
-    font-size: 18px;
-    display: block;
-    font-weight: bold;
-}
-
-    </style>
-    <div class="card card-head">
-        <div class="card-body search-content">
-            <h1>Research Topics Suggestion Tool</h1>
-            <p>Get project topics, thesis topics, dissertation topics in your field of study</p>
-        </div>
+<div class="card card-head list-head">
+    <div class="card-body search-content">
+        <h1>Research Topics Suggestion Tool</h1>
+        <p>Get project topics, thesis topics, and dissertation topics in your field of study</p>
     </div>
-    <section class="search-section container mt-4">
-        <form action="" class="row">
-            <div class="row">
-                <div class="col">
-                    <select id="inputState" class="form-select">
-                        <option selected>select department</option>
-                        <option>...</option>
-                    </select>
-                </div>
-                <div class="col">
-                    <select id="inputState" class="form-select">
-                        <option selected>Select type of work</option>
-                        <option>Project</option>
-                    </select>
-                </div>
+</div>
+
+<section class="search-section container mt-4">
+    <form action="" class="row" method="get">
+        <div class="row">
+            <div class="col-12 col-md-6">
+                <select id="book_type" name="book_type" class="form-select">
+                    <option value="">Select Type of Work</option>
+                    {% for book_type in book_types %}
+                    <option value="{{ book_type.id }}" {% if book_type.id == selected_book_type %} selected {% endif %}>
+                        {{ book_type.name }}
+                    </option>
+                    {% endfor %}
+                </select>
             </div>
-            <div class="row mt-4">
-                <div class="col-12 text-center">
-                    <button type="submit" class="btn btn-primary btn-lg">Search Topics</button>
-                </div>
+            <div class="col-12 col-md-6">
+                <select id="category" name="category" class="form-select">
+                    <option value="">Select Category</option>
+                    {% for category in categories %}
+                    <option value="{{ category.id }}" {% if category.id == selected_category %} selected {% endif %}>
+                        {{ category.name }}
+                    </option>
+                    {% endfor %}
+                </select>
             </div>
-        </form>
+        </div>
+        <div class="row mt-4">
+            <div class="col-12 text-center">
+                <button type="submit" class="btn btn-primary btn-lg">Search Topics</button>
+            </div>
+        </div>
+    </form>
+</section>
+
+<div class="container">
+    <h1>{{ selected_book_type.name }} {{ selected_category.name }} Topics</h1>
+    <!-- Search Bar -->
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Search articles...">
+    </div>
+    <!-- Article List -->
+    <section id="project-list">
+        {% if books %}
+        <ul>
+            {% for book in books %}
+            <li><a href="#">{{ book.title }}</a></li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>No topics found for the selected criteria.</p>
+        {% endif %}
     </section>
-    <div class="container">
-        <h1>Microbiology Article Topics</h1>
-        <!-- Search Bar -->
-        <div class="search-bar">
-            <input type="text" id="searchInput" placeholder="Search articles...">
-        </div>
-        <!-- Article List -->
-        <section id="project-list">
-            <ul>
-                <li><a href="project1.html">Project 1 - Web Development</a></li>
-                <li><a href="project2.html">Project 2 - Data Science</a></li>
-                <li><a href="project3.html">Project 3 - Mobile App</a></li>
-                <li><a href="project4.html">Project 4 - AI & Machine Learning</a></li>
-            </ul>
-        </section>
-    </div>
+</div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

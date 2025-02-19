@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'users',
+    'storages',
 ]
 
 SITE_ID = 1

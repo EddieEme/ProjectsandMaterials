@@ -10,6 +10,7 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.conf import settings
+from .models import Book, Category, BookType
 import logging
 
 
@@ -19,14 +20,49 @@ User = get_user_model()
 logger = logging.getLogger(__name__)
 
 def home(request):
-    return render(request, 'books/index.html')
+    # Retrieve the first 12 categories in alphabetical order
+    categories = Category.objects.order_by('name')[:12]
+
+    context = {
+        'categories': categories,
+    }
+
+    return render(request, 'books/index.html', context)
 
 
 def projects(request):
     return render(request, 'books/project.html')
 
 def projectList(request):
-    return render(request, 'books/list-project.html')
+     # Get the selected book type and category from the request
+    book_type_id = request.GET.get('book_type', '')
+    category_id = request.GET.get('category', '')
+
+    # Get all books initially
+    books = Book.objects.filter(is_approved=True)
+
+    # Filter by book type if selected
+    if book_type_id:
+        books = books.filter(book_type__id=book_type_id)
+
+    # Filter by category if selected
+    if category_id:
+        books = books.filter(category__id=category_id)
+
+    # Get all distinct book types and categories for the dropdown options
+    book_types = BookType.objects.all()
+    categories = Category.objects.all()
+
+    # Pass selected values to the template for retaining user selections
+    context = {
+        'books': books,
+        'selected_book_type': book_type_id,
+        'selected_category': category_id,
+        'book_types': book_types,
+        'categories': categories,
+    }
+
+    return render(request, 'books/list-project.html', context)
 
 
 def user_login(request):
