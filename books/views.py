@@ -1,4 +1,4 @@
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate, login, logout
@@ -11,6 +11,8 @@ from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.conf import settings
 from .models import Book, Category, BookType
+from .utils import extract_first_10_pages
+import json
 import logging
 
 
@@ -20,18 +22,35 @@ User = get_user_model()
 logger = logging.getLogger(__name__)
 
 def home(request):
-    # Retrieve the first 12 categories in alphabetical order
-    categories = Category.objects.order_by('name')[:12]
+    # # Retrieve the first 12 categories in alphabetical order
+    # categories = Category.objects.order_by('name')[:12]
 
-    context = {
-        'categories': categories,
-    }
+    # context = {
+    #     'categories': categories,
+    # }
 
-    return render(request, 'books/index.html', context)
+    return render(request, 'books/index.html')
 
 
 def projects(request):
-    return render(request, 'books/project.html')
+    # Get all categories
+    categories = Category.objects.all()
+    
+    # Get all approved books
+    approved_books = Book.objects.filter(is_approved=True)
+
+    # Count books in each category
+    category_book_counts = {
+        category: approved_books.filter(category=category).count() for category in categories
+    }
+
+    context = {
+        'categories': categories,
+        'approved_books': approved_books,
+        'category_book_counts': category_book_counts,
+    }
+    
+    return render(request, 'books/project.html', context)
 
 def projectList(request):
      # Get the selected book type and category from the request
@@ -152,10 +171,33 @@ def register(request):
     return render(request, "books/register.html")
 
 def product_details(request, id):
-    return render(request, 'books/product-details.html', {'id': id})
+    book = get_object_or_404(Book, id=id)
+    stats = book.get_file_statistics()
+    preview_url = f"/preview/{book.id}/" if book.file else None
 
-def department(request):
-    return render(request, 'books/department.html')
+    
+    # preview_url = None
+    # if book.file:
+    #     book = extract_first_10_pages(book)  # Ensure preview is generated
+    #     preview_url = request.build_absolute_uri(f"/preview/{book.id}/")  # Correct URL pattern
+
+    context = {
+        "book": book,
+        "preview_url": preview_url,
+        "page_count": stats["pages"],
+        "word_count": stats["words"],
+    }
+
+    return render(request, 'books/product-details.html', context)
+def department(request, category_id):
+    books = Book.objects.filter(category_id=category_id, is_approved=True)
+    selected_category = Category.objects.get(id=category_id)
+
+
+    context = {
+        'selected_category': selected_category,
+    }
+    return render(request, 'books/department.html', context)
 
 @login_required(login_url='books:user_login')
 def buyorsubscribe(request):

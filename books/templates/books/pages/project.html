@@ -27,26 +27,15 @@ a {
     
                 <h5 class="mb-3">CATEGORIES</h5>
                 <div class="categories">
-                    <a href="{% url 'books:departments' %}" class="category-item">
-                        <span>BUSINESS</span>
-                        <span class="count">19</span>
-                    </a>
-                    <a href="#" class="category-item">
-                        <span>TECHNOLOGY</span>
-                        <span class="count">21</span>
-                    </a>
-                    <a href="#" class="category-item">
-                        <span>WEB DESIGN</span>
-                        <span class="count">07</span>
-                    </a>
-                    <a href="#" class="category-item">
-                        <span>INSPIRATION</span>
-                        <span class="count">13</span>
-                    </a>
-                    <a href="#" class="category-item">
-                        <span>PHOTOSHOP</span>
-                        <span class="count">05</span>
-                    </a>
+                   {% if categories %}
+                    {% for category in categories %}
+                        <a href="{% url 'books:departments' category.id %}" class="category-item">
+                            <span>{{ category.name }}</span>
+                            {% comment %} <span class="count">{{ category_book_counts}}</span> {% endcomment %}
+
+                        </a>
+                    {% endfor %}
+                 {% endif %}
                 </div>
             </div>
     

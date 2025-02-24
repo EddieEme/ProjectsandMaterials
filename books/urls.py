@@ -3,7 +3,8 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework import routers
 from users.views import UserViewSet, AuthViewSet, EmailVerificationView
 from . import views
-from books.api_views import most_viewed_videos 
+from books.api_views import most_viewed_videos, GetDepartmentView, DepartmentAPIView
+from .utils import extract_first_10_pages, serve_preview
 
 
 app_name = 'books'
@@ -22,7 +23,7 @@ web_urlpatterns = [
     path('logout/', views.user_logout, name='user_logout'),
     path('register/', views.register, name='register'),
     path('product-details/<int:id>/', views.product_details, name='product-details'),
-    path('departments/', views.department, name='departments'),
+     path('departments/<int:category_id>/', views.department, name='departments'),
     path('payment-method/', views.payment_method, name='payment-method'),
     path('payment-checkout/', views.payment_checkout, name='payment-checkout'),
     path('subscription/', views.subscription, name='subscription'),
@@ -47,9 +48,12 @@ web_urlpatterns = [
 auth_patterns = [
     path('api/auth/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/get-categories/', GetDepartmentView.as_view(), name='get-categories'),
+    path('api/department/<int:category_id>/', DepartmentAPIView.as_view(), name='api-department'),
     path('api/auth/resend-verification-email/', AuthViewSet.as_view({'post': 'resend_verification_email'}), name='resend-verification-email'),
     # path('api/most-viewed-videos/<str:channel_id>/', MostViewedVideos.as_view(), name='most-viewed-videos'),
     path('api/most-viewed-videos/<str:channel_id>/', most_viewed_videos, name='most-viewed-videos'),
+    path("preview/<int:book_id>/", serve_preview, name="preview"),
 ]
 
 
