@@ -22,14 +22,14 @@ User = get_user_model()
 logger = logging.getLogger(__name__)
 
 def home(request):
-    # # Retrieve the first 12 categories in alphabetical order
-    # categories = Category.objects.order_by('name')[:12]
+    # Retrieve the first 12 categories in alphabetical order
+    categories = Category.objects.order_by('name')[:12]
 
-    # context = {
-    #     'categories': categories,
-    # }
+    context = {
+        'categories': categories,
+    }
 
-    return render(request, 'books/index.html')
+    return render(request, 'books/index.html', context)
 
 
 def projects(request):
@@ -189,13 +189,14 @@ def product_details(request, id):
     }
 
     return render(request, 'books/product-details.html', context)
-def department(request, category_id):
-    books = Book.objects.filter(category_id=category_id, is_approved=True)
-    selected_category = Category.objects.get(id=category_id)
 
+def department(request, category_id):
+    selected_category = get_object_or_404(Category, id=category_id)
+    books = Book.objects.filter(category_id=category_id, is_approved=True)
 
     context = {
         'selected_category': selected_category,
+        'books': books,
     }
     return render(request, 'books/department.html', context)
 
