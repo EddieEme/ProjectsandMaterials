@@ -2,7 +2,6 @@
 {% block link %}
 <link href="{% static 'books/department.css' %}" rel="stylesheet">
 <link href="{% static 'books/css/project.css' %}" rel="stylesheet">
-
 {% endblock %}
 
 {% block style %}
@@ -36,20 +35,9 @@
         right: 1rem;
     }
 
-    .book-type-badge {
-        position: absolute;
-        top: 3rem;
-        right: 1rem;
-    }
-
     .stats {
         font-size: 0.9em;
         color: #6c757d;
-    }
-
-    .loading-spinner {
-        text-align: center;
-        padding: 2rem;
     }
 
     #searchInput {
@@ -66,12 +54,11 @@
 {% endblock %}
 
 {% block content %}
-<input type="hidden" id="categoryId" value="{{ selected_category.id }}">
 
 <!-- Search Section -->
 <div class="search-section card-head">
     <div class="container search-content">
-        <h2 class="text-center mb-4" id="categoryTitle"> Research Projects</h2>
+        <h2 class="text-center mb-4" id="categoryTitle">{{ selected_category.name }} Research Projects</h2>
         <div class="row justify-content-center">
             <div class="col-md-6">
                 <div class="input-group mb-3">
@@ -85,112 +72,65 @@
 
 <!-- Books List -->
 <div class="container">
-    <div id="loadingIndicator" class="loading-spinner">
-        <div class="spinner-border text-primary" role="status">
-            {% comment %} <span class="visually-hidden">Loading...</span> {% endcomment %}
-
-           {% if books %}
-                {% for book in books %}
-                    <div class="col-md-12 col-lg-12">
-                        <a href="/product-details/{{ book.id }}/" class="text-decoration-none">
-                            <div class="card book-card">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ book.title }}</h5>
-                                    <span class="badge bg-primary category-badge">
-                                        {{ book.category.name }} {{ book.book_type.name }}
-                                    </span>
-                                    <p class="card-text">
-                                        {{ book.description|truncatechars:500 }}
-                                    </p>
-                                    <div class="stats d-flex justify-content-between">
-                                        <span>{{ book.created_at|date:"M d, Y" }}</span>
-                                        <span>
-                                            <i class="bi bi-eye"></i> {{ book.views|default:0 }} views
-                                            <i class="bi bi-chat ms-2"></i> {{ book.comments|default:0 }} comments
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
+    <div class="row books-list" id="booksList">
+        {% for book in books %}
+        <div class="col-md-12 col-lg-12 book-item">
+            <a href="/product-details/{{ book.id }}/" class="text-decoration-none">
+                <div class="card book-card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ book.title }}</h5>
+                        <span class="badge bg-primary category-badge">
+                            {{ book.category.name }} {{ book.book_type.name }}
+                        </span>
+                        <p class="card-text">
+                            {{ book.description|truncatechars:500 }}
+                        </p>
+                        <div class="stats d-flex justify-content-between">
+                            <span>{{ book.created_at|date:"F j, Y" }}</span>
+                            <span>
+                                <i class="bi bi-eye"></i> {{ book.views|default:0 }} views
+                                <i class="bi bi-chat ms-2"></i> {{ book.comments|default:0 }} comments
+                            </span>
+                        </div>
                     </div>
-                {% endfor %}
-            {% else %}
-                <div class="col-12 text-center">
-                    <p>No books found matching your search.</p>
                 </div>
-            {% endif %}
+            </a>
         </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <p>No books available.</p>
+        </div>
+        {% endfor %}
     </div>
-    
-    <div class="row books-list" id="booksList"></div>
     
     <nav aria-label="Books pagination" class="my-4">
         <ul class="pagination justify-content-center" id="pagination"></ul>
     </nav>
 </div>
 
+<!-- JavaScript -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize variables
-    const categoryId = document.getElementById('categoryId').value;
-    const booksPerPage = 10;
+    const booksPerPage = 5;
     let currentPage = 1;
-    let booksData = [];
-    
-    // DOM Elements
+
     const elements = {
         booksList: document.getElementById('booksList'),
         pagination: document.getElementById('pagination'),
         searchInput: document.getElementById('searchInput'),
         searchButton: document.getElementById('searchButton'),
-        loadingIndicator: document.getElementById('loadingIndicator'),
-        categoryTitle: document.getElementById('categoryTitle')
     };
 
-    // Show/hide loading
-    const toggleLoading = (show) => {
-        elements.loadingIndicator.style.display = show ? 'block' : 'none';
-        elements.booksList.style.display = show ? 'none' : 'flex';
-    }; 
+    const allBooks = Array.from(document.querySelectorAll('.book-item'));
 
-    // Fetch books from API
-    async function fetchBooks() {
-        try {
-            toggleLoading(true);
-            
-            const response = await fetch(`/api/department/${categoryId}/`);
-            if (!response.ok) throw new Error('Failed to fetch books');
-            
-            const data = await response.json();
-            booksData = data.books;
-            
-            // Update category title if needed
-            if (data.selected_category) {
-                elements.categoryTitle.textContent = `${data.selected_category.name} Research Projects`;
-            }
-            
-            renderBooks();
-        } catch (error) {
-            console.error('Error:', error);
-            elements.booksList.innerHTML = `
-                <div class="col-12">
-                    <div class="alert alert-danger">
-                        Failed to load books. Please try again later.
-                    </div>
-                </div>`;
-        } finally {
-            toggleLoading(false);
-        }
-    }
-
-    // Render books with pagination
     function renderBooks(searchTerm = '') {
-        let filteredBooks = booksData;
+        let filteredBooks = allBooks;
+        
         if (searchTerm) {
             searchTerm = searchTerm.toLowerCase();
-            filteredBooks = booksData.filter(book => 
-                book.title.toLowerCase().includes(searchTerm) ||
-                book.description.toLowerCase().includes(searchTerm)
+            filteredBooks = allBooks.filter(book => 
+                book.querySelector('.card-title').textContent.toLowerCase().includes(searchTerm) ||
+                book.querySelector('.card-text').textContent.toLowerCase().includes(searchTerm)
             );
         }
 
@@ -199,44 +139,21 @@ document.addEventListener('DOMContentLoaded', function() {
         const end = start + booksPerPage;
         const paginatedBooks = filteredBooks.slice(start, end);
 
-        elements.booksList.innerHTML = paginatedBooks.length ? 
-            paginatedBooks.map(book => `
-                <div class="col-md-12 col-lg-12">
-                    <a href="/product-details/${book.id}/" class="text-decoration-none">
-                        <div class="card book-card">
-                            <div class="card-body">
-                                <h5 class="card-title">${book.title}</h5>
-                                <span class="badge bg-primary category-badge">
-                                    ${book.category.name} ${book.book_type.name}
-                                </span>
-                                <p class="card-text">
-                                ${book.description ? book.description.substring(0, 500) + (book.description.length > 500 ? '...' : '') : 'No description available'}
-                               </p>
-                                <div class="stats d-flex justify-content-between">
-                                    <span>${new Date(book.created_at).toLocaleDateString()}</span>
-                                    <span>
-                                        <i class="bi bi-eye"></i> ${book.views || 0} views
-                                        <i class="bi bi-chat ms-2"></i> ${book.comments || 0} comments
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            `).join('') :
-            `<div class="col-12 text-center">
-                <p>No books found matching your search.</p>
-            </div>`;
+        elements.booksList.innerHTML = '';
+
+        if (paginatedBooks.length === 0) {
+            elements.booksList.innerHTML = `<div class="col-12 text-center"><p>No books found matching your search.</p></div>`;
+        } else {
+            paginatedBooks.forEach(book => elements.booksList.appendChild(book));
+        }
 
         renderPagination(totalPages);
     }
 
-    // Render pagination controls
     function renderPagination(totalPages) {
-        if (totalPages <= 1) {
-            elements.pagination.innerHTML = '';
-            return;
-        }
+        elements.pagination.innerHTML = '';
+
+        if (totalPages <= 1) return;
 
         elements.pagination.innerHTML = `
             <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
@@ -254,7 +171,6 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
     }
 
-    // Event Listeners
     elements.pagination.addEventListener('click', function(e) {
         e.preventDefault();
         if (e.target.classList.contains('page-link')) {
@@ -267,7 +183,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Debounced search
     let searchTimeout;
     elements.searchInput.addEventListener('input', function(e) {
         clearTimeout(searchTimeout);
@@ -282,8 +197,7 @@ document.addEventListener('DOMContentLoaded', function() {
         renderBooks(elements.searchInput.value);
     });
 
-    // Initial load
-    fetchBooks();
+    renderBooks();
 });
 </script>
 
