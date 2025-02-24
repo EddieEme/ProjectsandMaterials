@@ -116,7 +116,7 @@
     </style>
 
     <div class="container mt-4" style="margin-top: 6.5rem !important;">
-        <h1 class="h2 mb-4">AYATUTU ONTOLOGY - The George Akume Leadership Recruitment Model</h1>
+        <h1 class="h2 mb-4">{{book.title}}</h1>
 
         <div class="row">
             <div class="col-md-8 project-overview">
@@ -141,14 +141,7 @@
                     <!-- Overview Tab -->
                     <div class="tab-pane fade show active" id="overview" role="tabpanel" >
                         <div class="content mb-4">
-                            <p class="lead">The Nigerian state has failed from a formerly epistemic purity of the past
-                                and that there is the conflict of "truth" and "facts" as opposed to disencrypted fake
-                                news. Poor leadership recruitment process has aided corruption and instilled the culture
-                                of falsehood and fake news.</p>
-                            <p>It has created a huge gap between the anticipated gains of democracy and democracy
-                                dividends on ground. This paper argues that the masses in Nigeria are like boats on the
-                                volatile sea without a leadership guide and that, democratic consolidation in Nigeria
-                                suffers too often because of the problem of failure of leadership.</p>
+                            <p class="lead">{{book.description}}</p>
                                 <div class="container col-md-6 mt-5 align-items-center">
                                     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#documentModal">
                                         Preview Document
@@ -162,41 +155,23 @@
                             <div class="modal-dialog modal-lg modal-dialog-scrollable">
                                 <div class="modal-content no-select watermarked">
                                     <div class="modal-header">
-                                        <h5 class="modal-title">Ayatutu Ontology Document</h5>
+                                        <h5 class="modal-title">{{book.title}}</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                     </div>
                                     <div class="modal-body">
+                                        {% comment %} <div class="document-content" id="pdf-container" style="width: 100%; height: 600px;"></div> {% endcomment %}
                                         <div class="document-content">
-                                            <h3>The George Akume Leadership Recruitment Model</h3>
-                                        
-                                            <p>The Nigerian state has failed from a formerly epistemic purity of the past and that there is the conflict of
-                                                "truth" and "facts" as opposed to disencrypted fake news. Poor leadership recruitment process has aided
-                                                corruption and instilled the culture of falsehood and fake news.</p>
-                                        
-                                            <p>It has created a huge gap between the anticipated gains of democracy and democracy dividends on ground. This
-                                                paper argues that the masses in Nigeria are like boats on the volatile sea without a leadership guide and that,
-                                                democratic consolidation in Nigeria suffers too often because of the problem of failure of leadership.</p>
-                                        
-                                            <h4>Key Observations</h4>
-                                            <ul>
-                                                <li>Leadership recruitment process has been compromised</li>
-                                                <li>Democratic institutions are weakened by poor leadership selection</li>
-                                                <li>The gap between democratic promises and reality continues to widen</li>
-                                            </ul>
-                                        
-                                            <p>The ontology proposed in this paper seeks to address these fundamental challenges by reimagining the leadership
-                                                recruitment model. It emphasizes the need for a more transparent, merit-based approach to selecting political
-                                                leaders.</p>
-                                        
-                                            <h4>Proposed Solutions</h4>
-                                            <ol>
-                                                <li>Implement rigorous candidate screening processes</li>
-                                                <li>Establish clear leadership competency frameworks</li>
-                                                <li>Create accountability mechanisms for political candidates</li>
-                                            </ol>
-                                        
-                                            <p>By addressing these critical areas, the Ayatutu Ontology aims to transform the current leadership paradigm and
-                                                restore faith in democratic governance.</p>
+                                        {% if preview_url %}
+                                            <iframe 
+                                                src="{{ preview_url }}#toolbar=0&navpanes=0&scrollbar=0"
+                                                width="100%" 
+                                                height="600px" 
+                                                style="border: none;"
+                                              
+                                            ></iframe>
+                                        {% else %}
+                                            <p>No preview available.</p>
+                                        {% endif %}
                                         </div>
                                         <img src="{% static 'books/images/hero_image_1.jpg' %}" alt="advert"/ style="width: 20%;">
                                     </div>
@@ -346,22 +321,22 @@
 
                     <div class="mb-3">
                         <div class="field-label">BY:</div>
-                        <span class="text-success">ALLOY HUGH</span>
+                        <span class="text-success">{{book.author}}</span>
                     </div>
 
                     <div class="mb-3">
                         <div class="field-label">FIELD:</div>
-                        <span>AND GENERAL STUDIES</span>
+                        <span>{{book.category.name}}</span>
                     </div>
 
                     <div class="mb-3">
                         <div class="field-label">TYPE:</div>
-                        <span>PAPER/ESSAY</span>
+                        <span>{{book.book_type.name}}</span>
                     </div>
 
                     <div class="mb-3">
                         <div class="field-label">PAGES:</div>
-                        <span>40 PAGES (14858 WORDS)</span>
+                        <span>{{page_count}} PAGES ({{word_count}} WORDS)</span>
                     </div>
                     <div class="mb-3">
                         <div class="field-label">CHAPTERS:</div>
@@ -439,6 +414,7 @@
                 alert('Redirecting to purchase document...');
             });
         });
+
     </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>

@@ -160,8 +160,15 @@
 </section>
 
 <div class="container">
-    <h1> {% if selected_book_type %}{{ selected_book_type.name }}{% endif %}
-    {% if selected_category %}{{ selected_category.name }}{% endif %} Topics</h1>
+    <h1>
+    {% if selected_book_type or selected_category %}
+        {% if selected_book_type %}{{ selected_book_type.name }}{% endif %}
+        {% if selected_category %}{{ selected_category.name }}{% endif %}
+        Topics
+    {% else %}
+        All Research Topics
+    {% endif %}
+</h1>
     <!-- Search Bar -->
     <div class="search-bar">
         <input type="text" id="searchInput" placeholder="Search articles...">
