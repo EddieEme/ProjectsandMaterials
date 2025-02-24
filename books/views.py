@@ -175,12 +175,6 @@ def product_details(request, id):
     stats = book.get_file_statistics()
     preview_url = f"/preview/{book.id}/" if book.file else None
 
-    
-    # preview_url = None
-    # if book.file:
-    #     book = extract_first_10_pages(book)  # Ensure preview is generated
-    #     preview_url = request.build_absolute_uri(f"/preview/{book.id}/")  # Correct URL pattern
-
     context = {
         "book": book,
         "preview_url": preview_url,
