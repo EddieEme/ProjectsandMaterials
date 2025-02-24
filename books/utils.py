@@ -1,5 +1,5 @@
 import os
-import fitz  # PyMuPDF
+import fitz
 from django.shortcuts import get_object_or_404
 from docx import Document
 from reportlab.pdfgen import canvas
