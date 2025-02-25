@@ -1,5 +1,10 @@
 
 {% load static %}
+{% block link %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
+{% endblock %}
+
+{% block style %}
     <style>
         .project-overview{
             border: 2px solid #198754 !important;
@@ -113,7 +118,21 @@
             z-index: 1;
         }
 
+    
+    #pdf-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+    .pdf-page {
+        max-width: 100%;
+        height: auto;
+        margin-bottom: 10px;
+    }
+
     </style>
+    {% endblock %}
 
     <div class="container mt-4" style="margin-top: 6.5rem !important;">
         <h1 class="h2 mb-4">{{book.title}}</h1>
@@ -160,8 +179,9 @@
                                     </div>
                                     <div class="modal-body">
                                         {% comment %} <div class="document-content" id="pdf-container" style="width: 100%; height: 600px;"></div> {% endcomment %}
-                                        <div class="document-content">
-                                        {% if preview_url %}
+                                        <div class="document-content" id="pdf-container">
+                                             <p>Loading PDF...</p>
+                                        {% comment %} {% if preview_url %}
                                             <iframe 
                                                 src="{{ preview_url }}#toolbar=0&navpanes=0&scrollbar=0"
                                                 width="100%" 
@@ -171,7 +191,7 @@
                                             ></iframe>
                                         {% else %}
                                             <p>No preview available.</p>
-                                        {% endif %}
+                                        {% endif %} {% endcomment %}
                                         </div>
                                         <img src="{% static 'books/images/hero_image_1.jpg' %}" alt="advert"/ style="width: 20%;">
                                     </div>
@@ -415,6 +435,40 @@
             });
         });
 
+
+        document.addEventListener("DOMContentLoaded", function () {
+        var url = "{{ preview_url }}";  // Replace with your dynamic PDF URL
+        var container = document.getElementById('pdf-container');
+
+        // Load PDF
+        pdfjsLib.getDocument(url).promise.then(function (pdf) {
+            container.innerHTML = ''; // Clear "Loading PDF..." text
+
+            for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                pdf.getPage(pageNum).then(function (page) {
+                    var scale = 1.2; // Adjust for mobile responsiveness
+                    var viewport = page.getViewport({ scale: scale });
+
+                    var canvas = document.createElement('canvas');
+                    canvas.classList.add("pdf-page");
+                    container.appendChild(canvas);
+
+                    var context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+
+                    var renderContext = {
+                        canvasContext: context,
+                        viewport: viewport
+                    };
+                    page.render(renderContext);
+                });
+            }
+        }).catch(function (error) {
+            console.error("Error loading PDF:", error);
+            container.innerHTML = "<p>Failed to load PDF. <a href='" + url + "' target='_blank'>Download here</a></p>";
+        });
+    });
     </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
