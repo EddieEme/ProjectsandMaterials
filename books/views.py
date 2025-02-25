@@ -37,16 +37,18 @@ def projects(request):
     categories = Category.objects.all()
     
     # Get all approved books
-    approved_books = Book.objects.filter(is_approved=True)
+    books = Book.objects.filter(is_approved=True)
 
     # Count books in each category
     category_book_counts = {
-        category: approved_books.filter(category=category).count() for category in categories
+        category: books.filter(category=category).count() for category in categories
     }
+    
+    print(f"this is the count {category_book_counts}")
 
     context = {
         'categories': categories,
-        'approved_books': approved_books,
+        'books': books,
         'category_book_counts': category_book_counts,
     }
     

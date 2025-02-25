@@ -4,6 +4,14 @@
 {% block link %}<link href="{% static 'books/css/project.css' %}" rel="stylesheet"> {% endblock %}
 
 {% block style %} 
+{% load custom_filters %}
+
+<ul>
+    {% for category in categories %}
+        <li>{{ category.name }} - {{ category_book_counts|get_item:category }}</li>
+    {% endfor %}
+</ul>
+
 <style>
 a {
     text-decoration: none;
@@ -31,7 +39,7 @@ a {
                     {% for category in categories %}
                         <a href="{% url 'books:departments' category.id %}" class="category-item">
                             <span>{{ category.name }}</span>
-                            {% comment %} <span class="count">{{ category_book_counts}}</span> {% endcomment %}
+                            <span class="count">{{ category_book_counts|get_item:category }}</span>
 
                         </a>
                     {% endfor %}
@@ -49,7 +57,26 @@ a {
                             <p class="card-text">Sorry, we couldn't find any results for your search.</p>
                         </div>
                     </div>
+
+                    {% for book in books %}
                     <div class="col-lg-12 mb-4">
+                        <a href="{% url 'books:product-details' id=book.id %}">
+                            <div class="card blog-card project-content">
+                                <div class="card-body">
+                                    <span class="badge bg-primary mb-2">{{ book.category.name|upper }}</span>
+                                    <h5 class="card-title">{{ book.title }}</h5>
+                                    <div class="text-muted small mb-2">
+                                        {{ book.created_at|date:"d F Y" }} • Comments {{ book.comment_count }}
+                                    </div>
+                                    <p class="card-text">{{ book.description|truncatewords:20 }}</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    {% empty %}
+                    <p>No books available.</p>
+                    {% endfor %}
+                    {% comment %} <div class="col-lg-12 mb-4">
                         <a href="{% url 'books:product-details' id=1 %}"><div class="card blog-card project-content">
                             <!-- <img src="/api/placeholder/400/200" class="card-img-top" alt="Blog image"> -->
                             <div class="card-body">
@@ -167,7 +194,7 @@ a {
                                 <p class="card-text">Understanding the design thinking methodology.</p>
                             </div>
                         </div>
-                    </div>
+                    </div> {% endcomment %}
                 </div>
             
                 <!-- Pagination -->
