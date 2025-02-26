@@ -35,32 +35,38 @@ class Book(models.Model):
         return self.title
     
     def get_file_statistics(self):
-        """Returns a dictionary containing the page count and word count of the book's file."""
+        """Returns page count and word count of the book's file, ensuring fresh updates."""
         if not self.file:
             return {"pages": "No file uploaded", "words": "No file uploaded"}
 
+        # Force refresh the file path in case the file was updated
+        self.refresh_from_db()
         file_path = self.file.path
+
+        if not os.path.exists(file_path):
+            return {"pages": "File not found", "words": "File not found"}
+
         file_extension = os.path.splitext(file_path)[1].lower()
 
         try:
             if file_extension == ".pdf":
                 with fitz.open(file_path) as pdf:
                     text = ""
-                    for page in pdf:  
+                    for page in pdf:
                         text += page.get_text("text")  # Extract text from each page
 
                     page_count = pdf.page_count
-                    word_count = len(text.split())  # Count words in the extracted text
+                    word_count = len(text.split())  # Count words
 
                 return {"pages": page_count, "words": word_count}
 
             elif file_extension == ".docx":
                 doc = Document(file_path)
                 paragraphs = doc.paragraphs
-                text = " ".join([p.text for p in paragraphs])  # Combine all paragraph text
+                text = " ".join([p.text for p in paragraphs])  # Combine paragraph text
 
                 estimated_pages = max(1, len(paragraphs) // 30)  # Estimate based on ~30 paragraphs per page
-                word_count = len(text.split())  # Count words
+                word_count = len(text.split())
 
                 return {"pages": estimated_pages, "words": word_count}
 
