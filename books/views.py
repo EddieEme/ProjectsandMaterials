@@ -22,6 +22,8 @@ User = get_user_model()
 logger = logging.getLogger(__name__)
 
 def home(request):
+    if request.user.is_authenticated:
+        return redirect('books:login-home')
     # Retrieve the first 12 categories in alphabetical order
     categories = Category.objects.order_by('name')[:12]
 
@@ -33,6 +35,8 @@ def home(request):
 
 
 def projects(request):
+    if request.user.is_authenticated:
+        return redirect('books:login-project')
     # Get all categories
     categories = Category.objects.all()
     
@@ -55,6 +59,8 @@ def projects(request):
     return render(request, 'books/project.html', context)
 
 def projectList(request):
+    if request.user.is_authenticated:
+        return redirect('books:login-project-list')
      # Get the selected book type and category from the request
     book_type_id = request.GET.get('book_type', '')
     category_id = request.GET.get('category', '')
@@ -87,6 +93,8 @@ def projectList(request):
 
 
 def user_login(request):
+    if request.user.is_authenticated:
+        return redirect('books:user-dashboard')
     if request.method == "POST":
         email = request.POST['email']
         password = request.POST['password']
@@ -107,6 +115,8 @@ def user_logout(request):
     return redirect('/')
 
 def register(request):
+    if request.user.is_authenticated:
+        return redirect('books:user-dashboard')
     """Register a new user."""
     if request.method == "POST":
         email = request.POST.get("email")
@@ -174,6 +184,9 @@ def register(request):
 
 def product_details(request, id):
     book = get_object_or_404(Book, id=id)
+    if request.user.is_authenticated:
+        return redirect('books:login-product-details', id=book.id)
+    book = get_object_or_404(Book, id=id)
     stats = book.get_file_statistics()
     preview_url = f"/preview/{book.id}/" if book.file else None
 
@@ -217,15 +230,56 @@ def payment_method(request):
 
 @login_required(login_url='books:user_login')
 def login_projects(request):
-    return render(request, 'books/login-project.html')
+    categories = Category.objects.all()
+    
+    # Get all approved books
+    books = Book.objects.filter(is_approved=True)
+
+    # Count books in each category
+    category_book_counts = {
+        category: books.filter(category=category).count() for category in categories
+    }
+    
+    print(f"this is the count {category_book_counts}")
+
+    context = {
+        'categories': categories,
+        'books': books,
+        'category_book_counts': category_book_counts,
+    }
+    
+    return render(request, 'books/login-project.html', context)
 
 @login_required(login_url='books:user_login') 
 def login_projectList(request):
-    return render(request, 'books/login-list-project.html')
+    book_type_id = request.GET.get('book_type', '')
+    category_id = request.GET.get('category', '')
 
-@login_required(login_url='books:user_login')
-def login_product_details(request, id):
-    return render(request, 'books/login-product-details.html', {'id': id})
+    # Get all books initially
+    books = Book.objects.filter(is_approved=True)
+
+    # Filter by book type if selected
+    if book_type_id:
+        books = books.filter(book_type__id=book_type_id)
+
+    # Filter by category if selected
+    if category_id:
+        books = books.filter(category__id=category_id)
+
+    # Get all distinct book types and categories for the dropdown options
+    book_types = BookType.objects.all()
+    categories = Category.objects.all()
+
+    # Pass selected values to the template for retaining user selections
+    context = {
+        'books': books,
+        'selected_book_type': book_type_id,
+        'selected_category': category_id,
+        'book_types': book_types,
+        'categories': categories,
+    }
+    return render(request, 'books/login-list-project.html', context)
+
 
 @login_required(login_url='books:user_login')
 def login_department(request):
@@ -249,10 +303,13 @@ def login_home(request):
         print("User is not authenticated when accessing /login-home/")
     
     user = request.user
+    categories = Category.objects.order_by('name')[:12]
+
     context = {
         'first_name': user.first_name,
         'last_name': user.last_name,
         'email': user.email,
+        'categories': categories,
     }
     return render(request, "books/login-index.html", context)
 
@@ -263,7 +320,18 @@ def verification_error(request):
 
 @login_required(login_url='books:user_login')
 def login_product_details(request, id):
-    return render(request, 'books/login_product-details.html', {'id': id})
+    book = get_object_or_404(Book, id=id)
+    stats = book.get_file_statistics()
+    preview_url = f"/preview/{book.id}/" if book.file else None
+
+    context = {
+        "book": book,
+        "preview_url": preview_url,
+        "page_count": stats["pages"],
+        "word_count": stats["words"],
+    }
+
+    return render(request, 'books/login-product-details.html', context)
 
 
 @login_required(login_url='books:user_login')
