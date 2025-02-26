@@ -25,8 +25,11 @@ def extract_first_10_pages(book):
     preview_path = os.path.join(preview_dir, f"preview_{book.id}.pdf")
 
     try:
+        # ✅ Delete existing preview before generating a new one
+        if os.path.exists(preview_path):
+            os.remove(preview_path)
+
         if file_extension == ".pdf":
-            # Extract first 10 pages from PDF
             doc = fitz.open(file_path)
             new_doc = fitz.open()
             try:
@@ -38,21 +41,20 @@ def extract_first_10_pages(book):
                 doc.close()
 
         elif file_extension == ".docx":
-            # Convert first 10 pages of DOCX to PDF
             doc = Document(file_path)
             new_pdf = canvas.Canvas(preview_path, pagesize=letter)
             width, height = letter
-            y_position = height - 50  # Start near the top
+            y_position = height - 50
 
             try:
                 for para in doc.paragraphs:
                     text = para.text.strip()
                     if text:
-                        lines = simpleSplit(text, "Helvetica", 12, width - 100)  # Word wrap
+                        lines = simpleSplit(text, "Helvetica", 12, width - 100)
                         for line in lines:
                             new_pdf.drawString(50, y_position, line)
                             y_position -= 20
-                            if y_position < 50:  # Move to next page when needed
+                            if y_position < 50:
                                 new_pdf.showPage()
                                 y_position = height - 50
                 new_pdf.save()
@@ -60,7 +62,7 @@ def extract_first_10_pages(book):
                 new_pdf.showPage()
                 new_pdf.save()
 
-        return f"/media/previews/preview_{book.id}.pdf"  # Relative URL for frontend use
+        return f"/media/previews/preview_{book.id}.pdf"  # ✅ Always return the updated path
 
     except Exception as e:
         print(f"Error generating preview: {e}")

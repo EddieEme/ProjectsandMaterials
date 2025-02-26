@@ -160,7 +160,7 @@
                     <!-- Overview Tab -->
                     <div class="tab-pane fade show active" id="overview" role="tabpanel" >
                         <div class="content mb-4">
-                            <p class="lead">{{book.description}}</p>
+                            <p class="lead">{{book.description|truncatewords:200}}</p>
                                 <div class="container col-md-6 mt-5 align-items-center">
                                     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#documentModal">
                                         Preview Document
@@ -437,37 +437,50 @@
 
 
         document.addEventListener("DOMContentLoaded", function () {
-        var url = "{{ preview_url }}";  // Replace with your dynamic PDF URL
+        var previewUrl = "{{ preview_url|escapejs }}"; // Ensure Django passes the correct URL
+        if (!previewUrl) {
+            console.error("Preview URL is missing!");
+            document.getElementById('pdf-container').innerHTML = "<p>No preview available.</p>";
+            return;
+        }
+
+        var url = previewUrl + "?v=" + new Date().getTime(); // Prevent browser caching
         var container = document.getElementById('pdf-container');
 
-        // Load PDF
-        pdfjsLib.getDocument(url).promise.then(function (pdf) {
-            container.innerHTML = ''; // Clear "Loading PDF..." text
+        // Load and render the PDF
+        pdfjsLib.getDocument(url).promise
+            .then(function (pdf) {
+                container.innerHTML = ''; // Clear "Loading PDF..." text
+                console.log("PDF Loaded: " + pdf.numPages + " pages");
 
-            for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-                pdf.getPage(pageNum).then(function (page) {
-                    var scale = 1.2; // Adjust for mobile responsiveness
-                    var viewport = page.getViewport({ scale: scale });
+                for (let pageNum = 1; pageNum <= Math.min(pdf.numPages, 10); pageNum++) {
+                    pdf.getPage(pageNum).then(function (page) {
+                        var scale = window.innerWidth < 768 ? 0.8 : 1.2; // Adjust scale for mobile
+                        var viewport = page.getViewport({ scale: scale });
 
-                    var canvas = document.createElement('canvas');
-                    canvas.classList.add("pdf-page");
-                    container.appendChild(canvas);
+                        var canvas = document.createElement('canvas');
+                        canvas.classList.add("pdf-page");
+                        container.appendChild(canvas);
 
-                    var context = canvas.getContext('2d');
-                    canvas.height = viewport.height;
-                    canvas.width = viewport.width;
+                        var context = canvas.getContext('2d');
+                        canvas.width = viewport.width;
+                        canvas.height = viewport.height;
 
-                    var renderContext = {
-                        canvasContext: context,
-                        viewport: viewport
-                    };
-                    page.render(renderContext);
-                });
-            }
-        }).catch(function (error) {
-            console.error("Error loading PDF:", error);
-            container.innerHTML = "<p>Failed to load PDF. <a href='" + url + "' target='_blank'>Download here</a></p>";
-        });
+                        var renderContext = {
+                            canvasContext: context,
+                            viewport: viewport
+                        };
+
+                        page.render(renderContext);
+                    });
+                }
+            })
+            .catch(function (error) {
+                console.error("Error loading PDF:", error.message);
+                container.innerHTML = `
+                    <p>Failed to load PDF. <a href="${url}" target="_blank">Download here</a></p>
+                    <p>Error: ${error.message}</p>`;
+            });
     });
     </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
