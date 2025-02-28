@@ -1,13 +1,46 @@
 import os
-import fitz
-from django.shortcuts import get_object_or_404, render
+import fitz  # PyMuPDF
+from django.shortcuts import get_object_or_404
+from django.http import FileResponse, HttpResponseNotFound
 from docx import Document
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
-from reportlab.lib.utils import simpleSplit
 from django.conf import settings
-from django.http import FileResponse, HttpResponseNotFound
 from .models import Book
+
+
+def convert_docx_to_pdf(docx_path, pdf_path):
+    """Converts a .docx file (paragraphs & tables) to PDF (Linux-friendly)."""
+    doc = Document(docx_path)
+    pdf_canvas = canvas.Canvas(pdf_path, pagesize=letter)
+    
+    width, height = letter
+    y_position = height - 50  # Start position
+
+    def add_text(text):
+        """Helper function to add text to PDF."""
+        nonlocal y_position
+        pdf_canvas.drawString(50, y_position, text)
+        y_position -= 20  # Move down for the next line
+        if y_position < 50:  # Create a new page if needed
+            pdf_canvas.showPage()
+            y_position = height - 50
+
+    # Extract paragraphs
+    for para in doc.paragraphs:
+        text = para.text.strip()
+        if text:
+            add_text(text)
+
+    # Extract tables
+    for table in doc.tables:
+        for row in table.rows:
+            row_text = " | ".join(cell.text.strip() for cell in row.cells if cell.text.strip())
+            if row_text:
+                add_text(row_text)
+
+    pdf_canvas.save()
+
 
 def extract_first_10_pages(book):
     """Generates a preview PDF with the first 10 pages of a book."""
@@ -25,7 +58,7 @@ def extract_first_10_pages(book):
     preview_path = os.path.join(preview_dir, f"preview_{book.id}.pdf")
 
     try:
-        # ✅ Delete existing preview before generating a new one
+        # Delete existing preview before generating a new one
         if os.path.exists(preview_path):
             os.remove(preview_path)
 
@@ -41,32 +74,15 @@ def extract_first_10_pages(book):
                 doc.close()
 
         elif file_extension == ".docx":
-            doc = Document(file_path)
-            new_pdf = canvas.Canvas(preview_path, pagesize=letter)
-            width, height = letter
-            y_position = height - 50
+            # Convert .docx to PDF directly into preview_path
+            convert_docx_to_pdf(file_path, preview_path)
 
-            try:
-                for para in doc.paragraphs:
-                    text = para.text.strip()
-                    if text:
-                        lines = simpleSplit(text, "Helvetica", 12, width - 100)
-                        for line in lines:
-                            new_pdf.drawString(50, y_position, line)
-                            y_position -= 20
-                            if y_position < 50:
-                                new_pdf.showPage()
-                                y_position = height - 50
-                new_pdf.save()
-            finally:
-                new_pdf.showPage()
-                new_pdf.save()
-
-        return f"/media/previews/preview_{book.id}.pdf"  # ✅ Always return the updated path
+        return f"/media/previews/preview_{book.id}.pdf" 
 
     except Exception as e:
         print(f"Error generating preview: {e}")
         return None
+
 
 def serve_preview(request, book_id):
     """Serve the preview PDF inline instead of forcing a download."""
@@ -86,4 +102,3 @@ def serve_preview(request, book_id):
                 return HttpResponseNotFound("Preview not available.")
     
     return HttpResponseNotFound("Preview not available.")
-
