@@ -1,9 +1,11 @@
+from google.cloud import storage
 from django.db import models
 from django.conf import settings
 import fitz  # PyMuPDF for PDFs
 import os
 from docx import Document 
 from reportlab.pdfgen import canvas
+import tempfile
 
 class BookType(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -39,12 +41,15 @@ class Book(models.Model):
         if not self.file:
             return {"pages": "No file uploaded", "words": "No file uploaded"}
 
-        # Force refresh the file path in case the file was updated
-        self.refresh_from_db()
-        file_path = self.file.path
+        # Initialize GCS client
+        client = storage.Client(credentials=settings.GS_CREDENTIALS)
+        bucket = client.bucket(settings.GS_BUCKET_NAME)
+        blob = bucket.blob(self.file.name)  # self.file.name is the file path in GCS
 
-        if not os.path.exists(file_path):
-            return {"pages": "File not found", "words": "File not found"}
+        # Download the file to a temporary location
+        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+            blob.download_to_filename(temp_file.name)
+            file_path = temp_file.name
 
         file_extension = os.path.splitext(file_path)[1].lower()
 
@@ -75,47 +80,8 @@ class Book(models.Model):
 
         except Exception as e:
             return {"pages": f"Error reading file: {e}", "words": f"Error reading file: {e}"}
-        
-        
-    # def extract_first_10_pages(self):
-    #     """Creates a temporary file with the first 10 pages of the document while preserving formatting."""
-    #     file_path = self.file.path
-    #     file_extension = os.path.splitext(file_path)[1].lower()
 
-    #     # Output file (Temporary)
-    #     preview_folder = os.path.join(settings.MEDIA_ROOT, "previews")
-    #     os.makedirs(preview_folder, exist_ok=True)  # Ensure the folder exists
-
-    #     temp_file_path = os.path.join(preview_folder, f"preview_{self.id}.pdf")
-
-    #     if file_extension == ".pdf":
-    #         try:
-    #             doc = fitz.open(file_path)
-    #             new_doc = fitz.open()
-    #             for page_num in range(min(10, doc.page_count)):  # Use `doc.page_count`
-    #                 new_doc.insert_pdf(doc, from_page=page_num, to_page=page_num)
-    #             new_doc.save(temp_file_path)
-    #             new_doc.close()
-    #             return os.path.join(settings.MEDIA_URL, "previews", f"preview_{self.id}.pdf")
-    #         except Exception as e:
-    #             return f"Error processing PDF: {e}"
-
-    #     elif file_extension == ".docx":
-    #         try:
-    #             doc = Document(file_path)
-    #             new_pdf = canvas.Canvas(temp_file_path)
-    #             paragraphs = doc.paragraphs[:300]  # Approx. 10 pages worth of text
-    #             y_position = 800
-    #             for para in paragraphs:
-    #                 new_pdf.drawString(50, y_position, para.text)
-    #                 y_position -= 20
-    #                 if y_position < 50:
-    #                     new_pdf.showPage()
-    #                     y_position = 800
-    #             new_pdf.save()
-    #             return os.path.join(settings.MEDIA_URL, "previews", f"preview_{self.id}.pdf")
-    #         except Exception as e:
-    #             return f"Error processing DOCX: {e}"
-
-    #     else:
-    #         return "Unsupported file format."
+        finally:
+            # Clean up the temporary file
+            if os.path.exists(file_path):
+                os.remove(file_path)

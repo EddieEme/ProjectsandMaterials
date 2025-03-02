@@ -186,7 +186,7 @@ def product_details(request, id):
     book = get_object_or_404(Book, id=id)
     if request.user.is_authenticated:
         return redirect('books:login-product-details', id=book.id)
-    book = get_object_or_404(Book, id=id)
+    
     stats = book.get_file_statistics()
     preview_url = f"/preview/{book.id}/" if book.file else None
 
@@ -202,6 +202,9 @@ def product_details(request, id):
 def department(request, category_id):
     selected_category = get_object_or_404(Category, id=category_id)
     books = Book.objects.filter(category_id=category_id, is_approved=True)
+    
+    if request.user.is_authenticated:
+        return redirect('books:login-home')
 
     context = {
         'selected_category': selected_category,
@@ -209,9 +212,19 @@ def department(request, category_id):
     }
     return render(request, 'books/department.html', context)
 
-@login_required(login_url='books:user_login')
-def buyorsubscribe(request):
-    return render(request, 'books/buyorsubscribe.html')
+
+def buyorsubscribe(request, id):
+    if request.user.is_authenticated:
+        return render(request, 'books/login-buyorsubscribe.html',)
+    
+    book = get_object_or_404(Book, id=id)
+    stats = book.get_file_statistics()
+    context = {
+        "book": book,
+        "page_count": stats["pages"],
+        "word_count": stats["words"],
+        }
+    return render(request, 'books/buyorsubscribe.html', context)
 
 
 @login_required(login_url='books:user_login')
@@ -219,6 +232,8 @@ def payment_checkout(request):
     return render(request, 'books/paymentcheckout.html')
 
 def subscription(request):
+    if request.user.is_authenticated:
+        return render(request, 'books/login-subscription.html')
     return render(request, 'books/subscription.html')
 
 @login_required(login_url='books:user_login')
@@ -282,12 +297,26 @@ def login_projectList(request):
 
 
 @login_required(login_url='books:user_login')
-def login_department(request):
+def login_department(request, category_id ):
+    selected_category = get_object_or_404(Category, id=category_id)
+    books = Book.objects.filter(category_id=category_id, is_approved=True)
+
+    context = {
+        'selected_category': selected_category,
+        'books': books,
+    }
     return render(request, 'books/login-department.html')
 
 @login_required(login_url='books:user_login')
-def login_buyorsubscribe(request):
-    return render(request, 'books/login-buyorsubscribe.html')
+def login_buyorsubscribe(request, id):
+    book = get_object_or_404(Book, id=id)
+    stats = book.get_file_statistics()
+    context = {
+        "book": book,
+        "page_count": stats["pages"],
+        "word_count": stats["words"],
+        }
+    return render(request, 'books/login-buyorsubscribe.html', context)
 
 @login_required(login_url='books:user_login')
 def login_subscription(request):

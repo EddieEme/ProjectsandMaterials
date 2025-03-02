@@ -7,7 +7,8 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from django.conf import settings
 from .models import Book
-
+from google.cloud import storage
+import tempfile
 
 def convert_docx_to_pdf(docx_path, pdf_path):
     """Converts a .docx file (paragraphs & tables) to PDF (Linux-friendly)."""
@@ -46,8 +47,17 @@ def extract_first_10_pages(book):
     """Generates a preview PDF with the first 10 pages of a book."""
     if not book.file:
         return None
-    
-    file_path = book.file.path
+
+    # Initialize GCS client
+    client = storage.Client(credentials=settings.GS_CREDENTIALS)
+    bucket = client.bucket(settings.GS_BUCKET_NAME)
+    blob = bucket.blob(book.file.name)  # book.file.name is the file path in GCS
+
+    # Download the file to a temporary location
+    with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(book.file.name)[1]) as temp_file:
+        blob.download_to_filename(temp_file.name)
+        file_path = temp_file.name
+
     file_extension = os.path.splitext(file_path)[1].lower()
 
     # Ensure preview directory exists
@@ -83,6 +93,10 @@ def extract_first_10_pages(book):
         print(f"Error generating preview: {e}")
         return None
 
+    finally:
+        # Clean up the temporary file
+        if os.path.exists(file_path):
+            os.remove(file_path)
 
 def serve_preview(request, book_id):
     """Serve the preview PDF inline instead of forcing a download."""
