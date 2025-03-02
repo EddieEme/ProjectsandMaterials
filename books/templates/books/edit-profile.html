@@ -11,7 +11,7 @@
                     <div class="row mb-4">
                         <div class="col-md-3">
                             <div class="text-center">
-                                {% if profile.profile_picture %}
+                                {% if profile.profile_picture and profile.profile_picture.url %}
                                     <img src="{{ profile.profile_picture.url }}" class="img-fluid rounded-circle mb-3" alt="Profile Picture">
                                 {% else %}
                                     <img src="{% static 'books/images/default_profile_image.jpg' %}" class="img-fluid rounded-circle mb-3" alt="Default Profile Picture">

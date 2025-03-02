@@ -6,11 +6,6 @@
 {% block style %} 
 {% load custom_filters %}
 
-<ul>
-    {% for category in categories %}
-        <li>{{ category.name }} - {{ category_book_counts|get_item:category }}</li>
-    {% endfor %}
-</ul>
 
 <style>
 a {

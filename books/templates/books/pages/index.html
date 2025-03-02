@@ -108,6 +108,16 @@
                 <!-- Row 1 -->
                 {% for category in categories %}
                 <div class="col-md-6 col-lg-3" data-aos="fade-left" data-aos-delay="50">
+                    {% if request.user.is_uathenticated %}
+                    <a href="{% url 'books:login-departments' category.id %} ">
+                        <div class="field-card">
+                        <h3 class="field-title">
+                            <i class="fa-solid fa-book-open"></i>
+                            {{category}}
+                        </h3>
+                        </div>
+                    </a>
+                    {% else %}
                     <a href="{% url 'books:departments' category.id %} ">
                         <div class="field-card">
                         <h3 class="field-title">
@@ -116,6 +126,8 @@
                         </h3>
                         </div>
                     </a>
+                    {% endif %}
+
                 </div>
                 {% endfor %}
             </div>
