@@ -2,7 +2,7 @@ dj_database_url==2.3.0
 Django==4.2.17
 djangorestframework_simplejwt==5.3.1
 fitz==0.0.1.dev2
-protobuf==6.30.0
+protobuf==4.24.4
 python-decouple==3.8
 python_docx==1.1.2
 reportlab==4.3.1
