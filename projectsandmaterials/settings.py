@@ -157,14 +157,17 @@ if DATABASE_URL:
 # Google Cloud Storage Configuration
 DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
 STATICFILES_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
-STATICFILES_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
 GS_BUCKET_NAME = config('GS_BUCKET_NAME')
 GS_PROJECT_ID = config('GS_PROJECT_ID')
 GS_CREDENTIALS_JSON = config('GS_CREDENTIALS')
 GS_CREDENTIALS = service_account.Credentials.from_service_account_info(json.loads(GS_CREDENTIALS_JSON))
 
+PAYSTACK_SECRET_KEY = config('PAYSTACK_SECRET_KEY')
+PAYSTACK_PUBLIC_KEY = config('PAYSTACK_PUBLIC_KEY')
 
-STATICFILES_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
+FLUTTERWAVE_PUBLIC_KEY = config('FLUTTERWAVE_PUBLIC_KEY')
+FLUTTERWAVE_SECRET_KEY = config('FLUTTERWAVE_SECRET_KEY')
+
 
 # Social Account Providers
 SOCIALACCOUNT_PROVIDERS = {

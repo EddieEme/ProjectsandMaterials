@@ -4,7 +4,8 @@ from rest_framework import routers
 from users.views import UserViewSet, AuthViewSet, EmailVerificationView
 from . import views
 from books.api_views import most_viewed_videos, GetDepartmentView, DepartmentAPIView
-from .utils import extract_first_10_pages, serve_preview
+from .utils import extract_first_10_pages, serve_preview, download_book
+from .payment import pay_with_paystack, pay_with_flutterwave, paystack_callback, flutterwave_callback
 
 
 app_name = 'books'
@@ -24,7 +25,7 @@ web_urlpatterns = [
     path('register/', views.register, name='register'),
     path('product-details/<int:id>/', views.product_details, name='product-details'),
     path('departments/<int:category_id>/', views.department, name='departments'),
-    path('payment-method/', views.payment_method, name='payment-method'),
+    path('payment-method/<int:id>/', views.payment_method, name='payment-method'),
     path('payment-checkout/', views.payment_checkout, name='payment-checkout'),
     path('subscription/', views.subscription, name='subscription'),
     path('buyorsubscribe/<int:id>/', views.buyorsubscribe, name='buyorsubscribe'),
@@ -42,6 +43,7 @@ web_urlpatterns = [
     path('user-dashboard/', views.user_dashboard, name='user-dashboard'),
     path('view-profile/', views.view_profile, name='view-profile'),
     path('edit-profile/', views.edit_profile, name='edit-profile'),
+    path('download/<uuid:token>/', download_book, name='download_book'),
 ]
 
 # API authentication URLs
@@ -56,6 +58,13 @@ auth_patterns = [
     path("preview/<int:book_id>/", serve_preview, name="preview"),
 ]
 
+payment_patterns = [
+    path('paystack/<int:book_id>/', pay_with_paystack, name='pay_with_paystack'),
+    path('flutterwave/<int:book_id>/', pay_with_flutterwave, name='pay_with_flutterwave'),
+    path('paystack/callback/', paystack_callback, name='paystack_callback'),
+    path('flutterwave/callback/', flutterwave_callback, name='flutterwave_callback'),
+]
+
 
 # API ViewSet URLs
 api_urlpatterns = [
@@ -67,5 +76,6 @@ api_urlpatterns = [
 urlpatterns = [
     *web_urlpatterns,  # Web pages
     *auth_patterns,    # Authentication endpoints
-    *api_urlpatterns,  # API ViewSets
+    *api_urlpatterns, 
+    *payment_patterns,
 ]
