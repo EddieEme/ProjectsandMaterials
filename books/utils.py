@@ -1,14 +1,36 @@
 import os
 import fitz  # PyMuPDF
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.http import FileResponse, HttpResponseNotFound
 from docx import Document
+from django.http import HttpResponse
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from django.conf import settings
-from .models import Book
+from .models import Book, Download
 from google.cloud import storage
 import tempfile
+import requests
+from django.conf import settings
+import datetime
+from datetime import timedelta
+
+class Paystack:
+    base_url = "https://api.paystack.co"
+
+    @staticmethod
+    def verify_payment(reference):
+        """Verify transaction from Paystack."""
+        url = f"{Paystack.base_url}/transaction/verify/{reference}"
+        headers = {
+            "Authorization": f"Bearer {settings.PAYSTACK_SECRET_KEY}",
+            "Content-Type": "application/json",
+        }
+        response = requests.get(url, headers=headers)
+        return response.json()
+
+
+
 
 def convert_docx_to_pdf(docx_path, pdf_path):
     """Converts a .docx file (paragraphs & tables) to PDF (Linux-friendly)."""
@@ -83,7 +105,7 @@ def extract_first_10_pages(book):
                 new_doc.close()
                 doc.close()
 
-        elif file_extension == ".docx":
+        elif file_extension == ".docx" or  file_extension == '.doc':
             # Convert .docx to PDF directly into preview_path
             convert_docx_to_pdf(file_path, preview_path)
 
@@ -116,3 +138,67 @@ def serve_preview(request, book_id):
                 return HttpResponseNotFound("Preview not available.")
     
     return HttpResponseNotFound("Preview not available.")
+
+
+def download_book(request, token):
+    download = get_object_or_404(Download, download_token=token)
+
+    # Ensure the book has a file
+    if not download.book.file:
+        return HttpResponse("File not found", status=404)
+
+    # ✅ Use file.url (GCS provides a public URL for stored files)
+    if hasattr(download.book.file, 'url'):
+        return redirect(download.book.file.url)  # ✅ Redirect to GCS file URL
+
+    return HttpResponse("Download failed", status=500)
+
+# import logging
+# logger = logging.getLogger(__name__)
+
+# def generate_signed_url(bucket_name, blob_name, expiration=3600):
+#     """Generate a signed URL for a GCS object."""
+#     try:
+#         # Use the credentials from Django settings
+#         storage_client = storage.Client(credentials=settings.GS_CREDENTIALS)
+#         bucket = storage_client.bucket(bucket_name)
+#         blob = bucket.blob(blob_name)
+        
+#         # Generate a signed URL with the specified expiration time
+#         url = blob.generate_signed_url(
+#             expiration=timedelta(seconds=expiration),
+#             version="v4"  # Use v4 signing
+#         )
+#         return url
+#     except Exception as e:
+#         logger.error(f"Error generating signed URL: {str(e)}")
+#         raise
+
+# def download_book(request, token):
+#     try:
+#         # Retrieve the download object
+#         download = get_object_or_404(Download, download_token=token)
+
+#         # Check if the book file exists
+#         if not download.book.file:
+#             logger.error(f"File not found for download token: {token}")
+#             return HttpResponse("File not found", status=404)
+
+#         # Extract the GCS file path
+#         gcs_url = download.book.file.url
+#         bucket_name = settings.GS_BUCKET_NAME  # Use the bucket name from settings
+
+#         # Extract the relative file path from the GCS URL
+#         if bucket_name not in gcs_url:
+#             logger.error(f"Invalid GCS URL for download token: {token}")
+#             return HttpResponse("Invalid GCS URL", status=400)
+#         file_path = gcs_url.split(bucket_name + "/")[-1]  # Get only the relative path
+
+#         # Generate a signed URL (valid for 1 hour)
+#         signed_url = generate_signed_url(bucket_name, file_path, expiration=3600)
+
+#         # Redirect to the signed URL for download
+#         return redirect(signed_url)
+#     except Exception as e:
+#         logger.error(f"Error processing download request for token {token}: {str(e)}")
+#         return HttpResponse("An error occurred while processing your request.", status=500)

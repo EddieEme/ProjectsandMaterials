@@ -23,12 +23,15 @@
         .payment-method {
             display: flex;
             align-items: center;
+            justify-content: space-between;
             margin-bottom: 15px;
             padding: 15px;
             border: 1px solid #e0e0e0;
             border-radius: 5px;
             cursor: pointer;
             transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
         }
 
         .payment-method:hover {
@@ -40,6 +43,27 @@
             width: 50px;
             margin-right: 15px;
         }
+
+        .payment-method button {
+            flex-grow: 1;
+            text-align: left;
+            background: none;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            padding: 0;
+            font-size: 16px;
+        }
+
+        .payment-method button:hover {
+            color: #198754;
+        }
+
+        .alert-info {
+            background-color: #e2f3f5;
+            border-color: #bee5eb;
+            color: #0c5460;
+        }
     </style>
 </head>
 
@@ -47,47 +71,38 @@
     <div class="container">
         <div class="payment-container">
             <h2 class="text-center mb-4">Complete Your Purchase</h2>
-            <div class="alert alert-info text-center" role="alert">
-                You're purchasing: Ayatutu Ontology - George Akume Leadership Recruitment Model
+            <div class="alert alert-info" role="alert">
+                <span>Book Title: {{ book.title }}</span><br>
+                <span>Amount: ₦ {{ book.price }}</span>
+            </div>
+            <div>
+                <h4>Pay with Card/Bank/USSD/Mobile Money</h4>
+                <p>We accept several ATM, debit, credit cards. We also process bank transfer,
+                    direct bank debit, mobile money, and USSD payments. Click "Pay Now"
+                    below to pay online and access works immediately.</p>
             </div>
 
             <h4 class="mb-3">Select Payment Method</h4>
 
-            <div class="payment-method" onclick="processPayment('credit')">
-                <img src="#" alt="Credit Card">
-                <div>
-                    <h5>Credit Card</h5>
-                    <p class="text-muted mb-0">Visa, MasterCard</p>
-                </div>
-            </div>
+            <!-- Paystack Payment Form -->
+            <form class="payment-method" action="{% url 'books:pay_with_paystack' book.id %}" method="post">
+                {% csrf_token %}
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Paystack.png/640px-Paystack.png" alt="Paystack">
+                <button type="submit">Pay with Paystack</button>
+            </form>
 
-            <div class="payment-method" onclick="processPayment('bank')">
-                <img src="/api/placeholder/50/50" alt="Bank Transfer">
-                <div>
-                    <h5>Bank Transfer</h5>
-                    <p class="text-muted mb-0">Direct bank account transfer</p>
-                </div>
-            </div>
+            <!-- Flutterwave Payment Form -->
+            <form class="payment-method" action="{% url 'books:pay_with_flutterwave' book.id %}" method="post">
+                {% csrf_token %}
+                <img src="https://flutterwave.com/images/flutterwave-logo.svg" alt="Flutterwave">
+                <button type="submit">Pay with Flutterwave</button>
+            </form>
 
             <div class="text-center mt-4">
                 <button class="btn btn-secondary" onclick="window.history.back()">Cancel</button>
             </div>
         </div>
     </div>
-
-    <script>
-        function processPayment(method) {
-            switch (method) {
-                case 'credit':
-                    alert('Redirecting to Credit Card Payment');
-                    break;
-                case 'bank':
-                    alert('Initiating Bank Transfer Process');
-                    break;
-            }
-            // In a real application, this would redirect to the actual payment processor
-        }
-    </script>
 </body>
 
 </html>

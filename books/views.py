@@ -1,7 +1,9 @@
 from django.shortcuts import get_object_or_404, redirect, render
+from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate, login, logout
+from django.core.paginator import Paginator
 from django.contrib import messages
 from django.urls import reverse
 from django.core.mail import EmailMessage
@@ -10,8 +12,8 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.conf import settings
-from .models import Book, Category, BookType
-from .utils import extract_first_10_pages
+from .models import Book, Category, BookType, Order, Download
+from django.db.models import Sum, Avg, Q, Count
 import json
 import logging
 
@@ -237,8 +239,17 @@ def subscription(request):
     return render(request, 'books/subscription.html')
 
 @login_required(login_url='books:user_login')
-def payment_method(request):
-    return render(request, 'books/payment-method.html')
+def payment_method(request, id):
+    # Fetch the book by its ID
+    book = get_object_or_404(Book, id=id)
+    
+    # Prepare the context
+    context = {
+        'book': book,
+    }
+    
+    # Render the template with the context
+    return render(request, 'books/payment-method.html', context)
 
 
 
@@ -368,9 +379,56 @@ def user_settings(request):
     return render(request, 'books/settings.html')
 
 
+
 @login_required(login_url='books:user_login')
 def user_dashboard(request):
-    return render(request, 'books/userdashboard.html')
+    user = request.user
+
+    # Get paginated orders
+    orders_qs = Order.objects.filter(user=user).order_by('-created_at')
+    orders_paginator = Paginator(orders_qs, 10)
+    orders_page = request.GET.get('orders_page', 1)  # Get order page number
+    orders_page_obj = orders_paginator.get_page(orders_page)
+
+    # Get paginated downloads
+    downloads_qs = Download.objects.filter(user=user).order_by('-downloaded_at')
+    downloads_paginator = Paginator(downloads_qs, 10)
+    downloads_page = request.GET.get('downloads_page', 1)  # Get download page number
+    downloads_page_obj = downloads_paginator.get_page(downloads_page)
+
+    # Get latest download URL (if available)
+    latest_download = downloads_qs.first()
+    download_url = latest_download.get_download_url() if latest_download else None
+
+    # Retrieve user's uploaded books with sales count
+    products = Book.objects.filter(user=user).annotate(
+        sales_count=Count('order', filter=Q(order__status='completed'))
+    ).order_by('-created_at')
+
+    total_products = products.count()
+    total_sales_count = Order.objects.filter(book__user=user, status='completed').count() or 0
+
+    # Calculate total earnings from completed orders
+    total_earnings = (
+        Order.objects.filter(book__user=user, status='completed')
+        .aggregate(total=Sum('uploader_earning'))['total'] or 0
+    )
+
+    # Prepare context
+    context = {
+        'total_sales': total_sales_count,
+        'total_products': total_products,
+        'total_earnings': f"{total_earnings:,.2f}",
+        'user': user,
+        'products': products,
+        'orders_page_obj': orders_page_obj,
+        'downloads_page_obj': downloads_page_obj,
+        'download_url': download_url,
+    }
+
+    return render(request, 'books/userdashboard.html', context)
+
+
 
 
 @login_required(login_url='books:user_login')
