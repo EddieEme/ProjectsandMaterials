@@ -1,11 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Gateway - Ayatutu Ontology</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+{% extends 'books/loginbase.html' %}
+{% load static %}
+{% block link %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+{% endblock %}
+{% block title %} Payment Gateway {% endblock %}
+{% block style %}
     <style>
         body {
             background-color: #f4f6f9;
@@ -65,9 +64,8 @@
             color: #0c5460;
         }
     </style>
-</head>
-
-<body>
+{% endblock %}
+{% block content %}
     <div class="container">
         <div class="payment-container">
             <h2 class="text-center mb-4">Complete Your Purchase</h2>
@@ -87,14 +85,14 @@
             <!-- Paystack Payment Form -->
             <form class="payment-method" action="{% url 'books:pay_with_paystack' book.id %}" method="post">
                 {% csrf_token %}
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Paystack.png/640px-Paystack.png" alt="Paystack">
+                <img src="{% static 'books/images/paystack.png' %}" alt="Paystack">
                 <button type="submit">Pay with Paystack</button>
             </form>
 
             <!-- Flutterwave Payment Form -->
             <form class="payment-method" action="{% url 'books:pay_with_flutterwave' book.id %}" method="post">
                 {% csrf_token %}
-                <img src="https://flutterwave.com/images/flutterwave-logo.svg" alt="Flutterwave">
+                <img src="{% static 'books/images/flutterwave.png' %}" alt="Flutterwave">
                 <button type="submit">Pay with Flutterwave</button>
             </form>
 
@@ -103,6 +101,9 @@
             </div>
         </div>
     </div>
-</body>
+    {% include 'books/pages/footer.html' %}
 
-</html>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}

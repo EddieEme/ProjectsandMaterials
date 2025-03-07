@@ -1,0 +1,104 @@
+/* Base font size for scaling */
+html {
+  font-size: 16px; /* Default for larger screens */
+}
+
+/* Desktop Heading Sizes */
+h1 { font-size: 2.5rem; }  /* 40px */
+h2 { font-size: 2rem; }    /* 32px */
+h3 { font-size: 1.75rem; } /* 28px */
+h4 { font-size: 1.5rem; }  /* 24px */
+h5 { font-size: 1.25rem; } /* 20px */
+h6 { font-size: 1rem; }    /* 16px */
+
+/* Body Text */
+p, a, li, span {
+  font-size: 1rem; /* 16px */
+  line-height: 1.6;
+}
+
+/* 🔹 Responsive Adjustments for Mobile */
+@media (max-width: 768px) { 
+  html {
+    font-size: 14px; /* Slightly smaller base size */
+  }
+  h1 { font-size: 2rem; }   /* 32px */
+  h2 { font-size: 1.75rem; } /* 28px */
+  h3 { font-size: 1.5rem; }  /* 24px */
+  h4 { font-size: 1.25rem; } /* 20px */
+  h5 { font-size: 1.1rem; }  /* 18px */
+  h6 { font-size: 1rem; }    /* 16px */
+
+  /* Body Text */
+  p, a, li {
+    font-size: 0.95rem; /* 15px */
+    line-height: 1.5;
+  }
+}
+
+/* Larger screens */
+@media (min-width: 1024px) {
+    h1 { font-size: 2.5rem; }
+    h2 { font-size: 2rem; }
+    h3 { font-size: 1.75rem; }
+    h4 { font-size: 1.5rem; }
+    h5 { font-size: 1.25rem; }
+    h6 { font-size: 1rem; }
+    p, a, li, span { font-size: 1rem; }
+}
+
+/* Tablet screens */
+@media (max-width: 1023px) {
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.75rem; }
+    h3 { font-size: 1.5rem; }
+    h4 { font-size: 1.25rem; }
+    h5 { font-size: 1.1rem; }
+    h6 { font-size: 1rem; }
+    p, a, li, { font-size: 0.95rem; }
+}
+
+/* Mobile screens */
+@media (max-width: 768px) {
+    h1 { font-size: 1.75rem; }
+    h2 { font-size: 1.5rem; }
+    h3 { font-size: 1.25rem; }
+    h4 { font-size: 1.1rem; }
+    h5 { font-size: 1rem; }
+    h6 { font-size: 0.9rem; }
+    p, a, li, { font-size: 0.9rem; }
+}
+
+
+
+
+/* Set the same font family and style for all elements */
+h1, h2, h3, h4, h5, h6, p, a, li, span {
+    font-family: "Poppins", sans-serif;  /* Change to your preferred font */
+    font-weight: 400; /* Normal weight */
+    font-style: normal; /* Regular style */
+    font-size: 100%; /* Default size */
+    color: #333; /* Optional: Set a universal color */
+}
+
+/* Larger screens */
+@media (min-width: 1024px) {
+    h1, h2, h3, h4, h5, h6, p, a, li, span {
+        font-size: 1rem; /* Adjust as needed */
+    }
+}
+
+/* Tablet screens */
+@media (max-width: 1023px) {
+    h1, h2, h3, h4, h5, h6, p, a, li, span {
+        font-size: 0.95rem;
+    }
+}
+
+/* Mobile screens */
+@media (max-width: 768px) {
+    h1, h2, h3, h4, h5, h6, p, a, li, span {
+        font-size: 0.9rem;
+    }
+}
+

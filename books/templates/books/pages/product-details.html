@@ -37,6 +37,22 @@
             border-radius: 4px;
         }
 
+        .related-work a {
+            text-decoration: none;
+            color: #333;
+            font-size: 16px;
+            font-weight: 500;
+            display: block;
+            padding: 8px 12px;
+            transition: color 0.3s ease;
+        }
+
+        .related-works li {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
         .review-header {
             display: flex;
             justify-content: space-between;
@@ -130,6 +146,9 @@
         height: auto;
         margin-bottom: 10px;
     }
+    .lead{
+        text-align:justify;
+    }
 
     </style>
     {% endblock %}
@@ -160,7 +179,7 @@
                     <!-- Overview Tab -->
                     <div class="tab-pane fade show active" id="overview" role="tabpanel" >
                         <div class="content mb-4">
-                            <p class="lead">{{book.description|truncatewords:200}}</p>
+                            <p class="lead">{{book.description|truncatewords:250}}</p>
                                 <div class="container col-md-6 mt-5 align-items-center">
                                     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#documentModal">
                                         Preview Document
@@ -214,21 +233,13 @@
 
                         <!-- Ayatutu Ontology Definition -->
                         <div class="ayatutu-definition">
-                            <h3 class="mb-3">Definition of Ayatutu Ontology</h3>
-                            <p>Ayatutu Ontology refers to the conceptual framework and model developed in the paper,
-                                which examines the leadership recruitment process in Nigeria. It aims to analyze the
-                                factors that have led to the deterioration of democratic consolidation and the
-                                "anticipated gains of democracy" in the country. The ontology provides a critical
-                                appraisal of the leadership system and proposes a reformatting of the leadership
-                                recruitment model to allow for better democratic governance.</p>
+                            
                         </div>
 
 
                         <!-- Ayatutu Ontology Word Generator -->
                         <div class="ayatutu-definition">
-                            <h3 class="mb-3">50 Words Related to Ayatutu Ontology</h3>
-                            <div class="generated-words" id="generated-words"></div>
-                            <button class="btn btn-success mt-3" onclick="generateWords()">Generate New Words</button>
+                      
                         </div>
                     </div>
 
@@ -382,16 +393,15 @@
                 </div>
                 <div class="related-works">
                     <h4 class="mb-3">Related Works</h4>
-                    <div class="related-work">
-                        <h6>GIRL CHILD EDUCATION AT THE PRE-TERTIARY LEVEL IN THE BUNKPURUGU/YUNYOO DISTRICT: ISSUES,
-                            CHALLENGES AND THE
-                            WAY FORWARD</h6>
-                    </div>
-                    <div class="related-work">
-                        <h6>THE EFFECTS OF AGRICULTURAL MODERNISATION ON POVERTY REDUCTION: A CASE STUDY OF THE TONO
-                            IRRIGATION SCHEME
-                            IN THE KASSENA-NANKANA DISTRICT OF THE UPPER - EAST REGION OF GHANA</h6>
-                    </div>
+                    {% for related_book in related_books %}
+                        <li class="related-work">
+                            <a href="{% url 'books:product-details' related_book.id %}">
+                                {{ related_book.title }}
+                            </a>
+                        </li>
+                    {% empty %}
+                        <li class="related-work">No related books found.</li>
+                    {% endfor %}
                 </div>
 
             </div>
@@ -400,26 +410,6 @@
 
     
     <script>
-        function generateWords() {
-            const words = [
-                "Ayatutu", "Ontology", "Leadership", "Recruitment", "Democratic", "Consolidation", "Governance", "Epistemic", "Purity", "Disencrypted",
-                "Falsehood", "Dividends", "Volatile", "Strengthens", "Institutions", "Complementarity", "Reformatting", "Appraisal", "Anticipated",
-                "Deterioration", "Gains", "Rational", "Emotional", "Supremacist", "Solidarity", "Individuality", "Dependency", "Corruption", "Instilled"
-            ];
-
-            let generatedWords = '';
-            for (let i = 0; i < 50; i++) {
-                const randomIndex = Math.floor(Math.random() * words.length);
-                generatedWords += words[randomIndex] + ' ';
-            }
-
-            document.getElementById('generated-words').textContent = generatedWords.trim();
-        }
-
-        // Generate words on page load
-        generateWords();
-
-
         document.addEventListener('DOMContentLoaded', function () {
             // Prevent text selection
             document.body.addEventListener('selectstart', function (e) {

@@ -184,24 +184,41 @@ def register(request):
     # Render the registration form
     return render(request, "books/register.html")
 
+
 def product_details(request, id):
+    # Get the selected book
     book = get_object_or_404(Book, id=id)
+    
+    # Redirect authenticated users (if needed)
     if request.user.is_authenticated:
         return redirect('books:login-product-details', id=book.id)
     
+    # Get book statistics
     stats = book.get_file_statistics()
     preview_url = f"/preview/{book.id}/" if book.file else None
 
+    # Get related books based on the title
+    title_keywords = book.title.split()  # Split title into keywords
+    related_books = Book.objects.filter(
+        # Search for books with similar titles
+        Q(title__icontains=title_keywords[0]) |  # Match the first keyword
+        Q(title__icontains=title_keywords[-1]),  # Match the last keyword
+    ).exclude(id=book.id).distinct()[:5]  # Exclude the current book and limit to 5 results
+
+    # Prepare context
     context = {
         "book": book,
         "preview_url": preview_url,
         "page_count": stats["pages"],
         "word_count": stats["words"],
+        "related_books": related_books,  # Add related books to the context
     }
 
     return render(request, 'books/product-details.html', context)
 
 def department(request, category_id):
+    if request.user.is_authenticated:
+        return redirect('books:login-departments', category_id )
     selected_category = get_object_or_404(Category, id=category_id)
     books = Book.objects.filter(category_id=category_id, is_approved=True)
     
@@ -316,7 +333,7 @@ def login_department(request, category_id ):
         'selected_category': selected_category,
         'books': books,
     }
-    return render(request, 'books/login-department.html')
+    return render(request, 'books/login-department.html', context)
 
 @login_required(login_url='books:user_login')
 def login_buyorsubscribe(request, id):
@@ -361,14 +378,25 @@ def verification_error(request):
 @login_required(login_url='books:user_login')
 def login_product_details(request, id):
     book = get_object_or_404(Book, id=id)
+    # Get book statistics
     stats = book.get_file_statistics()
     preview_url = f"/preview/{book.id}/" if book.file else None
 
+    # Get related books based on the title
+    title_keywords = book.title.split()  # Split title into keywords
+    related_books = Book.objects.filter(
+        # Search for books with similar titles
+        Q(title__icontains=title_keywords[0]) |  # Match the first keyword
+        Q(title__icontains=title_keywords[-1]),  # Match the last keyword
+    ).exclude(id=book.id).distinct()[:8]  # Exclude the current book and limit to 5 results
+
+    # Prepare context
     context = {
         "book": book,
         "preview_url": preview_url,
         "page_count": stats["pages"],
         "word_count": stats["words"],
+        "related_books": related_books,  # Add related books to the context
     }
 
     return render(request, 'books/login-product-details.html', context)
