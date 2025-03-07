@@ -17,6 +17,10 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from google.oauth2 import service_account
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 
 class BookType(models.Model):
@@ -55,6 +59,7 @@ class Book(models.Model):
         from .utils import convert_docx_to_pdf
         
         if not self.file:
+            logger.warning("No file uploaded for book: %s", self.title)
             return {"pages": "No file uploaded", "words": "No file uploaded"}
 
         # Initialize GCS client
@@ -71,23 +76,31 @@ class Book(models.Model):
 
         try:
             if file_extension == ".pdf":
+                logger.info("Processing PDF file: %s", file_path)
                 return self._extract_pdf_stats(file_path)
 
             elif file_extension == ".docx":
+                logger.info("Processing DOCX file: %s", file_path)
                 pdf_path = convert_docx_to_pdf(file_path)
                 if pdf_path:
+                    logger.info("DOCX to PDF conversion successful: %s", pdf_path)
                     return self._extract_pdf_stats(pdf_path)
-                return {"pages": "Conversion failed", "words": "Conversion failed"}
+                else:
+                    logger.error("DOCX to PDF conversion failed for file: %s", file_path)
+                    return {"pages": "Conversion failed", "words": "Conversion failed"}
 
             else:
+                logger.warning("Unsupported file format: %s", file_extension)
                 return {"pages": "Unsupported file format", "words": "Unsupported file format"}
 
         except Exception as e:
+            logger.error("Error processing file: %s", e)
             return {"pages": f"Error reading file: {e}", "words": f"Error reading file: {e}"}
 
         finally:
             # Clean up temporary files
             if os.path.exists(file_path):
+                logger.info("Cleaning up temporary file: %s", file_path)
                 os.remove(file_path)
 
     def _extract_pdf_stats(self, file_path):
