@@ -3,13 +3,20 @@ from django.shortcuts import render
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from google.cloud import storage
-import fitz  # PyMuPDF for PDFs
-import os
-from docx import Document
-import tempfile
-import uuid
+from django.core.mail import send_mail
 from django.urls import reverse
+import os
+import uuid
+import tempfile
+
+import fitz
+from docx import Document
+
+from google.cloud import storage
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaFileUpload
+from google.oauth2 import service_account
+
 
 
 class BookType(models.Model):
@@ -44,7 +51,9 @@ class Book(models.Model):
         return self.title
 
     def get_file_statistics(self):
-        """Returns page count and word count of the book's file, ensuring fresh updates."""
+        """Returns page count and word count of the file, ensuring fresh updates."""
+        from .utils import convert_docx_to_pdf
+        
         if not self.file:
             return {"pages": "No file uploaded", "words": "No file uploaded"}
 
@@ -54,7 +63,7 @@ class Book(models.Model):
         blob = bucket.blob(self.file.name)  # self.file.name is the file path in GCS
 
         # Download the file to a temporary location
-        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(self.file.name)[1]) as temp_file:
             blob.download_to_filename(temp_file.name)
             file_path = temp_file.name
 
@@ -62,25 +71,13 @@ class Book(models.Model):
 
         try:
             if file_extension == ".pdf":
-                with fitz.open(file_path) as pdf:
-                    text = ""
-                    for page in pdf:
-                        text += page.get_text("text")  # Extract text from each page
-
-                    page_count = pdf.page_count
-                    word_count = len(text.split())  # Count words
-
-                return {"pages": page_count, "words": word_count}
+                return self._extract_pdf_stats(file_path)
 
             elif file_extension == ".docx":
-                doc = Document(file_path)
-                paragraphs = doc.paragraphs
-                text = " ".join([p.text for p in paragraphs])  # Combine paragraph text
-
-                estimated_pages = max(1, len(paragraphs) // 30)  # Estimate based on ~30 paragraphs per page
-                word_count = len(text.split())
-
-                return {"pages": estimated_pages, "words": word_count}
+                pdf_path = convert_docx_to_pdf(file_path)
+                if pdf_path:
+                    return self._extract_pdf_stats(pdf_path)
+                return {"pages": "Conversion failed", "words": "Conversion failed"}
 
             else:
                 return {"pages": "Unsupported file format", "words": "Unsupported file format"}
@@ -89,11 +86,20 @@ class Book(models.Model):
             return {"pages": f"Error reading file: {e}", "words": f"Error reading file: {e}"}
 
         finally:
-            # Clean up the temporary file
+            # Clean up temporary files
             if os.path.exists(file_path):
                 os.remove(file_path)
 
+    def _extract_pdf_stats(self, file_path):
+        """Extracts page count and word count from a PDF."""
+        with fitz.open(file_path) as pdf:
+            text = " ".join(page.get_text("text") for page in pdf)
+            page_count = pdf.page_count
+            word_count = len(text.split())
 
+        return {"pages": page_count, "words": word_count}
+    
+    
 class SubscriptionPlan(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
@@ -102,7 +108,6 @@ class SubscriptionPlan(models.Model):
 
     def __str__(self):
         return self.name
-
 
 class UserSubscription(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='subscriptions')
@@ -260,9 +265,8 @@ def handle_payment_completion(sender, instance, **kwargs):
         # Create or get the Download entry
         download, created = Download.objects.get_or_create(user=order.user, book=order.book)
 
-        # Generate the download URL
-        download_url = request.build_absolute_uri(download.get_download_url())
-        # download_url = settings.SITE_URL + download.get_download_url()
+        # Generate the download URL using SITE_URL instead of request
+        download_url = f"{settings.SITE_URL}{download.get_download_url()}"
 
         # Calculate and record the uploader's royalty
         uploader = order.book.user

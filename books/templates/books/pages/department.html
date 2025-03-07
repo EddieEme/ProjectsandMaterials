@@ -29,15 +29,20 @@
         transform: translateY(-5px);
     }
 
-    .category-badge {
+    {% comment %} .category-badge {
         position: absolute;
         top: 1rem;
         right: 1rem;
-    }
+    } {% endcomment %}
 
     .stats {
         font-size: 0.9em;
         color: #6c757d;
+    }
+    .slag{
+        display: inline-flex;
+        justify-content: space-between;
+        width: 100%;
     }
 
     #searchInput {
@@ -78,18 +83,19 @@
             <a href="/product-details/{{ book.id }}/" class="text-decoration-none">
                 <div class="card book-card">
                     <div class="card-body">
-                        <h5 class="card-title">{{ book.title }}</h5>
-                        <span class="badge bg-primary category-badge">
-                            {{ book.category.name }} {{ book.book_type.name }}
-                        </span>
+                        <h5 class="card-title"><b>{{ book.title }}</b></h5>
                         <p class="card-text">
                             {{ book.description|truncatechars:500 }}
                         </p>
                         <div class="stats d-flex justify-content-between">
-                            <span>{{ book.created_at|date:"F j, Y" }}</span>
-                            <span>
+                            <span class="slag">
+                                <span class="badge bg-primary category-badge">
+                                    {{ book.category.name }} {{ book.book_type.name }}
+                                </span>
+                                <span>
                                 <i class="bi bi-eye"></i> {{ book.views|default:0 }} views
                                 <i class="bi bi-chat ms-2"></i> {{ book.comments|default:0 }} comments
+                                </span>
                             </span>
                         </div>
                     </div>

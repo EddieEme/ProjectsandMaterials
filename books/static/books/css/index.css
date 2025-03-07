@@ -74,6 +74,7 @@
     background-color: var(--hard-cover) !important;
 }
 
+
   /* Navigation */
 .navbar {
             padding: 15px 0;
@@ -175,7 +176,7 @@
     background: linear-gradient(
         rgba(0, 0, 0, 0.5),
         rgba(0, 0, 0, 0.5)
-    ), url('/static/books/images/heropage.jpg');
+    ), url('/projectsandmaterials_bucket/books/images/heropage.jpg');
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
