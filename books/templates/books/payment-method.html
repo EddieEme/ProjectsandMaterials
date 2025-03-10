@@ -83,14 +83,14 @@
             <h4 class="mb-3">Select Payment Method</h4>
 
             <!-- Paystack Payment Form -->
-            <form class="payment-method" action="{% url 'books:pay_with_paystack' book.id %}" method="post">
+            <form class="payment-method" action="{% url 'payments:pay_with_paystack' book.id %}" method="post">
                 {% csrf_token %}
                 <img src="{% static 'books/images/paystack.png' %}" alt="Paystack">
                 <button type="submit">Pay with Paystack</button>
             </form>
 
             <!-- Flutterwave Payment Form -->
-            <form class="payment-method" action="{% url 'books:pay_with_flutterwave' book.id %}" method="post">
+            <form class="payment-method" action="{% url 'payments:pay_with_flutterwave' book.id %}" method="post">
                 {% csrf_token %}
                 <img src="{% static 'books/images/flutterwave.png' %}" alt="Flutterwave">
                 <button type="submit">Pay with Flutterwave</button>

@@ -12,7 +12,8 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.conf import settings
-from .models import Book, Category, BookType, Order, Download
+from .models import Book, Category, BookType
+from payments.models import  Order, Download
 from django.db.models import Sum, Avg, Q, Count
 import json
 import logging
@@ -27,14 +28,28 @@ def home(request):
     if request.user.is_authenticated:
         return redirect('books:login-home')
     # Retrieve the first 12 categories in alphabetical order
-    categories = Category.objects.order_by('name')[:12]
+    faculties = BookType.objects.order_by('name')[:12]
 
     context = {
-        'categories': categories,
+        'faculties': faculties,
     }
 
     return render(request, 'books/index.html', context)
 
+
+@login_required(login_url='books:user_login')
+def login_home(request):  
+    user = request.user
+    faculties = BookType.objects.order_by('name')[:12]
+   
+
+    context = {
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+        'email': user.email,
+        'faculties': faculties,
+    }
+    return render(request, "books/login-index.html", context)
 
 def projects(request):
     if request.user.is_authenticated:
@@ -94,95 +109,7 @@ def projectList(request):
     return render(request, 'books/list-project.html', context)
 
 
-def user_login(request):
-    if request.user.is_authenticated:
-        return redirect('books:user-dashboard')
-    if request.method == "POST":
-        email = request.POST['email']
-        password = request.POST['password']
 
-        user = authenticate(email=email, password=password)
-
-        if user is not None:
-            login(request, user)
-            return redirect('books:user-dashboard')
-        else:
-            messages.error(request, "Invalid login credentials.")
-            return redirect('books:user_login')
-
-    return render(request, 'books/login.html')
-
-def user_logout(request):
-    logout(request)
-    return redirect('/')
-
-def register(request):
-    if request.user.is_authenticated:
-        return redirect('books:user-dashboard')
-    """Register a new user."""
-    if request.method == "POST":
-        email = request.POST.get("email")
-        password = request.POST.get("password")
-        confirm_password = request.POST.get("confirm_password")
-        first_name = request.POST.get("first_name")
-        last_name = request.POST.get("last_name")
-
-        # Check if passwords match
-        if password != confirm_password:
-            messages.error(request, "Passwords do not match.")
-            return redirect("books:register")
-
-        # Check if email already exists
-        if User.objects.filter(email=email).exists():
-            messages.error(request, "Email already exists.")
-            return redirect("books:register")
-
-        try:
-            # Create the user (inactive until email is verified)
-            user = User.objects.create_user(
-                email=email,
-                password=password,
-                first_name=first_name,
-                last_name=last_name,
-                is_active=False
-            )
-
-            # Generate email verification token
-            uid = urlsafe_base64_encode(force_bytes(user.id))
-            token = default_token_generator.make_token(user)
-
-            # Build verification link
-            verification_link = request.build_absolute_uri(
-                reverse('books:verify-email', kwargs={'uidb64': uid, 'token': token})
-            )
-
-            # Render the email template
-            email_subject = 'Verify Your Email Address'
-            email_body = render_to_string('users/email_verification.html', {
-                'user': user,
-                'verification_link': verification_link,
-            })
-
-            # Send the email
-            email = EmailMessage(
-                email_subject,
-                email_body,
-                settings.DEFAULT_FROM_EMAIL,
-                [user.email],
-            )
-            email.content_subtype = 'html'  # Set email content type to HTML
-            email.send()
-
-            messages.success(request, "Registration successful! Please check your email for verification.")
-            return redirect("books:user_login")  # Redirect to the login page
-
-        except Exception as e:
-            logger.error(f"Registration failed: {str(e)}")
-            messages.error(request, "Registration failed. Please try again.")
-            return redirect("books:register")
-
-    # Render the registration form
-    return render(request, "books/register.html")
 
 
 def product_details(request, id):
@@ -216,11 +143,11 @@ def product_details(request, id):
 
     return render(request, 'books/product-details.html', context)
 
-def department(request, category_id):
+def department(request, department_id):
     if request.user.is_authenticated:
-        return redirect('books:login-departments', category_id )
-    selected_category = get_object_or_404(Category, id=category_id)
-    books = Book.objects.filter(category_id=category_id, is_approved=True)
+        return redirect('books:login-departments', department_id )
+    selected_category = get_object_or_404(Category, id=department_id)
+    books = Book.objects.filter(department_id=department_id, is_approved=True)
     
     if request.user.is_authenticated:
         return redirect('books:login-home')
@@ -232,28 +159,26 @@ def department(request, category_id):
     return render(request, 'books/department.html', context)
 
 
-def buyorsubscribe(request, id):
-    if request.user.is_authenticated:
-        return render(request, 'books/login-buyorsubscribe.html',)
-    
-    book = get_object_or_404(Book, id=id)
-    stats = book.get_file_statistics()
+@login_required(login_url='books:user_login')
+def login_department(request, department_id ):
+    selected_category = get_object_or_404(Category, id=department_id)
+    books = Book.objects.filter(department_id=department_id, is_approved=True)
+
     context = {
-        "book": book,
-        "page_count": stats["pages"],
-        "word_count": stats["words"],
-        }
-    return render(request, 'books/buyorsubscribe.html', context)
+        'selected_category': selected_category,
+        'books': books,
+    }
+    return render(request, 'books/login-department.html', context)
+
+
+
 
 
 @login_required(login_url='books:user_login')
 def payment_checkout(request):
     return render(request, 'books/paymentcheckout.html')
 
-def subscription(request):
-    if request.user.is_authenticated:
-        return render(request, 'books/login-subscription.html')
-    return render(request, 'books/subscription.html')
+
 
 @login_required(login_url='books:user_login')
 def payment_method(request, id):
@@ -324,51 +249,17 @@ def login_projectList(request):
     return render(request, 'books/login-list-project.html', context)
 
 
-@login_required(login_url='books:user_login')
-def login_department(request, category_id ):
-    selected_category = get_object_or_404(Category, id=category_id)
-    books = Book.objects.filter(category_id=category_id, is_approved=True)
 
-    context = {
-        'selected_category': selected_category,
-        'books': books,
-    }
-    return render(request, 'books/login-department.html', context)
 
-@login_required(login_url='books:user_login')
-def login_buyorsubscribe(request, id):
-    book = get_object_or_404(Book, id=id)
-    stats = book.get_file_statistics()
-    context = {
-        "book": book,
-        "page_count": stats["pages"],
-        "word_count": stats["words"],
-        }
-    return render(request, 'books/login-buyorsubscribe.html', context)
 
-@login_required(login_url='books:user_login')
-def login_subscription(request):
-    return render(request, 'books/login-subscription.html')
+
+
 
 @login_required(login_url='books:user_login')
 def login_payment_method(request):
     return render(request, 'books/login-payment-method.html')
 
-@login_required(login_url='books:user_login')
-def login_home(request):
-    if not request.user.is_authenticated:
-        print("User is not authenticated when accessing /login-home/")
-    
-    user = request.user
-    categories = Category.objects.order_by('name')[:12]
 
-    context = {
-        'first_name': user.first_name,
-        'last_name': user.last_name,
-        'email': user.email,
-        'categories': categories,
-    }
-    return render(request, "books/login-index.html", context)
 
 
 def verification_error(request):
@@ -402,97 +293,116 @@ def login_product_details(request, id):
     return render(request, 'books/login-product-details.html', context)
 
 
-@login_required(login_url='books:user_login')
-def user_settings(request):
-    return render(request, 'books/settings.html')
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from .models import Book, BookType, Category
+from django.core.files.storage import default_storage
 
+@login_required
+def upload_book(request):
+    if request.method == "POST":
+        title = request.POST.get("title")
+        description = request.POST.get("description")
+        author = request.POST.get("author")
+        book_type_id = request.POST.get("book_type")
+        category_id = request.POST.get("category")
+        file = request.FILES.get("file")
+        cover_image = request.FILES.get("cover_image")
 
+        # Check if a book with the same title exists (case-insensitive)
+        if Book.objects.filter(title__iexact=title).exists():
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({"success": False, "message": "A book with this title already exists."}, status=400)
+            else:
+                messages.error(request, "A book with this title already exists.")
+                return redirect("books:upload-book")
+            
+        # Validate file type
+        if file:
+            allowed_extensions = ["pdf", "docx"]
+            file_extension = file.name.split(".")[-1].lower()
+            if file_extension not in allowed_extensions:
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({"success": False, "message": "Only PDF and DOCX files are allowed."}, status=400)
+                else:
+                    messages.error(request, "Only PDF and DOCX files are allowed.")
+                    return redirect("books:upload-book")
+        else:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({"success": False, "message": "Book file is required."}, status=400)
+            else:
+                messages.error(request, "Book file is required.")
+                return redirect("books:upload-book")
 
-@login_required(login_url='books:user_login')
-def user_dashboard(request):
-    user = request.user
+        # Handle book type (faculty)
+        try:
+            # Check if creating a new faculty
+            if request.POST.get("book_type_name"):
+                book_type_name = request.POST.get("book_type_name")
+                # Check if a faculty with this name already exists
+                existing_type = BookType.objects.filter(name__iexact=book_type_name).first()
+                if existing_type:
+                    book_type = existing_type
+                else:
+                    book_type = BookType.objects.create(name=book_type_name)
+            else:
+                book_type = BookType.objects.get(id=book_type_id)
+        except BookType.DoesNotExist:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({"success": False, "message": "Selected faculty does not exist."}, status=400)
+            else:
+                messages.error(request, "Selected faculty does not exist.")
+                return redirect("books:upload-book")
 
-    # Get paginated orders
-    orders_qs = Order.objects.filter(user=user).order_by('-created_at')
-    orders_paginator = Paginator(orders_qs, 10)
-    orders_page = request.GET.get('orders_page', 1)  # Get order page number
-    orders_page_obj = orders_paginator.get_page(orders_page)
+        # Handle category (department)
+        try:
+            # Check if creating a new department
+            if request.POST.get("category_name"):
+                category_name = request.POST.get("category_name")
+                # Check if a department with this name already exists
+                existing_category = Category.objects.filter(name__iexact=category_name).first()
+                if existing_category:
+                    category = existing_category
+                else:
+                    category = Category.objects.create(name=category_name, book_type=book_type)
+            else:
+                category = Category.objects.get(id=category_id)
+        except Category.DoesNotExist:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({"success": False, "message": "Selected department does not exist."}, status=400)
+            else:
+                messages.error(request, "Selected department does not exist.")
+                return redirect("books:upload-book")
 
-    # Get paginated downloads
-    downloads_qs = Download.objects.filter(user=user).order_by('-downloaded_at')
-    downloads_paginator = Paginator(downloads_qs, 10)
-    downloads_page = request.GET.get('downloads_page', 1)  # Get download page number
-    downloads_page_obj = downloads_paginator.get_page(downloads_page)
+        try:
+            # Save the book with a fixed price of ₦5,000
+            book = Book.objects.create(
+                title=title,
+                description=description,
+                author=author,
+                book_type=book_type,
+                category=category,
+                price=5000,
+                file=file,
+                cover_image=cover_image,
+                user=request.user
+            )
+            
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({"success": True, "message": "Book uploaded successfully!"})
+            else:
+                messages.success(request, "Book uploaded successfully!")
+                return redirect("books:upload-book")
+                
+        except Exception as e:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({"success": False, "message": f"Error creating book: {str(e)}"}, status=500)
+            else:
+                messages.error(request, f"Error creating book: {str(e)}")
+                return redirect("books:upload-book")
 
-    # Get latest download URL (if available)
-    latest_download = downloads_qs.first()
-    download_url = latest_download.get_download_url() if latest_download else None
-
-    # Retrieve user's uploaded books with sales count
-    products = Book.objects.filter(user=user).annotate(
-        sales_count=Count('order', filter=Q(order__status='completed'))
-    ).order_by('-created_at')
-
-    total_products = products.count()
-    total_sales_count = Order.objects.filter(book__user=user, status='completed').count() or 0
-
-    # Calculate total earnings from completed orders
-    total_earnings = (
-        Order.objects.filter(book__user=user, status='completed')
-        .aggregate(total=Sum('uploader_earning'))['total'] or 0
-    )
-
-    # Prepare context
-    context = {
-        'total_sales': total_sales_count,
-        'total_products': total_products,
-        'total_earnings': f"{total_earnings:,.2f}",
-        'user': user,
-        'products': products,
-        'orders_page_obj': orders_page_obj,
-        'downloads_page_obj': downloads_page_obj,
-        'download_url': download_url,
-    }
-
-    return render(request, 'books/userdashboard.html', context)
-
-
-
-
-@login_required(login_url='books:user_login')
-def view_profile(request):
-    user = request.user
-    profile = user.profile
-
-    context = {
-        'user': user,          
-        'profile': profile,     
-    }
-    return render(request, 'books/view-profile.html', context)
-
-def edit_profile(request):
-    user = request.user
-    profile = user.profile
-
-    if request.method == 'POST':
-        # Update user fields
-        user.first_name = request.POST.get('first_name', user.first_name)
-        user.last_name = request.POST.get('last_name', user.last_name)
-        user.save()
-
-        # Update profile fields
-        profile.bio = request.POST.get('bio', profile.bio)
-        profile.phone_number = request.POST.get('phone_number', profile.phone_number)
-        profile.profession = request.POST.get('profession', profile.profession)
-
-        # Handle profile picture upload
-        if 'profile_picture' in request.FILES:
-            profile.profile_picture = request.FILES['profile_picture']
-
-        profile.save()
-
-        messages.success(request, "Your profile has been updated successfully!")
-        return redirect('books:view-profile')  # Adjust this to your actual view
-
-    # Pass profile and user data to the template
-    return render(request, 'books/edit-profile.html', {'profile': profile, 'user': user})
+    # Fetch all faculties and departments for the form
+    faculties = BookType.objects.all()
+    departments = Category.objects.all()
+    return render(request, "books/upload_book.html", {"faculties": faculties, "departments": departments})

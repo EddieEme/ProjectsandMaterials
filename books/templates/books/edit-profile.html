@@ -1,70 +1,209 @@
 {% extends 'books/loginbase.html' %}
 {% load static %}
+{% block style %}
+<style>
+  /* Edit Profile Container */
+  .container {
+    max-width: 800px;
+    width: 90%; /* Slightly wider for better spacing */
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  /* Edit Profile Card */
+  .card {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    width: 60%; /* 60% width on larger screens */
+    margin: 0 auto; /* Center the card horizontally */
+  }
+
+  /* Media query for mobile devices */
+  @media (max-width: 768px) {
+    .card {
+        width: 100%; /* Full width on mobile */
+    }
+  }
+
+  /* Card Body */
+  .card-body {
+    padding: 2rem;
+  }
+
+  /* Grid Layout for Form */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr; /* Left column for picture, right for form */
+    gap: 2rem; /* Space between columns */
+  }
+
+  @media (max-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr; /* Stack columns on mobile */
+    }
+  }
+
+  /* Profile Picture Section */
+  .profile-picture-section {
+    text-align: center;
+  }
+
+  .profile-picture-section img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    margin-bottom: 1.5rem;
+  }
+
+  .profile-picture-section input[type="file"] {
+    margin-top: 1rem;
+  }
+
+  .profile-picture-section .btn-outline-danger {
+    margin-top: 1rem;
+    width: 100%;
+  }
+
+  /* Form Styling */
+  .form-label {
+    font-weight: 500;
+    color: #495057;
+  }
+
+  .form-control {
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    padding: 0.75rem;
+    font-size: 1rem;
+  }
+
+  .form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+  }
+
+  .btn {
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+  }
+
+  .btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #004085;
+  }
+
+  .btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+  }
+
+  .btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+  }
+
+  .btn-outline-danger {
+    border-color: #dc3545;
+    color: #dc3545;
+  }
+
+  .btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: #fff;
+  }
+
+  .d-flex {
+    display: flex;
+    gap: 1rem; /* Space between buttons */
+  }
+
+  .justify-content-end {
+    justify-content: flex-end;
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-    <!-- Edit Profile Page -->
-    <div class="container py-4" id="edit-profile" style="margin-top:6.5rem !important;">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title mb-4">Edit Profile</h5>
-                <form method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <div class="row mb-4">
-                        <div class="col-md-3">
-                            <div class="text-center">
-                                {% if profile.profile_picture and profile.profile_picture.url %}
-                                    <img src="{{ profile.profile_picture.url }}" class="img-fluid rounded-circle mb-3" alt="Profile Picture">
-                                {% else %}
-                                    <img src="{% static 'books/images/default_profile_image.jpg' %}" class="img-fluid rounded-circle mb-3" alt="Default Profile Picture">
-                                {% endif %}
+<!-- Edit Profile Page -->
+<div class="container py-4" id="edit-profile" style="margin-top:6.5rem !important;">
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title mb-4">Edit Profile</h5>
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-grid">
+          <!-- Left Column: Profile Picture Section -->
+          <div class="profile-picture-section">
+            {% if profile.profile_picture and profile.profile_picture.url %}
+              <img src="{{ profile.profile_picture.url }}" class="img-fluid rounded-circle mb-3" alt="Profile Picture">
+            {% else %}
+              <img src="{% static 'books/images/default_profile_image.jpg' %}" class="img-fluid rounded-circle mb-3" alt="Default Profile Picture">
+            {% endif %}
 
-                                <div class="mb-3">
-                                    <label for="profile_picture" class="form-label fw-bold">Change Profile Picture</label>
-                                    <input type="file" class="form-control form-control-lg" id="profile_picture" name="profile_picture" accept="image/*">
-                                </div>
-                                <div class="d-grid">
-                                    <button type="submit" class="btn btn-outline-danger">Remove Picture</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-9">
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">First Name</label>
-                                    <input type="text" class="form-control" name="first_name" value="{{ user.first_name }}">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Last Name</label>
-                                    <input type="text" class="form-control" name="last_name" value="{{ user.last_name }}">
-                                </div>
-                            </div>
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">Email</label>
-                                    <input type="email" class="form-control" readonly value="{{ user.email }}">
-                                </div>
-                                 <div class="col-md-6">
-                                    <label class="form-label">profession</label>
-                                    <input type="profession" class="form-control" name="profession" value="{{ profile.profession }}">
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Phone</label>
-                                <input type="tel" class="form-control" name="phone_number" value="{{ profile.phone_number }}">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Bio</label>
-                                <textarea class="form-control" name="bio" rows="4">{{ profile.bio }}</textarea>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex justify-content-end gap-2">
-                        <button type="button" class="btn btn-secondary" onclick="window.history.back()">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Save Changes</button>
-                    </div>
-                </form>
+            <div class="mb-3">
+              <label for="profile_picture" class="form-label fw-bold">Change Profile Picture</label>
+              <input type="file" class="form-control form-control-lg" id="profile_picture" name="profile_picture" accept="image/*">
             </div>
-        </div>
-    </div>
+            <div class="d-grid">
+              <button type="submit" class="btn btn-outline-danger">Remove Picture</button>
+            </div>
+          </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+          <!-- Right Column: Form Fields -->
+          <div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">First Name</label>
+                <input type="text" class="form-control" name="first_name" value="{{ user.first_name }}">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Last Name</label>
+                <input type="text" class="form-control" name="last_name" value="{{ user.last_name }}">
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" readonly value="{{ user.email }}">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Profession</label>
+                <input type="text" class="form-control" name="profession" value="{{ profile.profession }}">
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Phone</label>
+              <input type="tel" class="form-control" name="phone_number" value="{{ profile.phone_number }}">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Bio</label>
+              <textarea class="form-control" name="bio" rows="4">{{ profile.bio }}</textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Save and Cancel Buttons -->
+        <div class="d-flex justify-content-end gap-2">
+          <button type="button" class="btn btn-secondary" onclick="window.history.back()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
 {% endblock %}

@@ -1,0 +1,95 @@
+{% comment %} {% extends "books/loginbase.html" %}  <!-- Assuming you have a base template --> {% endcomment %}
+
+{% block content %}
+<h1>Batch Upload Books</h1>
+<form id="batch-upload-form" method="post" enctype="multipart/form-data">
+    {% csrf_token %}  <!-- Ensure the CSRF token is included in the form -->
+    <div>
+        <label for="file">Upload CSV File:</label>
+        <input type="file" name="file" id="file" accept=".csv" required>
+    </div>
+    <button type="submit">Upload</button>
+</form>
+
+<!-- Display messages -->
+<div id="messages"></div>
+
+<!-- JavaScript for AJAX submission -->
+<script>
+// Function to get the CSRF token from cookies
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.startsWith(name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Add event listener for form submission
+document.getElementById("batch-upload-form").addEventListener("submit", function (e) {
+    e.preventDefault();  // Prevent the default form submission
+
+    const formData = new FormData(this);
+    const messagesDiv = document.getElementById("messages");
+    messagesDiv.innerHTML = "";  // Clear previous messages
+
+    // Get the CSRF token
+    const csrftoken = getCookie('csrftoken');
+
+    fetch("{% url 'admin_app:batch-upload-books' %}", {
+        method: "POST",
+        body: formData,
+        headers: {
+            "X-Requested-With": "XMLHttpRequest",  // Identify AJAX request
+            "X-CSRFToken": csrftoken,  // Include the CSRF token in the headers
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Display success message
+            const successMessage = document.createElement("div");
+            successMessage.className = "success";
+            successMessage.textContent = data.message;
+            messagesDiv.appendChild(successMessage);
+        } else {
+            // Display error message
+            const errorMessage = document.createElement("div");
+            errorMessage.className = "error";
+            errorMessage.textContent = data.message;
+            messagesDiv.appendChild(errorMessage);
+        }
+
+        // Display individual errors (if any)
+        if (data.errors && data.errors.length > 0) {
+            const errorList = document.createElement("ul");
+            data.errors.forEach(error => {
+                const errorItem = document.createElement("li");
+                errorItem.textContent = error;
+                errorList.appendChild(errorItem);
+            });
+            messagesDiv.appendChild(errorList);
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        const errorMessage = document.createElement("div");
+        errorMessage.className = "error";
+        errorMessage.textContent = "An unexpected error occurred. Please try again.";
+        messagesDiv.appendChild(errorMessage);
+    });
+});
+</script>
+
+<style>
+.success { color: green; }
+.error { color: red; }
+</style>
+{% endblock %}

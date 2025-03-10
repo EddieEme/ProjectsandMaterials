@@ -9,23 +9,26 @@
 </style>
 {% endblock %}
     <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-            <div class="hero-text" data-aos="fade-right">
-                <h1>Final Year <span>Library</span></h1>
-                <h2>Download now & save 30%! </h2>
-                <p>Access our vast collection of final year projects and research papers, 
-                    covering various fields of study. instant downloads available. limited time offer: save up to 30% off!</p>
-                <a href="#" class="buy-btn all-btn">Download Now!</a>
-            </div>
-            <!-- <div class="book-preview" data-aos="fade-left">
-                <img src="/images/hero_image.jpg" alt="Corporate Book Cover">
-            </div> -->
+   <section class="hero">
+    <!-- Background Image -->
+    <img src="{% static 'books/images/heropage.jpg' %}" alt="Hero Background" class="hero-bg">
+
+    <div class="hero-content">
+        <div class="hero-text" data-aos="fade-right">
+            <h1>Final Year Library </h1>
+            <h2>Download now & save 30%!</h2>
+            <p>Access our vast collection of final year projects and research papers, 
+                covering various fields of study. Instant downloads available</p>
+            <div class="search-container">
+            <input type="text" placeholder="Search for projects..." class="search-input">
+            <button class="search-btn">Search</button>
         </div>
-    </section>
+        </div>
+    </div>
+</section>
     
     <!-- Showcase Section -->
-    <section class="showcase-section">
+    {% comment %} <section class="showcase-section">
         <div class="showcase-container">
             <div class="showcase-text" data-aos="fade-right">
                 <h2>LEARN <span>HOW TO ACCESS</span> AND PUBLISH ACADEMIC RESEARCH FROM ANYWHERE IN THE WORLD</h2>
@@ -41,7 +44,7 @@
                 <img src="{% static 'books/images/hero_image.jpg' %}" alt="Laptop Mockup">
             </div>
         </div>
-    </section>
+    </section> {% endcomment %}
     <section class="services-section">
         <div class="services-header" data-aos="fade-up">
             <h2>OUR FEATURED SERVICES</h2>
@@ -100,27 +103,27 @@
     <!-- Courses Section -->
     <section class="research-section">
         <div class="container">
-            <h2 class="research-title">TOP DEPARMENTS PROJECTS</h2>
+            <h2 class="research-title">TOP DEPARMENTS FACULTY PROJECTS</h2>
 
             <div class="row g-4" id="categoriesList" >
                 <!-- Row 1 -->
-                {% for category in categories %}
+                {% for faculty in faculties %}
                 <div class="col-md-6 col-lg-3" data-aos="fade-left" data-aos-delay="50">
-                    {% if request.user.is_uathenticated %}
-                    <a href="{% url 'books:login-departments' category.id %} ">
+                {% if request.user.is_authenticated %}
+                    <a href="{% url 'books:login-departments' faculty.id %}">
                         <div class="field-card">
-                        <h3 class="field-title">
-                            <i class="fa-solid fa-book-open"></i>
-                            {{category}}
-                        </h3>
+                            <h3 class="field-title">
+                                <i class="fa-solid fa-book-open"></i>
+                                {{ faculty}}
+                            </h3>
                         </div>
                     </a>
                     {% else %}
-                    <a href="{% url 'books:departments' category.id %} ">
+                    <a href="{% url 'books:departments' faculty.id %}">
                         <div class="field-card">
                         <h3 class="field-title">
                             <i class="fa-solid fa-book-open"></i>
-                            {{category}}
+                            {{ faculty }}
                         </h3>
                         </div>
                     </a>
@@ -149,6 +152,39 @@
                         <i class="fas fa-arrow-right ms-2"></i>
                     </a>
                 </div>
+            </div>
+        </div>
+    </section>
+      <section class="research-section">
+        <div class="container">
+            <h2 class="research-title">TOP DEPARMENTS PROJECTS</h2>
+
+            <div class="row g-4" id="categoriesList" >
+                <!-- Row 1 -->
+                {% for faculty in faculties %}
+                <div class="col-md-6 col-lg-3" data-aos="fade-left" data-aos-delay="50">
+                {% if request.user.is_authenticated %}
+                    <a href="{% url 'books:login-departments' department.id %}">
+                        <div class="field-card">
+                            <h3 class="field-title">
+                                <i class="fa-solid fa-book-open"></i>
+                                {{ faculty}}
+                            </h3>
+                        </div>
+                    </a>
+                    {% else %}
+                    <a href="{% url 'books:departments' department.id %}">
+                        <div class="field-card">
+                        <h3 class="field-title">
+                            <i class="fa-solid fa-book-open"></i>
+                            {{ faculty }}
+                        </h3>
+                        </div>
+                    </a>
+                    {% endif %}
+
+                </div>
+                {% endfor %}
             </div>
         </div>
     </section>

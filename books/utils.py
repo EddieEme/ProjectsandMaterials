@@ -7,7 +7,8 @@ from django.http import HttpResponse
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from django.conf import settings
-from .models import Book, Download
+from .models import Book
+from payments.models import Download
 from google.cloud import storage
 import subprocess
 import tempfile

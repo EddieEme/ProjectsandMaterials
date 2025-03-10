@@ -27,6 +27,7 @@ SITE_URL = config("SITE_URL", default="http://127.0.0.1:8000")
 
 # Application definition
 INSTALLED_APPS = [
+    'unfold',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,10 +41,14 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'books',
+    'admin_app',
+    'payments',
+    'subscriptions',
     'rest_framework',
     'rest_framework_simplejwt',
     'users',
     'storages',
+    
 ]
 
 SITE_ID = 1
@@ -152,9 +157,9 @@ DATABASES = {
     }
 }
 
-DATABASE_URL = config("DATABASE_URL", default="")
-if DATABASE_URL:
-    DATABASES["default"] = dj_database_url.parse(DATABASE_URL)
+# DATABASE_URL = config("DATABASE_URL", default="")
+# if DATABASE_URL:
+#     DATABASES["default"] = dj_database_url.parse(DATABASE_URL)
 
 # Google Cloud Storage Configuration
 DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
@@ -205,13 +210,22 @@ USE_I18N = True
 USE_TZ = True
 
 # Static Files Configuration
-STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+# URLs
+STATIC_URL = f"https://storage.googleapis.com/{GS_BUCKET_NAME}/static/"
+MEDIA_URL = f"https://storage.googleapis.com/{GS_BUCKET_NAME}/media/"
 
-# Media Files Configuration
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# Remove local STATICFILES_DIRS to avoid conflicts
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = None  # Not needed for GCS
+
+# Static Files Configuration
+# STATIC_URL = 'static/'
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
+# # Media Files Configuration
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default Primary Key Field Type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
