@@ -1,32 +1,35 @@
 from django.shortcuts import redirect, render
-from rest_framework.authtoken.models import Token
+from django.contrib.auth import get_user_model, login, logout, authenticate
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.sites.shortcuts import get_current_site
+from django.urls import reverse
 from django.conf import settings
-from django.contrib.auth import get_user_model
-from rest_framework import viewsets, status
-from django.contrib.auth import authenticate
-from rest_framework.decorators import api_view
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
+from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-from django.core.mail import send_mail
-from django.urls import reverse
-from django.utils.http import urlsafe_base64_encode
-from django.utils.encoding import force_bytes
-from django.contrib.auth.tokens import default_token_generator
+from payments.models import Order, Download
+from books.models import Book
+from books.utils import download_book
+from django.core.paginator import Paginator
+from django.db.models import Count, Sum, Q
+
+
+
+from rest_framework import viewsets, status
+from rest_framework.decorators import api_view, action, authentication_classes, permission_classes
+from rest_framework.response import Response
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.decorators import action, authentication_classes, permission_classes
-from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.views import APIView
-from django.utils.encoding import force_str
-from django.utils.http import urlsafe_base64_decode
-from django.template.loader import render_to_string
-from django.core.mail import EmailMessage
-from django.contrib import messages
+from rest_framework.authtoken.models import Token
 
-from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
 
 from .serializers import *
 
@@ -36,85 +39,67 @@ logger = logging.getLogger(__name__)
 
 User = get_user_model() 
 
+def user_login(request):
+    if request.user.is_authenticated:
+        # Check if the user is a superuser
+        if request.user.is_superuser:
+            return redirect('admin_app:batch-upload-books')  # Redirect to admin_app dashboard
+        return redirect('users:user-dashboard')  # Redirect normal users
 
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated]
+    if request.method == "POST":
+        email = request.POST['email']
+        password = request.POST['password']
 
-    def get_queryset(self):
-        """Ensure users can only access their own profile"""
-        return User.objects.filter(id=self.request.user.id)
+        user = authenticate(email=email, password=password)
 
-    @action(detail=False, methods=['get'])
-    def me(self, request):
-        """Retrieve the currently authenticated user's details"""
-        serializer = self.get_serializer(request.user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        if user is not None:
+            login(request, user)
 
-    @action(detail=False, methods=['put', 'patch'])
-    @authentication_classes([JWTAuthentication])
-    def update_profile(self, request):
-        """Update both User and Profile in a single request"""
-        user = request.user
+            # Redirect based on user type
+            if user.is_superuser:
+                return redirect('admin_app:batch-upload-books')  # Redirect to admin_app
+            return redirect('users:user-dashboard')  # Redirect normal users
 
-        # Ensure user has a profile or create one
-        profile, created = Profile.objects.get_or_create(user=user, defaults={'bio': '', 'profession': ''})
+        else:
+            messages.error(request, "Invalid login credentials.")
+            return redirect('users:user_login')
 
-        # Extract profile data separately if sent under a "profile" key
-        profile_data = request.data.get("profile", {})
+    return render(request, 'books/login.html')
 
-        user_serializer = UserSerializer(user, data=request.data, partial=True)
-        profile_serializer = ProfileSerializer(profile, data=profile_data, partial=True)
+def user_logout(request):
+    logout(request)
+    return redirect('/')
 
-        if user_serializer.is_valid() and profile_serializer.is_valid():
-            user_serializer.save()
-            profile_serializer.save()
+def register(request):
+    if request.user.is_authenticated:
+        return redirect('users:user-dashboard')
+    """Register a new user."""
+    if request.method == "POST":
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+        confirm_password = request.POST.get("confirm_password")
+        first_name = request.POST.get("first_name")
+        last_name = request.POST.get("last_name")
 
-            return Response(
-                {
-                    "message": "Profile updated successfully",
-                    "user": user_serializer.data,
-                    "profile": profile_serializer.data
-                },
-                status=status.HTTP_200_OK
-            )
-
-        return Response(
-            {
-                "user_errors": user_serializer.errors,
-                "profile_errors": profile_serializer.errors
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
-
-class AuthViewSet(viewsets.GenericViewSet):
-    permission_classes = [AllowAny]  # Allow any user to access these endpoints
-    serializer_class = LoginSerializer  # Default serializer
-
-    def get_serializer_class(self):
-        """Return appropriate serializer for each action."""
-        if self.action == 'register':
-            return RegisterSerializer
-        elif self.action == 'login':
-            return LoginSerializer
-        return self.serializer_class
-
-    @action(detail=False, methods=['post'])
-    def register(self, request):
-        """Register a new user."""
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        data = serializer.validated_data
+        # Check if passwords match
+        if password != confirm_password:
+            messages.error(request, "Passwords do not match.")
+            return redirect("users:register")
 
         # Check if email already exists
-        if User.objects.filter(email=data['email']).exists():
-            return Response({'detail': 'Email already exists'}, status=status.HTTP_400_BAD_REQUEST)
+        if User.objects.filter(email=email).exists():
+            messages.error(request, "Email already exists.")
+            return redirect("users:register")
 
         try:
             # Create the user (inactive until email is verified)
-            user = User.objects.create_user(**data, is_active=False)
+            user = User.objects.create_user(
+                email=email,
+                password=password,
+                first_name=first_name,
+                last_name=last_name,
+                is_active=False
+            )
 
             # Generate email verification token
             uid = urlsafe_base64_encode(force_bytes(user.id))
@@ -122,7 +107,7 @@ class AuthViewSet(viewsets.GenericViewSet):
 
             # Build verification link
             verification_link = request.build_absolute_uri(
-                reverse('books:verify-email', kwargs={'uidb64': uid, 'token': token})
+                reverse('users:verify-email', kwargs={'uidb64': uid, 'token': token})
             )
 
             # Render the email template
@@ -142,125 +127,18 @@ class AuthViewSet(viewsets.GenericViewSet):
             email.content_subtype = 'html'  # Set email content type to HTML
             email.send()
 
-            # Generate JWT tokens (for immediate login after registration)
-            refresh = RefreshToken.for_user(user)
-
-            # Set tokens as HTTP-only cookies
-            response = Response({
-                'detail': 'User registered successfully. Please check your email for verification.',
-                'user': {
-                    'id': user.id,
-                    'email': user.email,
-                    'first_name': user.first_name,
-                    'last_name': user.last_name,
-                }
-            }, status=status.HTTP_201_CREATED)
-
-            # Set access and refresh tokens as HTTP-only cookies
-            response.set_cookie(
-                key='access_token',
-                value=str(refresh.access_token),
-                httponly=True,
-                secure=True,  # Only send over HTTPS
-                samesite='Lax', # Prevent CSRF
-                max_age=timedelta(minutes=15).total_seconds(),  # Short-lived access token
-            )
-            response.set_cookie(
-                key='refresh_token',
-                value=str(refresh),
-                httponly=True,
-                secure=True,
-                samesite='Lax',
-                max_age=timedelta(days=7).total_seconds(),  # Longer-lived refresh token
-            )
-
-            return response
+            messages.success(request, "Registration successful! Please check your email for verification.")
+            return redirect("users:user_login")  # Redirect to the login page
 
         except Exception as e:
-            logger.error(f'Registration failed: {str(e)}')
-            return Response({'detail': 'Registration failed. Please try again.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            logger.error(f"Registration failed: {str(e)}")
+            messages.error(request, "Registration failed. Please try again.")
+            return redirect("users:register")
 
-    @action(detail=False, methods=['post'])
-    def login(self, request):
-        """Authenticate a user and return JWT tokens."""
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        data = serializer.validated_data
+    # Render the registration form
+    return render(request, "books/register.html")
 
-        # Authenticate the user
-        user = authenticate(email=data['email'], password=data['password'])
 
-        if not user:
-            logger.warning(f"Failed login attempt for email: {data['email']}")
-            return Response({'detail': 'Invalid email or password'}, status=status.HTTP_401_UNAUTHORIZED)
-
-        if not user.is_active:
-            return Response({'detail': 'Account is disabled'}, status=status.HTTP_403_FORBIDDEN)
-
-        # Generate JWT tokens
-        refresh = RefreshToken.for_user(user)
-
-        # Set tokens as HTTP-only cookies
-        response = Response({
-            'detail': 'Login successful',
-            'user': {
-                'id': user.id,
-                'email': user.email,
-                'first_name': user.first_name,
-                'last_name': user.last_name,
-            }
-        }, status=status.HTTP_200_OK)
-
-        response.set_cookie(
-            key='access_token',
-            value=str(refresh.access_token),
-            httponly=True,
-            secure=True,
-            samesite='Lax',
-            max_age=timedelta(minutes=15).total_seconds(),  # Short-lived access token
-        )
-        response.set_cookie(
-            key='refresh_token',
-            value=str(refresh),
-            httponly=True,
-            secure=True,
-            samesite='Lax',
-            max_age=timedelta(days=7).total_seconds(),  # Longer-lived refresh token
-        )
-
-        return response
-
-    @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
-    def logout(self, request):
-        """Log out the user by clearing cookies."""
-        response = Response({'detail': 'Logout successful'}, status=status.HTTP_200_OK)
-        response.delete_cookie('access_token')
-        response.delete_cookie('refresh_token')
-        return response
-
-    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
-    def me(self, request):
-        """Fetch the authenticated user's data."""
-        user = request.user
-        return Response({
-            'id': user.id,
-            'email': user.email,
-            'first_name': user.first_name,
-            'last_name': user.last_name,
-        })
-    
-    @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
-    def logout(self, request):
-        """
-        Log out the user by clearing JWT cookies.
-        """
-        response = Response({'detail': 'Logout successful'}, status=status.HTTP_200_OK)
-        
-        # Clear access_token and refresh_token cookies
-        response.delete_cookie('access_token')
-        response.delete_cookie('refresh_token')
-        
-        return response
         
     @action(detail=False, methods=['post'])
     def resend_verification_email(self, request):
@@ -285,7 +163,7 @@ class AuthViewSet(viewsets.GenericViewSet):
 
                 # Build the verification link
                 verification_link = request.build_absolute_uri(
-                    reverse('books:verify-email', kwargs={'uidb64': uid, 'token': token})
+                    reverse('users:verify-email', kwargs={'uidb64': uid, 'token': token})
                 )
 
                 # Render the email template
@@ -330,19 +208,19 @@ class EmailVerificationView(APIView):
                     user.save()
                     # Redirect to a success page
                     messages.success(request, "✅ Email Already Verified")
-                    return redirect('books:user_login')
+                    return redirect('users:user_login')
                 else:
                     # Redirect to a page indicating the email is already verified
                     messages.success(request, "Email Verified Successfully!")
-                    return redirect('books:user_login')
+                    return redirect('users:user_login')
             else:
                 # Redirect to an error page for invalid tokens
                 messages.error(request, "The verification link is invalid or has expired. Please request a new verification email.")
-                return redirect('books:verification-error')
+                return redirect('users:verification-error')
 
         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
             # Redirect to an error page for invalid links
-            return redirect('books:verification-error')
+            return redirect('users:verification-error')
         
         
 
@@ -437,4 +315,100 @@ def password_reset_complete(request):
 
 
 
+
+
+@login_required(login_url='books:user_login')
+def user_settings(request):
+    return render(request, 'books/settings.html')
+
+
+
+@login_required(login_url='books:user_login')
+def user_dashboard(request):
+    user = request.user
+
+    # Get paginated orders
+    orders_qs = Order.objects.filter(user=user).order_by('-created_at')
+    orders_paginator = Paginator(orders_qs, 10)
+    orders_page = request.GET.get('orders_page', 1)  # Get order page number
+    orders_page_obj = orders_paginator.get_page(orders_page)
+
+    # Get paginated downloads
+    downloads_qs = Download.objects.filter(user=user).order_by('-downloaded_at')
+    downloads_paginator = Paginator(downloads_qs, 10)
+    downloads_page = request.GET.get('downloads_page', 1)  # Get download page number
+    downloads_page_obj = downloads_paginator.get_page(downloads_page)
+
+    # Get latest download URL (if available)
+    latest_download = downloads_qs.first()
+    download_url = latest_download.get_download_url() if latest_download else None
+
+    # Retrieve user's uploaded books with sales count
+    products = Book.objects.filter(user=user).annotate(
+        sales_count=Count('order', filter=Q(order__status='completed'))
+    ).order_by('-created_at')
+
+    total_products = products.count()
+    total_sales_count = Order.objects.filter(book__user=user, status='completed').count() or 0
+
+    # Calculate total earnings from completed orders
+    total_earnings = (
+        Order.objects.filter(book__user=user, status='completed')
+        .aggregate(total=Sum('uploader_earning'))['total'] or 0
+    )
+
+    # Prepare context
+    context = {
+        'total_sales': total_sales_count,
+        'total_products': total_products,
+        'total_earnings': f"{total_earnings:,.2f}",
+        'user': user,
+        'products': products,
+        'orders_page_obj': orders_page_obj,
+        'downloads_page_obj': downloads_page_obj,
+        'download_url': download_url,
+    }
+
+    return render(request, 'books/userdashboard.html', context)
+
+
+
+
+@login_required(login_url='books:user_login')
+def view_profile(request):
+    user = request.user
+    profile = user.profile
+
+    context = {
+        'user': user,          
+        'profile': profile,     
+    }
+    return render(request, 'books/view-profile.html', context)
+
+def edit_profile(request):
+    user = request.user
+    profile = user.profile
+
+    if request.method == 'POST':
+        # Update user fields
+        user.first_name = request.POST.get('first_name', user.first_name)
+        user.last_name = request.POST.get('last_name', user.last_name)
+        user.save()
+
+        # Update profile fields
+        profile.bio = request.POST.get('bio', profile.bio)
+        profile.phone_number = request.POST.get('phone_number', profile.phone_number)
+        profile.profession = request.POST.get('profession', profile.profession)
+
+        # Handle profile picture upload
+        if 'profile_picture' in request.FILES:
+            profile.profile_picture = request.FILES['profile_picture']
+
+        profile.save()
+
+        messages.success(request, "Your profile has been updated successfully!")
+        return redirect('users:view-profile')  # Adjust this to your actual view
+
+    # Pass profile and user data to the template
+    return render(request, 'books/edit-profile.html', {'profile': profile, 'user': user})
 

@@ -218,11 +218,11 @@
                                         <button type="button" class="btn btn-secondary"
                                             data-bs-dismiss="modal">Close</button>
                                   {% if request.user.is_authenticated %}
-                                    <a class="btn btn-success" id="downloadBtn" href="{% url 'books:login-buyorsubscribe' book.id %}">
+                                    <a class="btn btn-success" id="downloadBtn" href="{% url 'subscriptions:login-buyorsubscribe' book.id %}">
                                         <i class="fas fa-download"></i> Download
                                     </a>
                                 {% else %}
-                                    <a class="btn btn-success" id="downloadBtn" href="{% url 'books:buyorsubscribe' book.id %}">
+                                    <a class="btn btn-success" id="downloadBtn" href="{% url 'subscriptions:buyorsubscribe' book.id %}">
                                         <i class="fas fa-download"></i> Download
                                     </a>
                                 {% endif %}
@@ -382,11 +382,11 @@
 
                     
                     {% if request.user.is_authenticated %}
-                                    <a class="btn btn-success" id="downloadBtn" href="{% url 'books:login-buyorsubscribe' book.id %}">
+                                    <a class="btn btn-success" id="downloadBtn" href="{% url 'subscriptions:login-buyorsubscribe' book.id %}">
                                         <i class="fas fa-download"></i> Download
                                     </a>
                                 {% else %}
-                                    <a class="btn btn-success" id="downloadBtn" href="{% url 'books:buyorsubscribe' book.id %}">
+                                    <a class="btn btn-success" id="downloadBtn" href="{% url 'subscriptions:buyorsubscribe' book.id %}">
                                         <i class="fas fa-download"></i> Download
                                     </a>
                                 {% endif %}

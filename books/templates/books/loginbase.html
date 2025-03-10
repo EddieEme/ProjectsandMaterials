@@ -70,19 +70,19 @@
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'books:login-subscription' %}">Subscription</a>
+                        <a class="nav-link" href="{% url 'subscriptions:login-subscription' %}">Subscription</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                             {{user.first_name}}
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{% url 'books:user-dashboard' %}">My Dashboard</a></li>
-                             <li><a class="dropdown-item" href="{% url 'books:view-profile' %}">Profile</a></li>
-                            <li><a class="dropdown-item" href="{% url 'books:edit-profile' %}">Edit Profile</a></li>
-                            <li><a class="dropdown-item" href="{% url 'books:user-settings' %}">Settings</a></li>
+                            <li><a class="dropdown-item" href="{% url 'users:user-dashboard' %}">My Dashboard</a></li>
+                             <li><a class="dropdown-item" href="{% url 'users:view-profile' %}">Profile</a></li>
+                            <li><a class="dropdown-item" href="{% url 'users:edit-profile' %}">Edit Profile</a></li>
+                            <li><a class="dropdown-item" href="{% url 'users:user-settings' %}">Settings</a></li>
                             <hr class="dropdown-divider" />
-                            <li><a class="dropdown-item" href="{% url 'books:user_logout' %}" id="logoutLink" >Logout</a></li>
+                            <li><a class="dropdown-item" href="{% url 'users:user_logout' %}" id="logoutLink" >Logout</a></li>
                         </ul>
                       </li>
                 </ul>

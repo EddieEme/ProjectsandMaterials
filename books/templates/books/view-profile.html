@@ -2,61 +2,196 @@
 {% load static %}
 {% block style %}
 <style>
-  
-    .img-fluid {
-        max-width:15% !important;
+  /* Profile Container */
+   .profile-container {
+    max-width: 800px;
+    width: 90%; /* Slightly wider for better spacing */
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  /* Profile Card */
+  .profile-card {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    width: 60%; /* 60% width on larger screens */
+    margin: 0 auto; /* Center the card horizontally */
+  }
+
+  /* Media query for mobile devices */
+  @media (max-width: 768px) {
+    .profile-card {
+        width: 100%; /* Full width on mobile */
+    }
+  }
+  /* Profile Header */
+  .profile-header {
+    text-align: center;
+    padding: 2.5rem;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-bottom: 1px solid #ddd;
+  }
+
+  .profile-picture {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    margin-bottom: 1.5rem;
+  }
+
+  .profile-name {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: #343a40;
+  }
+
+  .profile-title {
+    color: #6c757d;
+    font-size: 1.1rem;
+    font-weight: 500;
+  }
+
+  /* Profile Body */
+  .profile-body {
+    padding: 2.5rem;
+  }
+
+  .profile-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .profile-section-title {
+    font-size: 1.3rem;
+    color: #495057;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 0.75rem;
+  }
+
+  .profile-info-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem; /* Added gap for better spacing */
+    margin-bottom: 1.5rem;
+  }
+
+  .profile-info-item {
+    flex: 1 1 45%; /* Flexible width with gap */
+    margin-bottom: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    .profile-container {
+      width: 100%; /* Full width on mobile */
+      padding: 1rem;
     }
 
+    .profile-info-item {
+      flex: 1 1 100%; /* Full width on mobile */
+    }
+  }
+
+  .profile-info-label {
+    color: #6c757d;
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+
+  .profile-info-value {
+    font-size: 1.1rem;
+    color: #343a40;
+    font-weight: 500;
+  }
+
+  /* Profile Actions */
+  .profile-actions {
+    text-align: center;
+  }
+
+  .btn-edit-profile {
+    background-color: #007bff;
+    color: #fff;
+    padding: 0.75rem 2.5rem;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+  }
+
+  .btn-edit-profile:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 123, 255, 0.4);
+  }
 </style>
 {% endblock %}
-{% block content %}
-    <!-- View Profile Page -->
-    <div class="container py-4" id="view-profile" style="margin-top:6.5rem !important;">
-        <div class="card">
-            <div class="card-body">
-                <div class="text-center mb-4">
-                    {% if profile.profile_picture %}
-                        <img src="{{ profile.profile_picture.url }}" class="img-fluid rounded-circle mb-3" alt="Profile Picture" style="max-width:15% !important;">
-                    {% else %}
-                        <img src="{% static 'books/images/default_profile_image.jpg' %}" class="img-fluid rounded-circle mb-3" alt="Default Profile Picture" style="max-width:15% !important;>
-                    {% endif %}
-                    <h4 class="mb-0">{{ user.first_name }} {{ user.last_name }}</h4>
-                    <p class="text-muted">{{ profile.profession|default:"Not specified" }}</p>
-                </div>
-                <div class="row justify-content-center">
-                    <div class="col-md-8">
-                        <div class="mb-4">
-                            <h6 class="text-muted mb-2">Bio</h6>
-                            <p>{{ profile.bio|default:"No bio provided" }}</p>
-                        </div>
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <h6 class="text-muted mb-2">Email</h6>
-                                <p>{{ user.email }}</p>
-                            </div>
-                            <div class="col-md-6">
-                                <h6 class="text-muted mb-2">Phone</h6>
-                                <p>{{ profile.phone_number|default:"No phone number provided" }}</p>
-                            </div>
-                        </div>
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <h6 class="text-muted mb-2">Member Since</h6>
-                                <p>{{ user.date_joined|date:"F Y" }}</p>
-                            </div>
-                            <div class="col-md-6">
-                                <h6 class="text-muted mb-2">Total Products</h6>
-                                <p>12 Products</p> <!-- Replace with dynamic value if needed -->
-                            </div>
-                        </div>
-                        <div class="text-center">
-                            <a href="{% url 'books:edit-profile' %}" class="btn btn-primary">Edit Profile</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+{% block content %}
+<!-- View Profile Page -->
+<div class="profile-container" id="view-profile" style="margin-top:6.5rem !important;">
+  <div class="profile-card">
+    <div class="profile-header">
+      {% if profile.profile_picture %}
+        <img src="{{ profile.profile_picture.url }}" class="profile-picture" alt="Profile Picture">
+      {% else %}
+        <img src="{% static 'books/images/default_profile_image.jpg' %}" class="profile-picture" alt="Default Profile Picture">
+      {% endif %}
+      <h1 class="profile-name">{{ user.first_name }} {{ user.last_name }}</h1>
+      <p class="profile-title">{{ profile.profession|default:"Not specified" }}</p>
+    </div>
+    
+    <div class="profile-body">
+      <div class="profile-section">
+        <h2 class="profile-section-title">Bio</h2>
+        <p>{{ profile.bio|default:"No bio provided" }}</p>
+      </div>
+      
+      <div class="profile-section">
+        <h2 class="profile-section-title">Contact Information</h2>
+        <div class="profile-info-row">
+          <div class="profile-info-item">
+            <p class="profile-info-label">Email</p>
+            <p class="profile-info-value">{{ user.email }}</p>
+          </div>
+          <div class="profile-info-item">
+            <p class="profile-info-label">Phone</p>
+            <p class="profile-info-value">{{ profile.phone_number|default:"No phone number provided" }}</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="profile-section">
+        <h2 class="profile-section-title">Account Details</h2>
+        <div class="profile-info-row">
+          <div class="profile-info-item">
+            <p class="profile-info-label">Member Since</p>
+            <p class="profile-info-value">{{ user.date_joined|date:"F Y" }}</p>
+          </div>
+          <div class="profile-info-item">
+            <p class="profile-info-label">Total Products</p>
+            <p class="profile-info-value">12 Products</p>
+          </div>
+        </div>
+      </div>
+      <div class="profile-actions">
+        <a href="{% url 'users:edit-profile' %}" class="btn-edit-profile">Edit Profile</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
 {% endblock %}

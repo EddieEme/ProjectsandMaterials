@@ -1,0 +1,276 @@
+{% extends 'books/loginbase.html' %}
+{% block style %}
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: "Arial", sans-serif;
+        }
+        .form-container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-label {
+            font-weight: 600;
+        }
+        .btn-primary {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+        }
+        .text-danger {
+            font-size: 14px;
+        }
+        .new-field-container {
+            display: none;
+            margin-top: 10px;
+        }
+        #previewImage {
+            max-width: 100%;
+            max-height: 200px;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+    {% endblock %}
+{% block content %}
+
+    <div class="form-container">
+        <h3 class="text-center mb-4">Upload a Book</h3>
+
+        <div id="messageContainer"></div>
+
+        <form id="bookForm" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label">Faculty:</label>
+                <select id="facultySelect" name="book_type" class="form-select" required>
+                    <option value="">-- Select Faculty --</option>
+                    {% for faculty in faculties %}
+                        <option value="{{ faculty.id }}">{{ faculty.name }}</option>
+                    {% endfor %}
+                </select>
+                <div id="newFacultyContainer" class="new-field-container">
+                    <input type="text" name="book_type_name" class="form-control mt-2" placeholder="Enter new faculty name">
+                </div>
+                <div class="form-check mt-2">
+                    <input class="form-check-input" type="checkbox" id="addNewFaculty">
+                    <label class="form-check-label" for="addNewFaculty">
+                        Add new faculty
+                    </label>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Department:</label>
+                <select id="departmentSelect" name="category" class="form-select" required>
+                    <option value="">-- Select Department --</option>
+                    {% for department in departments %}
+                        <option value="{{ department.id }}">{{ department.name }}</option>
+                    {% endfor %}
+                </select>
+                <div id="newDepartmentContainer" class="new-field-container">
+                    <input type="text" name="category_name" class="form-control mt-2" placeholder="Enter new department name">
+                </div>
+                <div class="form-check mt-2">
+                    <input class="form-check-input" type="checkbox" id="addNewDepartment">
+                    <label class="form-check-label" for="addNewDepartment">
+                        Add new department
+                    </label>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Book Title:</label>
+                <input type="text" name="title" class="form-control" placeholder="Enter book title" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Description:</label>
+                <textarea name="description" class="form-control" rows="4" placeholder="Enter book description" required></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Author:</label>
+                <input type="text" name="author" class="form-control" placeholder="Enter author's name" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Upload Book File (PDF or DOCX only):</label>
+                <input type="file" id="fileInput" name="file" class="form-control" accept=".pdf,.docx" required>
+                <small id="fileError" class="text-danger d-none">Only PDF and DOCX files are allowed.</small>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Cover Image (Optional):</label>
+                <input type="file" id="coverImageInput" name="cover_image" class="form-control" accept="image/*">
+                <img id="previewImage" src="#" alt="Cover preview" />
+            </div>
+
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+
+    {% include 'books/pages/footer.html' %}
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const fileInput = document.getElementById("fileInput");
+            const fileError = document.getElementById("fileError");
+            const form = document.getElementById("bookForm");
+            const messageContainer = document.getElementById("messageContainer");
+            const addNewFacultyCheckbox = document.getElementById("addNewFaculty");
+            const newFacultyContainer = document.getElementById("newFacultyContainer");
+            const facultySelect = document.getElementById("facultySelect");
+            const addNewDepartmentCheckbox = document.getElementById("addNewDepartment");
+            const newDepartmentContainer = document.getElementById("newDepartmentContainer");
+            const departmentSelect = document.getElementById("departmentSelect");
+            const coverImageInput = document.getElementById("coverImageInput");
+            const previewImage = document.getElementById("previewImage");
+
+            // Handle new faculty checkbox
+            addNewFacultyCheckbox.addEventListener("change", function() {
+                if (this.checked) {
+                    newFacultyContainer.style.display = "block";
+                    facultySelect.disabled = true;
+                    facultySelect.required = false;
+                } else {
+                    newFacultyContainer.style.display = "none";
+                    facultySelect.disabled = false;
+                    facultySelect.required = true;
+                }
+            });
+
+            // Handle new department checkbox
+            addNewDepartmentCheckbox.addEventListener("change", function() {
+                if (this.checked) {
+                    newDepartmentContainer.style.display = "block";
+                    departmentSelect.disabled = true;
+                    departmentSelect.required = false;
+                } else {
+                    newDepartmentContainer.style.display = "none";
+                    departmentSelect.disabled = false;
+                    departmentSelect.required = true;
+                }
+            });
+
+            // Preview cover image
+            coverImageInput.addEventListener("change", function() {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewImage.src = e.target.result;
+                        previewImage.style.display = "block";
+                    };
+                    reader.readAsDataURL(this.files[0]);
+                } else {
+                    previewImage.style.display = "none";
+                }
+            });
+
+            // Improved CSRF token retrieval function
+            function getCSRFToken() {
+                // First try to get it from the cookie
+                const cookieValue = document.cookie
+                    .split('; ')
+                    .find(row => row.startsWith('csrftoken='))
+                    ?.split('=')[1];
+                
+                if (cookieValue) return cookieValue;
+                
+                // If not in cookie, try to get it from a hidden input field
+                const csrfInput = document.querySelector('input[name="csrfmiddlewaretoken"]');
+                if (csrfInput) return csrfInput.value;
+                
+                return "";
+            }
+
+            // Validate File Type (Only PDF & DOCX)
+            fileInput.addEventListener("change", function () {
+                const allowedExtensions = ["pdf", "docx"];
+                const fileName = fileInput.value.toLowerCase();
+                const fileExtension = fileName.split(".").pop();
+
+                if (!allowedExtensions.includes(fileExtension)) {
+                    fileError.classList.remove("d-none");
+                    fileInput.value = ""; // Clear invalid file
+                } else {
+                    fileError.classList.add("d-none");
+                }
+            });
+
+            // Handle Form Submission via AJAX
+            form.addEventListener("submit", function (e) {
+                e.preventDefault();
+                messageContainer.innerHTML = ""; // Clear previous messages
+                
+                // Form validation
+                if (addNewFacultyCheckbox.checked) {
+                    const newFacultyName = document.querySelector('input[name="book_type_name"]').value;
+                    if (!newFacultyName) {
+                        messageContainer.innerHTML = '<div class="alert alert-danger">Please enter a name for the new faculty.</div>';
+                        return;
+                    }
+                }
+                
+                if (addNewDepartmentCheckbox.checked) {
+                    const newDepartmentName = document.querySelector('input[name="category_name"]').value;
+                    if (!newDepartmentName) {
+                        messageContainer.innerHTML = '<div class="alert alert-danger">Please enter a name for the new department.</div>';
+                        return;
+                    }
+                }
+
+                const formData = new FormData(form);
+
+                // Disable submit button to prevent multiple submissions
+                const submitButton = form.querySelector('button[type="submit"]');
+                submitButton.disabled = true;
+                submitButton.innerHTML = 'Uploading...';
+
+                fetch("{% url 'books:upload-book' %}", {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        "X-CSRFToken": getCSRFToken(),
+                        "X-Requested-With": "XMLHttpRequest"
+                    },
+                    credentials: "same-origin"
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    messageContainer.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+                    form.reset();
+                    previewImage.style.display = "none";
+                    
+                    // Re-enable faculty and department selects if they were disabled
+                    facultySelect.disabled = false;
+                    departmentSelect.disabled = false;
+                    
+                    // Hide new field containers
+                    newFacultyContainer.style.display = "none";
+                    newDepartmentContainer.style.display = "none";
+                })
+                .catch(error => {
+                    messageContainer.innerHTML = `<div class="alert alert-danger">Upload failed. Please try again or contact support.</div>`;
+                    console.error("Error:", error);
+                })
+                .finally(() => {
+                    // Re-enable submit button
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = 'Submit';
+                });
+            });
+        });
+    </script>
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}
