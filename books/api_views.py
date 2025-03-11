@@ -104,35 +104,3 @@ def most_viewed_videos(request, channel_id):
         
         
         
-
-
-
-
-class GetDepartmentView(APIView):
-    def get(self, request):
-        categories = Category.objects.order_by('name')[:12]
-        serializer = CategorySerializer(categories, many=True)
-        return Response(serializer.data)
-    
-class DepartmentAPIView(APIView):
-    def get(self, request, category_id=None):
-        if not category_id:
-            return Response({"error": "category_id is missing"}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            selected_category = Category.objects.get(id=category_id)
-            books = Book.objects.filter(category_id=selected_category.id, is_approved=True)
-            serializer = BookSerializer(books, many=True)
-
-            return Response({
-                'selected_category': {
-                    'id': selected_category.id,
-                    'name': selected_category.name,
-                },
-                'books': serializer.data,
-            }, status=status.HTTP_200_OK)
-
-        except Category.DoesNotExist:
-            return Response({"error": "Category not found"}, status=status.HTTP_404_NOT_FOUND)
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

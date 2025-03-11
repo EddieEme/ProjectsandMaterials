@@ -4,18 +4,24 @@ from .models import BookType, Category, Book
 class BookTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = BookType
-        fields = ['id', 'name']  # Serialize all fields in the BookType model
+        fields = '__all__'  
 
 class CategorySerializer(serializers.ModelSerializer):
+    book_type = BookTypeSerializer(read_only=True) 
+
     class Meta:
         model = Category
-        fields = ['id', 'name']
+        fields = '__all__'
 
 class BookSerializer(serializers.ModelSerializer):
-    # Include related fields for book_type and category
-    book_type = BookTypeSerializer(read_only=True)
+    book_type = BookTypeSerializer(read_only=True) 
     category = CategorySerializer(read_only=True)
+    user = serializers.StringRelatedField(read_only=True)
+    file_statistics = serializers.SerializerMethodField()
 
     class Meta:
         model = Book
-        fields = '__all__'  # Serialize all fields in the Book model
+        fields = '__all__' 
+
+    def get_file_statistics(self, obj):
+        return obj.get_file_statistics()
