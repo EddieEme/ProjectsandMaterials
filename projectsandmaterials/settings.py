@@ -102,7 +102,7 @@ ACCOUNT_EMAIL_REQUIRED = True
 
 LOGIN_URL = 'books:user_login'
 ACCOUNT_SIGNUP_URL = 'books:register'
-LOGIN_REDIRECT_URL = 'books:login-home'
+LOGIN_REDIRECT_URL = 'books:home'
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
