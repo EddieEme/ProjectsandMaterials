@@ -1,3 +1,4 @@
+from email.message import EmailMessage
 from django.shortcuts import redirect, render
 from django.contrib.auth import get_user_model, login, logout, authenticate
 from django.contrib.auth.decorators import login_required
@@ -41,9 +42,6 @@ User = get_user_model()
 
 def user_login(request):
     if request.user.is_authenticated:
-        # Check if the user is a superuser
-        if request.user.is_superuser:
-            return redirect('admin_app:batch-upload-books')  # Redirect to admin_app dashboard
         return redirect('users:user-dashboard')  # Redirect normal users
 
     if request.method == "POST":
@@ -53,12 +51,8 @@ def user_login(request):
         user = authenticate(email=email, password=password)
 
         if user is not None:
-            login(request, user)
-
-            # Redirect based on user type
-            if user.is_superuser:
-                return redirect('admin_app:batch-upload-books')  # Redirect to admin_app
-            return redirect('users:user-dashboard')  # Redirect normal users
+            login(request, user) 
+            return redirect('users:user-dashboard')
 
         else:
             messages.error(request, "Invalid login credentials.")

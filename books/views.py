@@ -24,56 +24,125 @@ User = get_user_model()
 
 logger = logging.getLogger(__name__)
 
+
+from django.shortcuts import render
+from .models import BookType, Category
+
 def home(request):
+    # Retrieve the first 12 BookTypes and 20 Categories in alphabetical order
+    faculties = BookType.objects.order_by('name')[:12]
+    categories = Category.objects.order_by('name')[:20]
+    
+    context = {
+        'faculties': faculties,
+        'categories': categories,
+        'user': request.user if request.user.is_authenticated else None,  # Fixed syntax error
+    }
+
+    template = 'books/login-index.html' if request.user.is_authenticated else 'books/index.html'
+    return render(request, template, context)
+
+
+
+
+def faculty(request, book_type_id):
     if request.user.is_authenticated:
-        return redirect('books:login-home')
-    # Retrieve the first 12 categories in alphabetical order
-    faculties = BookType.objects.order_by('name')[:12]
+        return redirect('books:login-faculty', book_type_id)
 
-    context = {
-        'faculties': faculties,
+    faculties = BookType.objects.order_by('name')
+    categories = Category.objects.order_by('name')
+    selected_book_type = get_object_or_404(BookType, id=book_type_id)
+
+    # Get all books for this book type
+    books_list = Book.objects.filter(book_type=selected_book_type, is_approved=True)
+
+    # Pagination (10 books per page)
+    paginator = Paginator(books_list, 10)  # Change '10' to the number of books per page
+    page_number = request.GET.get("page")
+    books = paginator.get_page(page_number)
+
+    # Count books in each category for this book type
+    category_book_counts = {
+        category.id: books_list.filter(category=category).count() for category in categories
     }
 
-    return render(request, 'books/index.html', context)
-
-
-@login_required(login_url='books:user_login')
-def login_home(request):  
-    user = request.user
-    faculties = BookType.objects.order_by('name')[:12]
-   
 
     context = {
-        'first_name': user.first_name,
-        'last_name': user.last_name,
-        'email': user.email,
+        'selected_book_type': selected_book_type,
+        'books': books,  # Paginated books
         'faculties': faculties,
+        'categories': categories,
+        'category_book_counts': category_book_counts,
     }
-    return render(request, "books/login-index.html", context)
+    template = 'books/login_faculty.html' if request.user.is_authenticated else 'books/faculty.html'
+    return render(request, template, context)
+
+
+
+
+def category_books(request, category_id):
+    category = get_object_or_404(Category, id=category_id)
+    books_list = Book.objects.filter(category=category, is_approved=True)  # Ensure only approved books
+    categories = Category.objects.all()
+
+    # Pagination (10 books per page)
+    paginator = Paginator(books_list, 10)
+    page_number = request.GET.get("page")
+    books = paginator.get_page(page_number)  # Paginated books
+
+    # Count books in each category using books_list (QuerySet)
+    category_book_counts = {
+        cat.id: Book.objects.filter(category=cat, is_approved=True).count() for cat in categories
+    }
+
+    context = {
+        "category": category,
+        "books": books,  # Paginated books
+        "categories": categories,
+        "category_book_counts": category_book_counts,  # Book count per category
+    }
+    template = 'books/login-department.html' if request.user.is_authenticated else 'books/department.html'
+    return render(request, template, context)
+
+
+
+
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 def projects(request):
     if request.user.is_authenticated:
         return redirect('books:login-project')
+
     # Get all categories
     categories = Category.objects.all()
     
     # Get all approved books
-    books = Book.objects.filter(is_approved=True)
+    books_list = Book.objects.filter(is_approved=True)
+
+    # Pagination: Show 5 books per page
+    paginator = Paginator(books_list, 5)  # Show 5 books per page
+    page_number = request.GET.get('page', 1)
+
+    try:
+        books = paginator.get_page(page_number)
+    except PageNotAnInteger:
+        books = paginator.get_page(1)  # If page is not an integer, deliver first page
+    except EmptyPage:
+        books = paginator.get_page(paginator.num_pages)  # If page is out of range, deliver last page
 
     # Count books in each category
     category_book_counts = {
-        category: books.filter(category=category).count() for category in categories
+        category: books_list.filter(category=category).count() for category in categories
     }
-    
-    print(f"this is the count {category_book_counts}")
 
     context = {
         'categories': categories,
-        'books': books,
+        'books': books,  # Paginated books
         'category_book_counts': category_book_counts,
     }
-    
-    return render(request, 'books/project.html', context)
+    template = 'books/login-project.html' if request.user.is_authenticated else 'books/project.html'
+    return render(request,template , context)
+
 
 def projectList(request):
     if request.user.is_authenticated:
@@ -143,32 +212,6 @@ def product_details(request, id):
 
     return render(request, 'books/product-details.html', context)
 
-def department(request, department_id):
-    if request.user.is_authenticated:
-        return redirect('books:login-departments', department_id )
-    selected_category = get_object_or_404(Category, id=department_id)
-    books = Book.objects.filter(department_id=department_id, is_approved=True)
-    
-    if request.user.is_authenticated:
-        return redirect('books:login-home')
-
-    context = {
-        'selected_category': selected_category,
-        'books': books,
-    }
-    return render(request, 'books/department.html', context)
-
-
-@login_required(login_url='books:user_login')
-def login_department(request, department_id ):
-    selected_category = get_object_or_404(Category, id=department_id)
-    books = Book.objects.filter(department_id=department_id, is_approved=True)
-
-    context = {
-        'selected_category': selected_category,
-        'books': books,
-    }
-    return render(request, 'books/login-department.html', context)
 
 
 

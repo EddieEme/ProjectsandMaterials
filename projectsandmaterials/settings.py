@@ -157,9 +157,9 @@ DATABASES = {
     }
 }
 
-# DATABASE_URL = config("DATABASE_URL", default="")
-# if DATABASE_URL:
-#     DATABASES["default"] = dj_database_url.parse(DATABASE_URL)
+DATABASE_URL = config("DATABASE_URL", default="")
+if DATABASE_URL:
+    DATABASES["default"] = dj_database_url.parse(DATABASE_URL)
 
 # Google Cloud Storage Configuration
 DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
