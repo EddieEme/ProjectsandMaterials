@@ -17,6 +17,7 @@ from payments.models import  Order, Download
 from django.db.models import Sum, Avg, Q, Count
 import json
 import logging
+import bleach
 
 
 User = get_user_model()
@@ -46,9 +47,7 @@ def home(request):
 
 
 def faculty(request, book_type_id):
-    if request.user.is_authenticated:
-        return redirect('books:login-faculty', book_type_id)
-
+    
     faculties = BookType.objects.order_by('name')
     categories = Category.objects.order_by('name')
     selected_book_type = get_object_or_404(BookType, id=book_type_id)
@@ -342,6 +341,8 @@ from django.contrib.auth.decorators import login_required
 from .models import Book, BookType, Category
 from django.core.files.storage import default_storage
 
+
+
 @login_required
 def upload_book(request):
     if request.method == "POST":
@@ -353,6 +354,13 @@ def upload_book(request):
         file = request.FILES.get("file")
         cover_image = request.FILES.get("cover_image")
 
+        # Sanitize the description field
+        cleaned_description = bleach.clean(
+            description,
+            tags=['p', 'strong', 'em', 'ul', 'li', 'a', 'br'],  # Allowed tags
+            attributes={'a': ['href', 'title']}  # Allowed attributes for <a>
+        )
+
         # Check if a book with the same title exists (case-insensitive)
         if Book.objects.filter(title__iexact=title).exists():
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -360,7 +368,7 @@ def upload_book(request):
             else:
                 messages.error(request, "A book with this title already exists.")
                 return redirect("books:upload-book")
-            
+
         # Validate file type
         if file:
             allowed_extensions = ["pdf", "docx"]
@@ -422,7 +430,7 @@ def upload_book(request):
             # Save the book with a fixed price of ₦5,000
             book = Book.objects.create(
                 title=title,
-                description=description,
+                description=cleaned_description,  # Use the sanitized description
                 author=author,
                 book_type=book_type,
                 category=category,
@@ -431,13 +439,13 @@ def upload_book(request):
                 cover_image=cover_image,
                 user=request.user
             )
-            
+
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({"success": True, "message": "Book uploaded successfully!"})
             else:
                 messages.success(request, "Book uploaded successfully!")
                 return redirect("books:upload-book")
-                
+
         except Exception as e:
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({"success": False, "message": f"Error creating book: {str(e)}"}, status=500)

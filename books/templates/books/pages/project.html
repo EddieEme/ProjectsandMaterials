@@ -18,6 +18,17 @@
             font-size: 2.5rem;
             padding-top: 2rem;
         }
+
+
+        @media(max-width: 768px) {
+
+       .slag {
+            flex-direction: column;
+        }
+
+        }
+
+
     </style>
 {% endblock %}
 
@@ -65,7 +76,7 @@
                             <div class="card blog-card">
                                 <div class="card-body">
                                     <h5 class="card-title"><b>{{ book.title }}</b></h5>
-                                    <p class="card-text">{{ book.description|truncatewords:50 }}</p>
+                                    <p class="card-text">{{ book.description|unescape_html|truncatehtml:50|safe }}</p>
                                     <div class="text-muted small mb-2">
                                         <span class="slag">
                                             <span class="badge bg-primary category-badge">

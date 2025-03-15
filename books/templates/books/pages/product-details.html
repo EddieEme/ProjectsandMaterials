@@ -1,8 +1,10 @@
 
 {% load static %}
+{% load custom_filters %}
 {% block link %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
 {% endblock %}
+
 
 {% block style %}
     <style>
@@ -179,7 +181,7 @@
                     <!-- Overview Tab -->
                     <div class="tab-pane fade show active" id="overview" role="tabpanel" >
                         <div class="content mb-4">
-                            <p class="lead">{{book.description|truncatewords:250}}</p>
+                            <p class="lead">{{ book.description|safe|truncatewords:250 }}</p>
                                 <div class="container col-md-6 mt-5 align-items-center">
                                     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#documentModal">
                                         Preview Document

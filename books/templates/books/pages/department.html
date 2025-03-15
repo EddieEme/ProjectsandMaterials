@@ -1,4 +1,5 @@
 {% load static %}
+{% load custom_filters %}
 {% block link %}
 <link href="{% static 'books/department.css' %}" rel="stylesheet">
 <link href="{% static 'books/css/project.css' %}" rel="stylesheet">
@@ -79,7 +80,7 @@
                 <div class="card book-card">
                     <div class="card-body">
                         <h5 class="card-title"><b>{{ book.title }}</b></h5>
-                        <p class="card-text">{{ book.description|truncatechars:500 }}</p>
+                        <p class="card-text">{{ book.description|unescape_html|truncatehtml:70|safe }}</p>
                         <div class="stats d-flex justify-content-between">
                             <span class="slag">
                                 <span class="badge bg-primary category-badge">{{ book.category.name }}</span>

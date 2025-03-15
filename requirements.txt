@@ -39,3 +39,5 @@ google-resumable-media==2.7.2
 googleapis-common-protos==1.67.0
 google-api-python-client==2.163.0
 django-unfold==0.46.0
+django-jazzmin==3.0.1
+bleach==6.1.0
