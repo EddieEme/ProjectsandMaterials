@@ -65,7 +65,7 @@
                             <div class="card blog-card project-content">
                                 <div class="card-body">
                                     <h5 class="card-title"><b>{{ book.title }}</b></h5>
-                                    <p class="card-text">{{ book.description|truncatewords:50 }}</p>
+                                    <p class="card-text">{{ book.description|unescape_html|truncatehtml:50|safe }}</p>
                                     <div class="text-muted small mb-2">
                                         <span class="slag">
                                             <span class="badge bg-primary category-badge">

@@ -1,25 +1,19 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin as BaseUserAdmin, GroupAdmin as BaseGroupAdmin
+from django.contrib.auth.admin import UserAdmin 
+from django.contrib.admin import ModelAdmin
 from django.contrib.auth.models import Group
-
-from unfold.admin import ModelAdmin, StackedInline
-from unfold.forms import AdminPasswordChangeForm, UserChangeForm, UserCreationForm
-
-from users.models import CustomUser, Profile
-
-
-# Unregister the default User and Group admin to replace with Unfold versions
-admin.site.unregister(Group)
-
+from .models import CustomUser, Profile
 
 @admin.register(CustomUser)
-class CustomUserAdmin(BaseUserAdmin, ModelAdmin):
+class CustomUserAdmin(UserAdmin):  # ✅ Now ModelAdmin is defined
     model = CustomUser
     ordering = ["email"]
     list_display = ("email", "first_name", "last_name", "is_staff")
     search_fields = ("email", "first_name", "last_name")
 
-    # Use Unfold-provided forms
+    # Use Django-provided forms
+    from django.contrib.auth.forms import UserChangeForm, UserCreationForm, AdminPasswordChangeForm
+
     form = UserChangeForm
     add_form = UserCreationForm
     change_password_form = AdminPasswordChangeForm
@@ -41,12 +35,10 @@ class CustomUserAdmin(BaseUserAdmin, ModelAdmin):
     filter_horizontal = ("groups", "user_permissions")
 
 
-@admin.register(Group)
-class GroupAdmin(BaseGroupAdmin, ModelAdmin):
-    pass
+
 
 
 @admin.register(Profile)
-class ProfileAdmin(ModelAdmin):
+class ProfileAdmin(admin.ModelAdmin):
     list_display = ("user", "can_publish", "created_at")
     search_fields = ("user__email",)
