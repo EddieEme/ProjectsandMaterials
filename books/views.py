@@ -216,13 +216,13 @@ def product_details(request, id):
 
 
 
-@login_required(login_url='books:user_login')
+@login_required(login_url='users:user_login')
 def payment_checkout(request):
     return render(request, 'books/paymentcheckout.html')
 
 
 
-@login_required(login_url='books:user_login')
+@login_required(login_url='users:user_login')
 def payment_method(request, id):
     # Fetch the book by its ID
     book = get_object_or_404(Book, id=id)
@@ -238,7 +238,7 @@ def payment_method(request, id):
 
 
 
-@login_required(login_url='books:user_login')
+@login_required(login_url='users:user_login')
 def login_projects(request):
     categories = Category.objects.all()
     
@@ -260,7 +260,7 @@ def login_projects(request):
     
     return render(request, 'books/login-project.html', context)
 
-@login_required(login_url='books:user_login') 
+@login_required(login_url='users:user_login') 
 def login_projectList(request):
     book_type_id = request.GET.get('book_type', '')
     category_id = request.GET.get('category', '')
@@ -297,7 +297,7 @@ def login_projectList(request):
 
 
 
-@login_required(login_url='books:user_login')
+@login_required(login_url='users:user_login')
 def login_payment_method(request):
     return render(request, 'books/login-payment-method.html')
 
@@ -308,7 +308,7 @@ def verification_error(request):
     """Render the template for verification errors"""
     return render(request, 'users/verification-error.html')
 
-@login_required(login_url='books:user_login')
+@login_required(login_url='users:user_login')
 def login_product_details(request, id):
     book = get_object_or_404(Book, id=id)
     # Get book statistics

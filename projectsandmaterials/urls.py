@@ -20,13 +20,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('', include(('books.urls', 'book'), namespace='books')),
+    path('admin/', admin.site.urls),  # Admin URLs should come first
+    path('accounts/', include('allauth.urls')),  # Allauth URLs
+    path('', include(('books.urls', 'books'), namespace='books')),
     path('users/', include(('users.urls', 'users'), namespace='users')),
     path('payments/', include(('payments.urls', 'payments'), namespace='payments')),
     path('admin_app/', include(('admin_app.urls', 'admin_app'), namespace='admin_app')),
     path('subscriptions/', include(('subscriptions.urls', 'subscriptions'), namespace='subscriptions')),
-    path('admin/', admin.site.urls),
-    path('accounts/', include('allauth.urls')),
    
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
