@@ -147,9 +147,9 @@ def paystack_callback(request):
             transaction_id=reference
         )
 
-        return redirect("/user-dashboard/")
+        return redirect("/users/user-dashboard/")
 
-    return redirect("payment_failed")  # Redirect to failure page
+    return redirect("payment_failed")
 
 
 
