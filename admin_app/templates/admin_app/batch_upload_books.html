@@ -43,7 +43,7 @@ document.getElementById("batch-upload-form").addEventListener("submit", function
     // Get the CSRF token
     const csrftoken = getCookie('csrftoken');
 
-    fetch("{% url 'admin_app:batch-upload-books' %}", {
+    fetch("{% url 'admin_app:batch-upload' %}", {
         method: "POST",
         body: formData,
         headers: {

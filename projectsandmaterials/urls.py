@@ -20,8 +20,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('admin/', admin.site.urls),  # Admin URLs should come first
-    path('accounts/', include('allauth.urls')),  # Allauth URLs
+    path('admin/', admin.site.urls),
+    path('accounts/', include('allauth.urls')),
     path('', include(('books.urls', 'books'), namespace='books')),
     path('users/', include(('users.urls', 'users'), namespace='users')),
     path('payments/', include(('payments.urls', 'payments'), namespace='payments')),

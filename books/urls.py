@@ -3,7 +3,9 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework import routers
 from . import views
 from books.api_views import most_viewed_videos
-from .utils import extract_first_10_pages, serve_preview, download_book
+from .utils import serve_preview, download_book
+
+
 
 
 

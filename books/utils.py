@@ -154,94 +154,88 @@ def extract_first_10_pages(book):
         logger.warning(f"Cannot generate preview for book {book.id}: No file attached")
         return None
 
-    # Check if required settings exist
+    # Ensure GCS settings exist
     if not hasattr(settings, 'GS_CREDENTIALS') or not hasattr(settings, 'GS_BUCKET_NAME'):
         logger.error("GCS settings missing: GS_CREDENTIALS or GS_BUCKET_NAME not configured")
         return None
 
     temp_file_path = None
     converted_pdf_path = None
-    
+    preview_path = None
+
     try:
-        # Create directory for previews if it doesn't exist
         preview_dir = os.path.join(settings.MEDIA_ROOT, "previews")
         os.makedirs(preview_dir, exist_ok=True)
-        
-        # Define preview paths consistently across functions
+
         preview_filename = f"preview_{book.id}.pdf"
         preview_path = os.path.join(preview_dir, preview_filename)
-        # The URL that will be used to access this file
         preview_url = f"/media/previews/{preview_filename}"
-        
-        logger.info(f"Generating preview for book {book.id} at path: {preview_path}")
-        
-        # Download file from GCS
+
+        logger.info(f"Generating preview for book {book.id}")
+
+        # Download the file from GCS
         client = storage.Client(credentials=settings.GS_CREDENTIALS)
         bucket = client.bucket(settings.GS_BUCKET_NAME)
         blob = bucket.blob(book.file.name)
-        
+
         with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(book.file.name)[1]) as temp_file:
             blob.download_to_filename(temp_file.name)
             temp_file_path = temp_file.name
-        
+
         logger.info(f"Downloaded file from GCS to {temp_file_path}")
-        
-        # Process based on file extension
+
+        # Determine file extension
         file_extension = os.path.splitext(temp_file_path)[1].lower()
-        
+
         # Remove existing preview if it exists
         if os.path.exists(preview_path):
             os.remove(preview_path)
-        
+
         if file_extension == ".pdf":
             logger.info(f"Processing PDF file for book {book.id}")
-            # Extract first 10 pages from PDF
             with fitz.open(temp_file_path) as doc, fitz.open() as new_doc:
                 for page_num in range(min(10, len(doc))):
                     new_doc.insert_pdf(doc, from_page=page_num, to_page=page_num)
                 new_doc.save(preview_path)
-                logger.info(f"Saved PDF preview with {min(10, len(doc))} pages to {preview_path}")
-        
+                logger.info(f"Saved PDF preview with {min(10, len(doc))} pages")
+
         elif file_extension in [".docx", ".doc"]:
             logger.info(f"Processing DOCX file for book {book.id}")
-            # Convert DOCX to PDF first
             converted_pdf_path = convert_docx_to_pdf(temp_file_path)
             if not converted_pdf_path:
                 logger.error(f"Failed to convert DOCX to PDF for book {book.id}")
                 return None
-                
+
             logger.info(f"Successfully converted DOCX to PDF: {converted_pdf_path}")
-                
+
             # Now extract first 10 pages from the converted PDF
             try:
                 with fitz.open(converted_pdf_path) as doc, fitz.open() as new_doc:
                     for page_num in range(min(10, len(doc))):
                         new_doc.insert_pdf(doc, from_page=page_num, to_page=page_num)
                     new_doc.save(preview_path)
-                    logger.info(f"Saved DOCX preview with {min(10, len(doc))} pages to {preview_path}")
+                    logger.info(f"Saved DOCX preview with {min(10, len(doc))} pages")
             except Exception as e:
                 logger.error(f"Error extracting pages from converted PDF: {str(e)}")
-                # If extraction fails, use the full converted PDF as a fallback
                 import shutil
                 shutil.copy(converted_pdf_path, preview_path)
-                logger.warning(f"Using full PDF as preview for book {book.id} due to extraction error")
+                logger.warning(f"Using full PDF as preview due to extraction error")
         else:
             logger.warning(f"Unsupported file format for preview: {file_extension}")
             return None
-        
+
         # Verify the preview file exists
-        if not os.path.exists(preview_path):
-            logger.error(f"Preview file wasn't created at {preview_path}")
+        if os.path.exists(preview_path):
+            logger.info(f"Preview successfully created at {preview_path}")
+            return preview_url
+        else:
+            logger.error("Preview file was not created.")
             return None
-        
-        logger.info(f"Successfully created preview at {preview_path}, returning URL: {preview_url}")  
-        # Return relative URL path to the preview
-        return preview_url
-    
+
     except Exception as e:
         logger.error(f"Error generating preview for book {book.id}: {str(e)}")
         return None
-    
+
     finally:
         # Clean up temporary files
         for path in [temp_file_path, converted_pdf_path]:
