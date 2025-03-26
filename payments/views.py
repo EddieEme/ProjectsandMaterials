@@ -153,24 +153,91 @@ def paystack_callback(request):
 
 
 
+@csrf_exempt  # Allow webhook POST requests without CSRF token
 def flutterwave_callback(request):
-    status = request.GET.get("status")
-    tx_ref = request.GET.get("tx_ref")
-    
-    if status == "successful":
-        order = Order.objects.get(id=tx_ref.split("-")[1])
-        order.status = "completed"
-        order.save()
-        
-        Payment.objects.create(
-            user=order.user,
-            order=order,
-            amount=order.price,
-            payment_method="flutterwave",
-            status="completed",
-            transaction_id=tx_ref
-        )
-        
-        return redirect("payment_success")  # Redirect to success page
-    else:
-        return redirect("payment_failed")  # Redirect to failure page
+    if request.method == "GET":
+        # Handle redirect after payment
+        status = request.GET.get("status")  # Payment status (successful, cancelled, failed)
+        tx_ref = request.GET.get("tx_ref")  # Transaction reference
+
+        logger.info(f"Flutterwave Redirect Callback Received: status={status}, tx_ref={tx_ref}")
+
+        if not tx_ref:
+            return redirect("payment_failed")  # No transaction reference, redirect to failure page
+
+        try:
+            order_id = int(tx_ref.split("-")[1])
+            order = Order.objects.get(id=order_id)
+
+            if status == "successful":
+                order.status = "completed"
+                order.save()
+                
+                # Create a Payment record
+                Payment.objects.create(
+                    user=order.user,
+                    order=order,
+                    amount=order.price,
+                    payment_method="flutterwave",
+                    status="completed",
+                    transaction_id=tx_ref
+                )
+
+                return redirect("payment_success")  # Redirect to success page
+
+            elif status in ["failed", "cancelled"]:
+                order.status = "cancelled"
+                order.save()
+                return redirect("payment_failed")  # Redirect to failure page
+
+        except Order.DoesNotExist:
+            logger.error(f"Order with ID {order_id} not found")
+            return redirect("payment_failed")
+
+    elif request.method == "POST":
+        # Handle webhook POST request from Flutterwave
+        try:
+            payload = json.loads(request.body)  # Parse incoming JSON data
+            logger.info(f"Flutterwave Webhook Received: {payload}")
+
+            tx_ref = payload.get("txRef")  # Transaction reference
+            status = payload.get("status")  # Status from webhook
+            transaction_id = payload.get("transaction_id")  # Flutterwave transaction ID
+
+            if not tx_ref:
+                logger.warning("Missing tx_ref in webhook data")
+                return JsonResponse({"error": "Invalid request"}, status=400)
+
+            order_id = int(tx_ref.split("-")[1])
+            order = Order.objects.get(id=order_id)
+
+            if status == "successful":
+                order.status = "completed"
+                order.save()
+
+                # Store payment details
+                Payment.objects.create(
+                    user=order.user,
+                    order=order,
+                    amount=order.price,
+                    payment_method="flutterwave",
+                    status="completed",
+                    transaction_id=transaction_id
+                )
+                
+                return JsonResponse({"message": "Payment processed successfully"}, status=200)
+
+            elif status in ["failed", "cancelled"]:
+                order.status = "cancelled"
+                order.save()
+                return JsonResponse({"message": "Payment failed or cancelled"}, status=200)
+
+        except json.JSONDecodeError:
+            logger.error("Invalid JSON in webhook request")
+            return JsonResponse({"error": "Invalid JSON"}, status=400)
+
+        except Order.DoesNotExist:
+            logger.error(f"Order with ID {order_id} not found")
+            return JsonResponse({"error": "Order not found"}, status=404)
+
+    return HttpResponse(status=405)
