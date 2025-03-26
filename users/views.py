@@ -19,6 +19,7 @@ from books.models import Book
 from books.utils import download_book
 from django.core.paginator import Paginator
 from django.db.models import Count, Sum, Q
+from allauth.socialaccount.views import SignupView
 
 
 
@@ -40,6 +41,11 @@ logger = logging.getLogger(__name__)
 
 User = get_user_model() 
 
+
+class CustomSocialSignupView(SignupView):
+    def get(self, request, *args, **kwargs):
+        return redirect("/")
+
 def user_login(request):
     if request.user.is_authenticated:
         return redirect('users:user-dashboard')  # Redirect normal users
@@ -59,6 +65,9 @@ def user_login(request):
             return redirect('users:user_login')
 
     return render(request, 'books/login.html')
+
+
+
 
 def user_logout(request):
     logout(request)

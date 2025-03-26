@@ -1,7 +1,7 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
-from . views import EmailVerificationView
+from . views import EmailVerificationView, CustomSocialSignupView
 
 app_name = 'users'
 
@@ -19,4 +19,6 @@ urlpatterns = [
     path('user-dashboard/', views.user_dashboard, name='user-dashboard'),
     path('view-profile/', views.view_profile, name='view-profile'),
     path('edit-profile/', views.edit_profile, name='edit-profile'),
+    
+    path("accounts/social/signup/", CustomSocialSignupView.as_view(), name="socialaccount_signup"),
 ]
