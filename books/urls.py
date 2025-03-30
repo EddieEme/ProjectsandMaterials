@@ -17,6 +17,7 @@ router = routers.DefaultRouter()
 # Web interface URLs
 web_urlpatterns = [
     path('', views.home, name='home'),
+    path('services/', views.services, name='services'),
     path('projects/', views.projects, name='projects'),
     path('project-list/', views.projectList, name='project-list'),
     path('product-details/<int:id>/', views.product_details, name='product-details'),

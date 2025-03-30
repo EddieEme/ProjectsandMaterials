@@ -5,6 +5,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.mail import send_mail
 from django.urls import reverse
+from django.core.cache import cache
 import os
 import uuid
 import tempfile
