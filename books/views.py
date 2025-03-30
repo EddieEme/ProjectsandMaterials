@@ -15,6 +15,7 @@ from django.conf import settings
 from .models import Book, Category, BookType
 from payments.models import  Order, Download
 from django.db.models import Sum, Avg, Q, Count
+from django.views.decorators.cache import cache_page
 import json
 import logging
 import bleach
@@ -42,6 +43,13 @@ def home(request):
 
     template = 'books/login-index.html' if request.user.is_authenticated else 'books/index.html'
     return render(request, template, context)
+
+
+def services(request):
+    template = 'books/login-services.html' if request.user.is_authenticated else 'books/services.html'
+    context = {}
+    return render(request, template, context)
+    
 
 
 
@@ -180,33 +188,50 @@ def projectList(request):
 
 
 
+@cache_page(60 * 15)
 def product_details(request, id):
-    # Get the selected book
-    book = get_object_or_404(Book, id=id)
+    # Get the selected book with select_related to optimize related object access
+    book = get_object_or_404(
+        Book.objects.select_related('book_type', 'category', 'user'),
+        id=id
+    )
     
-    # Redirect authenticated users (if needed)
+    # Redirect authenticated users
     if request.user.is_authenticated:
         return redirect('books:login-product-details', id=book.id)
     
-    # Get book statistics
+    # Defer statistics calculation to when it's actually needed in template
+    # (or consider caching these values in the model)
     stats = book.get_file_statistics()
-    preview_url = f"/preview/{book.id}/" if book.file else None
+    
+    # Optimize related books query
+    title_keywords = book.title.split()
+    if len(title_keywords) > 0:
+        # Use a more efficient query structure
+        first_keyword = title_keywords[0]
+        query = Q(title__icontains=first_keyword)
+        
+        if len(title_keywords) > 1:
+            last_keyword = title_keywords[-1]
+            if last_keyword != first_keyword:
+                query |= Q(title__icontains=last_keyword)
+        
+        related_books = (
+            Book.objects
+            .filter(query)
+            .exclude(id=book.id)
+            .only('id', 'title', 'cover_image', 'price')  # Only fetch needed fields
+            .order_by('?')[:5]  # Random sample for variety
+        )
+    else:
+        related_books = Book.objects.none()
 
-    # Get related books based on the title
-    title_keywords = book.title.split()  # Split title into keywords
-    related_books = Book.objects.filter(
-        # Search for books with similar titles
-        Q(title__icontains=title_keywords[0]) |  # Match the first keyword
-        Q(title__icontains=title_keywords[-1]),  # Match the last keyword
-    ).exclude(id=book.id).distinct()[:5]  # Exclude the current book and limit to 5 results
-
-    # Prepare context
     context = {
         "book": book,
-        "preview_url": preview_url,
-        "page_count": stats["pages"],
-        "word_count": stats["words"],
-        "related_books": related_books,  # Add related books to the context
+        "preview_url": f"/preview/{book.id}/" if book.file else None,
+        "page_count": stats.get("pages"),
+        "word_count": stats.get("words"),
+        "related_books": related_books,
     }
 
     return render(request, 'books/product-details.html', context)
@@ -444,6 +469,7 @@ def upload_book(request):
                 return JsonResponse({"success": True, "message": "Book uploaded successfully!"})
             else:
                 messages.success(request, "Book uploaded successfully!")
+                
                 return redirect("books:upload-book")
 
         except Exception as e:
