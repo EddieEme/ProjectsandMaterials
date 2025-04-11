@@ -8,6 +8,7 @@ from decouple import config
 from google.oauth2 import service_account
 import dj_database_url
 from datetime import timedelta
+from django.urls import reverse_lazy
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -165,7 +166,7 @@ if DATABASE_URL:
 
 # Google Cloud Storage Configuration
 DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
-STATICFILES_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
+# STATICFILES_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
 GS_BUCKET_NAME = config('GS_BUCKET_NAME')
 GS_PROJECT_ID = config('GS_PROJECT_ID')
 GS_CREDENTIALS_JSON = config('GS_CREDENTIALS')
@@ -213,18 +214,17 @@ USE_TZ = True
 
 # Static Files Configuration
 # URLs
-STATIC_URL = f"https://storage.googleapis.com/{GS_BUCKET_NAME}/static/"
-MEDIA_URL = f"https://storage.googleapis.com/{GS_BUCKET_NAME}/media/"
+# STATIC_URL = f"https://storage.googleapis.com/{GS_BUCKET_NAME}/static/"
+# MEDIA_URL = f"https://storage.googleapis.com/{GS_BUCKET_NAME}/media/"
 
-# Remove local STATICFILES_DIRS to avoid conflicts
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 
 
 
 # Static Files Configuration
-# STATIC_URL = 'static/'
-# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 # # Media Files Configuration
 # MEDIA_URL = '/media/'
@@ -235,10 +235,60 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 JAZZMIN_SETTINGS = {
-    "site_title": "Library Admin",
-    "use_fontawesome": True,  # Enable FontAwesome icons
+    "site_title": "Admin",
+    "site_brand": "Admin Page",
     "site_logo": "books/images/brand.jpg",
     "welcome_sign": "Welcome to the Projectsandmaterials",
     "copyright": "Emrisolution Ltd",
-    "search_model": ["auth.User", "auth.Group"],
+    "theme": "materia",
+    "dark_mode_theme": "solar",
+   
+
+    # "search_model": ["auth.User", "auth.Group"],
+    
+    "topmenu_links": [
+
+        {"name": "Home",  "url": "admin:index", "permissions": ["auth.view_user"]},
+
+        # model admin to link to (Permissions checked against model)
+        {"model": "auth.User"},
+
+        # App with dropdown menu to all its models pages (Permissions checked against models)
+        {"app": "books"},
+    ],
+    
+    "custom_links": {
+        "auth": [  # or use any registered app label
+            {
+                "name": "Batch Upload",
+                "url": reverse_lazy("admin_app:batch-upload"),
+                "icon": "fas fa-life-ring",
+                "new_window": True
+            }
+        ]
+    },
+    
+"icons": {
+        "auth.user": "fas fa-user",
+        "auth.Group": "fas fa-users",
+        "account.EmailAddress": "fas fa-envelope",
+        "books.Book": "fas fa-book",
+        "books.BookType": "fas fa-tags",
+        "books.Category": "fas fa-folder",
+        "payments.Payment": "fas fa-money-bill-wave",
+        "payments.Download": "fas fa-download",
+        "payments.Order": "fas fa-shopping-cart",
+        "payments.WithdrawalRequest": "fas fa-hand-holding-usd",
+        "sites.Site": "fas fa-globe",
+        "socialaccount.SocialAccount": "fas fa-share-alt",
+        "socialaccount.SocialToken": "fas fa-key",
+        "socialaccount.SocialApp": "fas fa-plug",
+        "subscriptions.SubscriptionPlan": "fas fa-credit-card",
+        "subscriptions.UserSubscription": "fas fa-user-check",
+        "users.CustomUser": "fas fa-user-shield",
+        "users.Profile": "fas fa-id-card",
+    },
+
+"show_ui_builder": False,
+
 }
