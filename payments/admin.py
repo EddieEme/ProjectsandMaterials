@@ -14,7 +14,7 @@ class PaymentAdmin(admin.ModelAdmin):
     list_display = ('user', 'order', 'amount', "payment_method", 'status', 'created_at')
     list_filter = ('status', 'payment_method')
     search_fields = ('user__email', 'transaction_id')
-
+    
 @admin.register(Download)
 class DownloadAdmin(admin.ModelAdmin):
     list_display = ('user', 'book', 'downloaded_at')
