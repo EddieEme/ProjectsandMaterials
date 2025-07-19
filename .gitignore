@@ -2,4 +2,12 @@
 .env
 .env
 projectsandmaterials-1bbd31a3d321.json
+<<<<<<< HEAD
 passenger_wsgi.py
+=======
+>>>>>>> 31b1525e6867f08fac2b34e09a420b7c3c1e9267
+venv/
+__pycache__/
+*.pyc
+*.exe
+*.pdf
