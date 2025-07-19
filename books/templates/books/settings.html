@@ -1,0 +1,135 @@
+
+{% extends 'books/loginbase.html' %}
+{% block content %}
+ <!-- Settings Page -->
+    <div class="container py-4" id="settings" style="margin-top:6.5rem !important;">
+        <div class="row">
+            <!-- Account Settings -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">Account Settings</h5>
+                        <div class="d-grid gap-3">
+                            <button class="btn btn-outline-primary text-start">
+                                <i class="fas fa-lock me-2"></i>
+                                Change Password
+                            </button>
+                            <button class="btn btn-outline-primary text-start">
+                                <i class="fas fa-shield-alt me-2"></i>
+                                Two-Factor Authentication
+                            </button>
+                            <button class="btn btn-outline-danger text-start">
+                                <i class="fas fa-trash-alt me-2"></i>
+                                Delete Account
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Settings -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">Payment Settings</h5>
+                        <div class="mb-3">
+                            <label class="form-label">Default Payment Method</label>
+                            <select class="form-select mb-3">
+                                <option>Bank Account (****1234)</option>
+                                <option>PayPal (john@example.com)</option>
+                            </select>
+                            <button class="btn btn-outline-primary"><a href="addpayment.html"><i class="fas fa-plus me-2"></i>
+                            Add Payment Method</a>
+                                
+                            </button>
+                        </div>
+                        <div class="mt-4">
+                            <h6 class="mb-3">Saved Payment Methods</h6>
+                            <div class="list-group">
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="fas fa-university me-2"></i>
+                                        Bank Account (****1234)
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-danger">Remove</button>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="fab fa-paypal me-2"></i>
+                                        PayPal (john@example.com)
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-danger">Remove</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notification Settings -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">Notification Settings</h5>
+                        <div class="mb-4">
+                            <h6 class="mb-3">Email Notifications</h6>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" checked>
+                                <label class="form-check-label">New Order Notifications</label>
+                            </div>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" checked>
+                                <label class="form-check-label">Payment Notifications</label>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" checked>
+                                <label class="form-check-label">Product Updates</label>
+                            </div>
+                        </div>
+                        <div>
+                            <h6 class="mb-3">SMS Notifications</h6>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox">
+                                <label class="form-check-label">Order Status Updates</label>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox">
+                                <label class="form-check-label">Security Alerts</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Privacy Settings -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">Privacy Settings</h5>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" checked>
+                            <label class="form-check-label">Profile Visibility</label>
+                            <div class="text-muted small">Make your profile visible to other users</div>
+                        </div>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" checked>
+                            <label class="form-check-label">Show Email Address</label>
+                            <div class="text-muted small">Display your email address on your public profile</div>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox">
+                            <label class="form-check-label">Marketing Communications</label>
+                            <div class="text-muted small">Receive updates about new features and promotions</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% include 'books/pages/footer.html' %}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}
+   

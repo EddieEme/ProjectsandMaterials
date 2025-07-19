@@ -1,0 +1,119 @@
+App 115479 output: [ pid=115479, time=2025-07-19 16:29:06,785 ]: Not Found: /2018/01/the-impact-of-modern-clothing-on_15.html
+App 115479 output: [ pid=115479, time=2025-07-19 16:29:17,942 ]: Not Found: /2018/01/the-impact-of-modern-clothing-on_15.html
+App 115479 output: [ pid=115479, time=2025-07-19 16:29:27,407 ]: Forbidden (CSRF cookie not set.): /users/user_login/
+App 124733 output: [ pid=124733, time=2025-07-19 16:32:41,935 ]: Not Found: /search/label/HUMAN%20RESOURCE%20DEVELOPMENT%20PROJECT%20TOPICS%20AND%20MATERIALS
+App 124733 output: [ pid=124733, time=2025-07-19 16:32:50,267 ]: Not Found: /search/label/HUMAN%20RESOURCE%20DEVELOPMENT%20PROJECT%20TOPICS%20AND%20MATERIALS
+App 124733 output: [ pid=124733, time=2025-07-19 16:36:45,552 ]: Not Found: /2017/01/godfatherism-and-official-corruption-in.html
+App 124733 output: [ pid=124733, time=2025-07-19 16:36:46,362 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 124733 output: [ pid=124733, time=2025-07-19 16:36:46,363 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 124733 output: [ pid=124733, time=2025-07-19 16:36:47,560 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 124733 output: [ pid=124733, time=2025-07-19 16:36:47,561 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 124733 output: [ pid=124733, time=2025-07-19 16:36:48,502 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 124733 output: [ pid=124733, time=2025-07-19 16:36:48,503 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 124733 output: [ pid=124733, time=2025-07-19 16:38:24,226 ]: Forbidden (CSRF cookie not set.): /users/user_login/
+App 141918 output: [ pid=141918, time=2025-07-19 16:42:07,824 ]: Forbidden (CSRF cookie not set.): /users/user_login/
+App 141918 output: [ pid=141918, time=2025-07-19 16:42:23,983 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 141918 output: [ pid=141918, time=2025-07-19 16:42:23,984 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 141918 output: [ pid=141918, time=2025-07-19 16:42:24,825 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 141918 output: [ pid=141918, time=2025-07-19 16:42:24,826 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 141918 output: [ pid=141918, time=2025-07-19 16:42:51,932 ]: Forbidden (CSRF cookie not set.): /users/user_login/
+App 141918 output: [ pid=141918, time=2025-07-19 16:44:14,608 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 141918 output: [ pid=141918, time=2025-07-19 16:44:14,609 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 141918 output: [ pid=141918, time=2025-07-19 16:44:14,621 ]: Not Found: /favicon.ico
+App 141918 output: [ pid=141918, time=2025-07-19 16:44:15,442 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 141918 output: [ pid=141918, time=2025-07-19 16:44:15,443 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 141918 output: [ pid=141918, time=2025-07-19 16:44:16,309 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 141918 output: [ pid=141918, time=2025-07-19 16:44:16,310 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 150081 output: [ pid=150081, time=2025-07-19 16:47:11,763 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 150081 output: [ pid=150081, time=2025-07-19 16:47:11,764 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 150081 output: [ pid=150081, time=2025-07-19 16:47:12,469 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 150081 output: [ pid=150081, time=2025-07-19 16:47:12,470 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 150081 output: [ pid=150081, time=2025-07-19 16:47:13,166 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 150081 output: [ pid=150081, time=2025-07-19 16:47:13,167 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 150081 output: [ pid=150081, time=2025-07-19 16:47:16,089 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 150081 output: [ pid=150081, time=2025-07-19 16:47:16,090 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 150081 output: [ pid=150081, time=2025-07-19 16:47:16,895 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 150081 output: [ pid=150081, time=2025-07-19 16:47:16,896 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 150081 output: [ pid=150081, time=2025-07-19 16:47:35,436 ]: Forbidden (CSRF cookie not set.): /users/user_login/
+App 150081 output: [ pid=150081, time=2025-07-19 16:47:37,743 ]: Not Found: /2017/01/character-formation-in-chimamanda-ngozi.html
+App 150081 output: [ pid=150081, time=2025-07-19 16:50:21,626 ]: Not Found: /2017/05/the-effects-of-training-and-development.html
+App 150081 output: [ pid=150081, time=2025-07-19 16:50:35,112 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 150081 output: [ pid=150081, time=2025-07-19 16:50:35,113 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 150081 output: [ pid=150081, time=2025-07-19 16:50:35,980 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 150081 output: [ pid=150081, time=2025-07-19 16:50:35,981 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 150081 output: [ pid=150081, time=2025-07-19 16:50:36,868 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 150081 output: [ pid=150081, time=2025-07-19 16:50:36,869 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 150081 output: [ pid=150081, time=2025-07-19 16:53:46,689 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 150081 output: [ pid=150081, time=2025-07-19 16:53:46,690 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 150081 output: [ pid=150081, time=2025-07-19 16:53:47,414 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 150081 output: [ pid=150081, time=2025-07-19 16:53:47,415 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 150081 output: [ pid=150081, time=2025-07-19 16:54:02,471 ]: Not Found: /2018/04/psychology-project-topics-and-materials.html
+App 150081 output: [ pid=150081, time=2025-07-19 16:54:06,733 ]: Forbidden (CSRF cookie not set.): /users/user_login/
+App 150081 output: [ pid=150081, time=2025-07-19 16:54:34,757 ]: Not Found: /ebooks
+App 150081 output: [ pid=150081, time=2025-07-19 16:56:12,014 ]: Not Found: /project-topic-in-philosophy/
+App 150081 output: [ pid=150081, time=2025-07-19 16:58:43,748 ]: Not Found: /project-topic-in-fine-and-applied-arts/
+App 150081 output: [ pid=150081, time=2025-07-19 17:02:56,668 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 150081 output: [ pid=150081, time=2025-07-19 17:02:56,669 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 150081 output: [ pid=150081, time=2025-07-19 17:02:56,688 ]: Not Found: /favicon.ico
+App 150081 output: [ pid=150081, time=2025-07-19 17:02:57,361 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 150081 output: [ pid=150081, time=2025-07-19 17:02:57,362 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 150081 output: [ pid=150081, time=2025-07-19 17:02:58,534 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 150081 output: [ pid=150081, time=2025-07-19 17:02:58,535 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 150081 output: [ pid=150081, time=2025-07-19 17:03:11,221 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 150081 output: [ pid=150081, time=2025-07-19 17:03:11,221 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 150081 output: [ pid=150081, time=2025-07-19 17:03:11,951 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 150081 output: [ pid=150081, time=2025-07-19 17:03:11,954 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 150081 output: [ pid=150081, time=2025-07-19 17:03:12,643 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 150081 output: [ pid=150081, time=2025-07-19 17:03:12,644 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 150081 output: [ pid=150081, time=2025-07-19 17:03:21,737 ]: /home/projec24/projectsandmaterials/books/views.py:130: UnorderedObjectListWarning: Pagination may yield inconsistent results with an unordered object_list: <class 'books.models.Book'> QuerySet.
+App 150081 output:   paginator = Paginator(books_list, 5)  # Show 5 books per page
+App 150081 output: 
+App 150081 output: [ pid=150081, time=2025-07-19 17:03:22,885 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 150081 output: [ pid=150081, time=2025-07-19 17:03:22,886 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 150081 output: [ pid=150081, time=2025-07-19 17:03:23,561 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 150081 output: [ pid=150081, time=2025-07-19 17:03:23,562 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 171443 output: [ pid=171443, time=2025-07-19 17:03:31,419 ]: /home/projec24/projectsandmaterials/books/views.py:130: UnorderedObjectListWarning: Pagination may yield inconsistent results with an unordered object_list: <class 'books.models.Book'> QuerySet.
+App 171443 output:   paginator = Paginator(books_list, 5)  # Show 5 books per page
+App 171443 output: 
+App 150081 output: [ pid=150081, time=2025-07-19 17:03:32,323 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 150081 output: [ pid=150081, time=2025-07-19 17:03:32,325 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 171443 output: [ pid=171443, time=2025-07-19 17:03:32,338 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 171443 output: [ pid=171443, time=2025-07-19 17:03:32,340 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 150081 output: [ pid=150081, time=2025-07-19 17:03:32,687 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 150081 output: [ pid=150081, time=2025-07-19 17:03:32,688 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 150081 output: [ pid=150081, time=2025-07-19 17:03:33,932 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 150081 output: [ pid=150081, time=2025-07-19 17:03:33,933 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 150081 output: [ pid=150081, time=2025-07-19 17:03:37,240 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 150081 output: [ pid=150081, time=2025-07-19 17:03:37,240 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 150081 output: [ pid=150081, time=2025-07-19 17:03:39,375 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 150081 output: [ pid=150081, time=2025-07-19 17:03:39,376 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 150081 output: [ pid=150081, time=2025-07-19 17:03:52,344 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 150081 output: [ pid=150081, time=2025-07-19 17:03:52,345 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 150081 output: [ pid=150081, time=2025-07-19 17:03:53,048 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 150081 output: [ pid=150081, time=2025-07-19 17:03:53,049 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 150081 output: [ pid=150081, time=2025-07-19 17:03:53,744 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 150081 output: [ pid=150081, time=2025-07-19 17:03:53,745 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 150081 output: [ pid=150081, time=2025-07-19 17:04:45,383 ]: Not Found: /download/project-topics-on-industrial-relations-and-personnel-management.html
+App 150081 output: [ pid=150081, time=2025-07-19 17:05:04,265 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 150081 output: [ pid=150081, time=2025-07-19 17:05:04,266 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 150081 output: [ pid=150081, time=2025-07-19 17:05:05,088 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 150081 output: [ pid=150081, time=2025-07-19 17:05:05,089 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 150081 output: [ pid=150081, time=2025-07-19 17:05:05,811 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 150081 output: [ pid=150081, time=2025-07-19 17:05:05,812 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 150081 output: [ pid=150081, time=2025-07-19 17:05:32,522 ]: Not Found: /ebook/financial-development-and-economic-growth-empirical-evidence-from-nigeria
+App 150081 output: [ pid=150081, time=2025-07-19 17:05:37,854 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 150081 output: [ pid=150081, time=2025-07-19 17:05:37,855 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 150081 output: [ pid=150081, time=2025-07-19 17:05:38,545 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 150081 output: [ pid=150081, time=2025-07-19 17:05:38,546 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 150081 output: [ pid=150081, time=2025-07-19 17:05:39,374 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 150081 output: [ pid=150081, time=2025-07-19 17:05:39,375 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 150081 output: [ pid=150081, time=2025-07-19 17:06:16,959 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 150081 output: [ pid=150081, time=2025-07-19 17:06:16,961 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 171443 output: [ pid=171443, time=2025-07-19 17:06:17,150 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 171443 output: [ pid=171443, time=2025-07-19 17:06:17,151 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 172220 output: [ pid=172220, time=2025-07-19 17:06:17,661 ]: YouTube API HTTP error: 403 Client Error: Forbidden for url: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UCaB3YPxB_eXqTcFdFo9CrCA&order=viewCount&type=video&maxResults=3&key=AIzaSyDjt40GkdOQP1k1WCy_Ms7ci7Gt59bnDzU
+App 172220 output: [ pid=172220, time=2025-07-19 17:06:17,663 ]: Internal Server Error: /api/most-viewed-videos/UCaB3YPxB_eXqTcFdFo9CrCA/
+App 150081 output: [ pid=150081, time=2025-07-19 17:06:28,068 ]: Not Found: /2017/04/assessment-of-soil-biological-and.html
+App 150081 output: [ pid=150081, time=2025-07-19 17:07:40,584 ]: Not Found: /2023/07/effect-of-dietary-supplementation-with.html
+App 150081 output: [ pid=150081, time=2025-07-19 17:13:24,566 ]: Not Found: /2017/04/growth-gonadal-development-and-blood.html
+App 150081 output: [ pid=150081, time=2025-07-19 17:14:51,262 ]: Not Found: /2018/01/how-to-get-your-project-materials.html

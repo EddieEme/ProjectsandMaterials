@@ -1,0 +1,135 @@
+{% extends 'books/loginbase.html' %} {% load static %} {% block link %}
+<link
+  href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css"
+  rel="stylesheet"
+/>
+{% endblock %} {% block title %} Payment Gateway {% endblock %} 
+{% block style %}
+<style>
+  body {
+    background-color: #f4f6f9;
+  }
+
+  .payment-container {
+    max-width: 500px;
+    margin: 50px auto;
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .payment-method {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .payment-method:hover {
+    background-color: #f0f0f0;
+    border-color: #198754;
+  }
+
+  .payment-method img {
+    width: 50px;
+    margin-right: 15px;
+  }
+
+  .payment-method button {
+    flex-grow: 1;
+    text-align: left;
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 0;
+    font-size: 16px;
+  }
+
+  .payment-method button:hover {
+    color: #198754;
+  }
+
+  .alert-info {
+    background-color: #e2f3f5;
+    border-color: #bee5eb;
+    color: #0c5460;
+  }
+</style>
+{% endblock %} 
+{% block content %}
+<div class="container">
+    
+  <div class="payment-container">
+    <div class="alert alert-info" role="alert">
+       <h3>Subscription Plan Details</h3>
+
+    <p><strong>Plan Name:</strong> {{ plan.name }}</p>
+
+    <h4>What You Get:</h4>
+    <ul>
+      <li>{{ plan.description }}</li>
+      <li><strong>Access duration:</strong> {{ plan.duration }} days</li>
+      <li>
+        <strong>Download limit:</strong> {% if plan.download_limit == 0 %}
+        Unlimited downloads
+        {% else %}
+        {{ plan.download_limit }}
+         downloads
+        {% endif %}
+      </li>
+      <li><strong>Price:</strong> ${{ plan.price }}</li>
+    </ul>
+
+    <p class="terms-notice" style="color:green;"><i>
+      By subscribing, you agree to our Terms of Service. Your subscription will
+      automatically renew at the end of the duration unless canceled.
+    </i></p>
+    </div>
+      <h4 class="mb-3">Select Payment Method</h4>
+
+    <!-- Paystack Payment Form -->
+    <form
+      class="payment-method"
+      {% comment %} action="{% url 'subscriptions:initiate_subscription_payment' plan.id %}" {% endcomment %}
+      method="post"
+    >
+      {% csrf_token %}
+      <img src="{% static 'books/images/paystack.png' %}" alt="Paystack" />
+      <button type="submit">Pay with Paystack</button>
+    </form>
+
+    <!-- Flutterwave Payment Form -->
+    <form
+      class="payment-method"
+      {% comment %} action="{% url 'payments:pay_with_flutterwave' book.id %}" {% endcomment %}
+      method="post"
+    >
+      {% csrf_token %}
+      <img
+        src="{% static 'books/images/flutterwave.png' %}"
+        alt="Flutterwave"
+      />
+      <button type="submit">Pay with Flutterwave</button>
+    </form>
+
+    <div class="text-center mt-4">
+      <button class="btn btn-secondary" onclick="window.history.back()">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>
+{% include 'books/pages/footer.html' %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}

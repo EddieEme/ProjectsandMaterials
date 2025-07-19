@@ -1,0 +1,303 @@
+{% extends 'books/loginbase.html' %}
+{% block style %}
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: "Arial", sans-serif;
+        }
+        .form-container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-label {
+            font-weight: 600;
+        }
+        .btn-primary {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+        }
+        .text-danger {
+            font-size: 14px;
+        }
+        .new-field-container {
+            display: none;
+            margin-top: 10px;
+        }
+        #previewImage {
+            max-width: 100%;
+            max-height: 200px;
+            margin-top: 10px;
+            display: none;
+        }
+        #quillEditor {
+            height: 300px;
+            margin-bottom: 10px;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="form-container">
+        <h3 class="text-center mb-4">Upload a Book</h3>
+        <div id="messageContainer"></div>
+        <form id="bookForm" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label">Faculty:</label>
+                <select id="facultySelect" name="book_type" class="form-select" required>
+                    <option value="">-- Select Faculty --</option>
+                    {% for faculty in faculties %}
+                        <option value="{{ faculty.id }}">{{ faculty.name }}</option>
+                    {% endfor %}
+                </select>
+                <div id="newFacultyContainer" class="new-field-container">
+                    <input type="text" name="book_type_name" class="form-control mt-2" placeholder="Enter new faculty name">
+                </div>
+                <div class="form-check mt-2">
+                    <input class="form-check-input" type="checkbox" id="addNewFaculty">
+                    <label class="form-check-label" for="addNewFaculty">
+                        Add new faculty
+                    </label>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Department:</label>
+                <select id="departmentSelect" name="category" class="form-select" required>
+                    <option value="">-- Select Department --</option>
+                    {% for department in departments %}
+                        <option value="{{ department.id }}">{{ department.name }}</option>
+                    {% endfor %}
+                </select>
+                <div id="newDepartmentContainer" class="new-field-container">
+                    <input type="text" name="category_name" class="form-control mt-2" placeholder="Enter new department name">
+                </div>
+                <div class="form-check mt-2">
+                    <input class="form-check-input" type="checkbox" id="addNewDepartment">
+                    <label class="form-check-label" for="addNewDepartment">
+                        Add new department
+                    </label>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Book Title:</label>
+                <input type="text" name="title" class="form-control" placeholder="Enter book title" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Description:</label>
+                <!-- Quill Editor Container -->
+                <div id="quillEditor"></div>
+                <!-- Hidden Input to Store HTML Content -->
+                <textarea id="description" name="description" style="display: none;"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Author:</label>
+                <input type="text" name="author" class="form-control" placeholder="Enter author's name" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Upload Book File (PDF or DOCX only):</label>
+                <input type="file" id="fileInput" name="file" class="form-control" accept=".pdf,.docx" required>
+                <small id="fileError" class="text-danger d-none">Only PDF and DOCX files are allowed.</small>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Cover Image (Optional):</label>
+                <input type="file" id="coverImageInput" name="cover_image" class="form-control" accept="image/*">
+                <img id="previewImage" src="#" alt="Cover preview" />
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                <span id="submitText">Submit</span>
+                <span id="loadingSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+            </button>
+        </form>
+    </div>
+
+    {% include 'books/pages/footer.html' %}
+    <!-- Include Quill CSS and JS -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Initialize Quill
+            const quill = new Quill('#quillEditor', {
+                theme: 'snow',  // Use the Snow theme
+                modules: {
+                    toolbar: [
+                        ['bold', 'italic', 'underline', 'strike'],        // Text formatting
+                        [{ 'header': [1, 2, 3, false] }],                // Headers
+                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],   // Lists
+                        ['link', 'image'],                               // Links and images
+                        ['clean']                                        // Remove formatting
+                    ]
+                }
+            });
+
+            // Sync Quill content with the hidden textarea before form submission
+            const form = document.getElementById('bookForm');
+            form.addEventListener('submit', function () {
+                const description = document.getElementById('description');
+                description.value = quill.root.innerHTML;  // Get the HTML content from Quill
+            });
+
+            // Handle new faculty checkbox
+            const addNewFacultyCheckbox = document.getElementById("addNewFaculty");
+            const newFacultyContainer = document.getElementById("newFacultyContainer");
+            const facultySelect = document.getElementById("facultySelect");
+
+            addNewFacultyCheckbox.addEventListener("change", function() {
+                if (this.checked) {
+                    newFacultyContainer.style.display = "block";
+                    facultySelect.disabled = true;
+                    facultySelect.required = false;
+                } else {
+                    newFacultyContainer.style.display = "none";
+                    facultySelect.disabled = false;
+                    facultySelect.required = true;
+                }
+            });
+
+            // Handle new department checkbox
+            const addNewDepartmentCheckbox = document.getElementById("addNewDepartment");
+            const newDepartmentContainer = document.getElementById("newDepartmentContainer");
+            const departmentSelect = document.getElementById("departmentSelect");
+
+            addNewDepartmentCheckbox.addEventListener("change", function() {
+                if (this.checked) {
+                    newDepartmentContainer.style.display = "block";
+                    departmentSelect.disabled = true;
+                    departmentSelect.required = false;
+                } else {
+                    newDepartmentContainer.style.display = "none";
+                    departmentSelect.disabled = false;
+                    departmentSelect.required = true;
+                }
+            });
+
+            // Preview cover image
+            const coverImageInput = document.getElementById("coverImageInput");
+            const previewImage = document.getElementById("previewImage");
+
+            coverImageInput.addEventListener("change", function() {
+                if (this.files && this.files[0]) {
+                    const file = this.files[0];
+                    if (!file.type.startsWith("image/")) {
+                        messageContainer.innerHTML = '<div class="alert alert-danger">Please upload a valid image file.</div>';
+                        this.value = ""; // Clear the file input
+                        previewImage.style.display = "none";
+                        return;
+                    }
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewImage.src = e.target.result;
+                        previewImage.style.display = "block";
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    previewImage.style.display = "none";
+                }
+            });
+
+            // Validate File Type (Only PDF & DOCX)
+            const fileInput = document.getElementById("fileInput");
+            const fileError = document.getElementById("fileError");
+
+            fileInput.addEventListener("change", function () {
+                const allowedExtensions = ["pdf", "docx"];
+                const fileName = fileInput.value.toLowerCase();
+                const fileExtension = fileName.split(".").pop();
+
+                if (!allowedExtensions.includes(fileExtension)) {
+                    fileError.classList.remove("d-none");
+                    fileInput.value = ""; // Clear invalid file
+                } else {
+                    fileError.classList.add("d-none");
+                }
+            });
+
+            // Handle Form Submission via AJAX
+            const messageContainer = document.getElementById("messageContainer");
+            const submitText = document.getElementById("submitText");
+            const loadingSpinner = document.getElementById("loadingSpinner");
+
+            form.addEventListener("submit", function (e) {
+                e.preventDefault();
+                messageContainer.innerHTML = ""; // Clear previous messages
+                
+                // Form validation
+                if (addNewFacultyCheckbox.checked) {
+                    const newFacultyName = document.querySelector('input[name="book_type_name"]').value;
+                    if (!newFacultyName) {
+                        messageContainer.innerHTML = '<div class="alert alert-danger">Please enter a name for the new faculty.</div>';
+                        return;
+                    }
+                }
+                
+                if (addNewDepartmentCheckbox.checked) {
+                    const newDepartmentName = document.querySelector('input[name="category_name"]').value;
+                    if (!newDepartmentName) {
+                        messageContainer.innerHTML = '<div class="alert alert-danger">Please enter a name for the new department.</div>';
+                        return;
+                    }
+                }
+
+                const formData = new FormData(form);
+
+                // Disable submit button and show loading spinner
+                submitText.style.display = "none";
+                loadingSpinner.classList.remove("d-none");
+
+                fetch("{% url 'books:upload-book' %}", {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        "X-CSRFToken": "{{ csrf_token }}",
+                        "X-Requested-With": "XMLHttpRequest"
+                    },
+                    credentials: "same-origin"
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => {
+                            throw new Error(err.message || "Upload failed. Please try again.");
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    messageContainer.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+                    form.reset(); 
+                    previewImage.style.display = "none"; 
+                    quill.root.innerHTML = "";  
+
+                    // Re-enable faculty and department selects if they were disabled
+                    facultySelect.disabled = false;
+                    departmentSelect.disabled = false;
+
+                    // Hide new field containers
+                    newFacultyContainer.style.display = "none";
+                    newDepartmentContainer.style.display = "none";
+                })
+                .catch(error => {
+                    messageContainer.innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
+                    console.error("Error:", error);
+                })
+                .finally(() => {
+                    // Re-enable submit button and hide loading spinner
+                    submitText.style.display = "inline";
+                    loadingSpinner.classList.add("d-none");
+                });
+            });
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}

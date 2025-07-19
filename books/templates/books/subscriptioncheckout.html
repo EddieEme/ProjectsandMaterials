@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription Checkout</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .plan-features li {
+            margin-bottom: 8px;
+        }
+
+        .selected-plan {
+            border: 2px solid #198754;
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title mb-4">Premium Plan Subscription</h3>
+
+                        <div class="selected-plan p-4 rounded mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h4 class="mb-0">Premium Plan</h4>
+                                <span class="h3 text-success mb-0">$19.99/month</span>
+                            </div>
+
+                            <ul class="plan-features ps-3">
+                                <li>Full Document Access</li>
+                                <li>Unlimited Research Papers</li>
+                                <li>Monthly Newsletter</li>
+                                <li>Priority Support</li>
+                            </ul>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="autoRenew" checked>
+                            <label class="form-check-label" for="autoRenew">
+                                Auto-renew subscription monthly
+                            </label>
+                        </div>
+
+                        <div class="alert alert-info">
+                            Your subscription will start immediately after payment confirmation.
+                        </div>
+
+                        <button class="btn btn-success btn-lg w-100" onclick="processSubscription()">
+                            Subscribe Now ($19.99/month)
+                        </button>
+
+                        <div class="text-center mt-3">
+                            <small class="text-muted">
+                                You can cancel your subscription anytime from your dashboard
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function processSubscription() {
+            window.location.href = 'payment.html';
+        }
+    </script>
+</body>
+
+</html>

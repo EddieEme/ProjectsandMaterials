@@ -1,0 +1,77 @@
+{% extends 'books/base.html' %}
+{% block style %}  
+    <style>
+        .navbar {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            height: 30px;
+        }
+
+        .nav-links {
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: #333;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .nav-links a:hover {
+            color: #007bff;
+        }
+
+        .toast {
+            min-width: 320px;
+        }
+
+        .toast-container {
+            margin-top: 4rem;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <strong class="me-auto text-danger">
+                    <i class="bi bi-x-circle me-2"></i>
+                    Verification Error
+                </strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                <p class="mb-3">The verification link is invalid or has expired. Please request a new verification email.</p>
+                <button class="btn btn-primary btn-sm" onclick="resendEmail()">Resend Verification Email</button>
+            </div>
+        </div>
+    </div>
+    {% include 'books/user-login.html'%}
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Initialize all toasts
+        document.addEventListener('DOMContentLoaded', function() {
+            var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+            var toastList = toastElList.map(function(toastEl) {
+                return new bootstrap.Toast(toastEl, {
+                    autohide: false
+                });
+            });
+            // Show the toast
+            toastList.forEach(toast => toast.show());
+        });
+
+        function resendEmail() {
+            // Add your email resend logic here
+            alert('Verification email resent. Please check your inbox.');
+            // Optionally hide the toast after resending
+            // bootstrap.Toast.getInstance(document.querySelector('.toast')).hide();
+        }
+    </script>
+{% endblock %}

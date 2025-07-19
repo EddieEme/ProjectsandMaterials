@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Payment Method</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .payment-option {
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .payment-option:hover {
+            border-color: #0d6efd;
+        }
+
+        .payment-option.selected {
+            border-color: #0d6efd;
+            background-color: #f8f9ff;
+        }
+
+        .payment-icon {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">Marketplace</a>
+            <div class="d-flex align-items-center">
+                <div class="dropdown">
+                    <button
+                        class="btn btn-link text-dark text-decoration-none dropdown-toggle d-flex align-items-center"
+                        type="button" data-bs-toggle="dropdown">
+                        <img src="/api/placeholder/40/40" class="rounded-circle me-2" width="40" height="40"
+                            alt="Profile">
+                        <span>John Doe</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#settings">Back to Settings</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="#">Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Add Payment Method Content -->
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">Add Payment Method</h5>
+
+                        <!-- Payment Method Selection -->
+                        <div class="mb-4">
+                            <label class="form-label">Select Payment Method</label>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="payment-option selected" data-method="bank">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-university payment-icon text-primary"></i>
+                                            <div>
+                                                <h6 class="mb-0">Bank Account</h6>
+                                                <small class="text-muted">Direct bank transfer</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="payment-option" data-method="paypal">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fab fa-paypal payment-icon text-primary"></i>
+                                            <div>
+                                                <h6 class="mb-0">PayPal</h6>
+                                                <small class="text-muted">Connect PayPal account</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bank Account Form -->
+                        <div id="bankForm">
+                            <form>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Account Holder Name</label>
+                                        <input type="text" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Account Type</label>
+                                        <select class="form-select" required>
+                                            <option value="">Select account type</option>
+                                            <option>Checking</option>
+                                            <option>Savings</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Bank Name</label>
+                                    <input type="text" class="form-control" required>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Routing Number</label>
+                                        <input type="text" class="form-control" maxlength="9" required>
+                                        <div class="form-text">9-digit routing number</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Account Number</label>
+                                        <input type="text" class="form-control" required>
+                                        <div class="form-text">Your account number</div>
+                                    </div>
+                                </div>
+
+                                <!-- Security Notice -->
+                                <div class="alert alert-info mb-4">
+                                    <div class="d-flex">
+                                        <i class="fas fa-shield-alt fs-5 me-2"></i>
+                                        <div>
+                                            <h6 class="alert-heading">Secure Information</h6>
+                                            <p class="mb-0 small">Your banking information is encrypted and secure. We
+                                                use industry-standard security measures to protect your data.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Terms Checkbox -->
+                                <div class="mb-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" required>
+                                        <label class="form-check-label">
+                                            I agree to the <a href="#">terms and conditions</a> for adding a payment
+                                            method
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="d-flex justify-content-end gap-2">
+                                    <button type="button" class="btn btn-secondary"
+                                        onclick="window.history.back()">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Add Payment Method</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- PayPal Form (hidden by default) -->
+                        <div id="paypalForm" style="display: none;">
+                            <div class="text-center py-4">
+                                <i class="fab fa-paypal fs-1 text-primary mb-3"></i>
+                                <h5>Connect with PayPal</h5>
+                                <p class="text-muted">You will be redirected to PayPal to connect your account</p>
+                                <button class="btn btn-primary">
+                                    <i class="fab fa-paypal me-2"></i>
+                                    Connect PayPal Account
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Payment method selection toggle
+        document.querySelectorAll('.payment-option').forEach(option => {
+            option.addEventListener('click', () => {
+                // Remove selected class from all options
+                document.querySelectorAll('.payment-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                // Add selected class to clicked option
+                option.classList.add('selected');
+
+                // Show/hide appropriate form
+                const method = option.dataset.method;
+                if (method === 'bank') {
+                    document.getElementById('bankForm').style.display = 'block';
+                    document.getElementById('paypalForm').style.display = 'none';
+                } else {
+                    document.getElementById('bankForm').style.display = 'none';
+                    document.getElementById('paypalForm').style.display = 'block';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,152 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<style>
+    .upload-wrapper {
+        max-width: 500px;
+        margin: 40px auto;
+        padding: 30px;
+        background-color: #f9f9f9;
+        border-radius: 12px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .upload-wrapper h1 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .upload-wrapper label {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    .upload-wrapper input[type="file"] {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+    }
+
+    .upload-wrapper button {
+        width: 100%;
+        padding: 12px;
+        background-color: #0c7cd5;
+        color: white;
+        font-size: 16px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .upload-wrapper button:hover {
+        background-color: #095a9e;
+    }
+
+    #messages {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    .success {
+        color: green;
+        font-weight: bold;
+    }
+
+    .error {
+        color: red;
+        font-weight: bold;
+    }
+
+    @media (max-width: 600px) {
+        .upload-wrapper {
+            margin: 20px;
+            padding: 20px;
+        }
+    }
+</style>
+
+<div class="upload-wrapper">
+    <h1>Batch Upload Books</h1>
+    <form id="batch-upload-form" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div>
+            <label for="file">Upload CSV File:</label>
+            <input type="file" name="file" id="file" accept=".csv" required>
+        </div>
+        <button type="submit">Upload</button>
+    </form>
+    <div id="messages"></div>
+</div>
+
+<script>
+// CSRF helper
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.startsWith(name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+document.getElementById("batch-upload-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+    const messagesDiv = document.getElementById("messages");
+    messagesDiv.innerHTML = "";
+
+    const csrftoken = getCookie('csrftoken');
+
+    fetch("{% url 'admin_app:batch-upload' %}", {
+        method: "POST",
+        body: formData,
+        headers: {
+            "X-Requested-With": "XMLHttpRequest",
+            "X-CSRFToken": csrftoken,
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const successMessage = document.createElement("div");
+            successMessage.className = "success";
+            successMessage.textContent = data.message;
+            messagesDiv.appendChild(successMessage);
+        } else {
+            const errorMessage = document.createElement("div");
+            errorMessage.className = "error";
+            errorMessage.textContent = data.message;
+            messagesDiv.appendChild(errorMessage);
+        }
+
+        if (data.errors && data.errors.length > 0) {
+            const errorList = document.createElement("ul");
+            data.errors.forEach(error => {
+                const errorItem = document.createElement("li");
+                errorItem.textContent = error;
+                errorList.appendChild(errorItem);
+            });
+            messagesDiv.appendChild(errorList);
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        const errorMessage = document.createElement("div");
+        errorMessage.className = "error";
+        errorMessage.textContent = "An unexpected error occurred. Please try again.";
+        messagesDiv.appendChild(errorMessage);
+    });
+});
+</script>
+{% endblock %}

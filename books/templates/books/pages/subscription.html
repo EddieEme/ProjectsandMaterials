@@ -1,0 +1,70 @@
+{% load static %}
+{% block link %}
+{% endblock %}
+{% block style %}
+    <style>
+        body {
+            background-color: #f4f6f9;
+        }
+
+        .subscription-container {
+            max-width: 1000px;
+            margin: 120px auto;
+        }
+
+        .subscription-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .subscription-card:hover {
+            transform: scale(1.05);
+        }
+
+        .subscription-card .card-header {
+            background-color: #198754;
+            color: white;
+            text-align: center;
+        }
+
+        .recommended {
+            border: 2px solid #ffc107;
+        }
+
+        .recommended .card-header {
+            background-color: #ffc107;
+            color: black;
+        }
+    </style>
+{% endblock %}
+
+<div class="container subscription-container">
+    <h1 class="text-center mb-5">Subscription Packages</h1>
+    <div class="row">
+        {% for plan in plans %}
+            <div class="col-md-4 mb-4">
+                <div class="card subscription-card {% if plan.name == 'Premium' %}recommended{% endif %}">
+                    <div class="card-header">
+                        <h3>{{ plan.name }}</h3>
+                    </div>
+                    <div class="card-body text-center">
+                        <h4 class="card-title">${{ plan.price }}/month</h4>
+                        <ul class="list-unstyled mt-3 mb-4">
+                            {% for feature in plan.features %}
+                                <li>{{ feature }}</li>
+                            {% empty %}
+                                <li>No features available.</li>
+                            {% endfor %}
+                        </ul>
+                        <a href='{% url 'subscriptions:subscription_payment' plan.id %}' class="btn {% if plan.name == 'Premium' %}btn-success{% else %}btn-outline-success{% endif %}" onclick="selectPackage('{{ plan.name|lower }}')">Select {{ plan.name }}</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
