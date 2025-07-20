@@ -1,87 +1,31 @@
 import os
-import re
 import csv
-import json
 import logging
-from pathlib import Path, PureWindowsPath
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required, user_passes_test
 from google.cloud import storage
 from books.models import Book, BookType, Category
 from admin_app.models import AdminLog
-from google.oauth2 import service_account
 from django.conf import settings
-
-
-
-
 
 logger = logging.getLogger(__name__)
 
-# GCS Configuration
+# GCS Setup
 BUCKET_NAME = "projectsandmaterials_bucket"
 BOOKS_FOLDER = "book_files/"
-COVERS_FOLDER = "book_covers/"
-client = storage.Client()
+client = storage.Client(credentials=settings.GS_CREDENTIALS)
 bucket = client.bucket(BUCKET_NAME)
 
-def convert_windows_to_linux_path(windows_path):
-    """Convert Windows path to Linux-compatible path"""
+def gcs_blob_exists(gcs_path):
+    """Check if a GCS blob exists"""
     try:
-        # Normalize Windows path (handle both \ and /)
-        windows_path = windows_path.replace('\\', '/')
-        
-        # Handle drive letters (C:/ → /mnt/c/)
-        if re.match(r'^[A-Za-z]:/', windows_path):
-            drive = windows_path[0].lower()
-            return f"/mnt/{drive}/{windows_path[3:]}"
-        
-        # Handle network paths (\\server\share → /mnt/server/share)
-        if windows_path.startswith('//'):
-            return f"/mnt/{windows_path[2:].replace('/', '/')}"
-            
-        return windows_path
+        blob = bucket.blob(gcs_path)
+        return blob.exists()
     except Exception as e:
-        logger.error(f"Path conversion failed: {str(e)}")
-        return None
+        logger.error(f"GCS check failed for '{gcs_path}': {e}")
+        return False
 
-def validate_and_convert_path(file_path):
-    """Validate path exists and convert Windows paths if needed"""
-    try:
-        # First try direct path
-        if os.path.exists(file_path):
-            return file_path, None
-            
-        # Try converting Windows path if on Linux
-        converted_path = convert_windows_to_linux_path(file_path)
-        if converted_path and os.path.exists(converted_path):
-            return converted_path, None
-            
-        return None, f"File not found at {file_path} or {converted_path}"
-    except Exception as e:
-        return None, f"Path validation error: {str(e)}"
-
-def upload_to_gcs(local_path, destination_folder):
-    """Upload file to GCS and return the relative path"""
-    try:
-        # Validate and convert path
-        valid_path, error = validate_and_convert_path(local_path)
-        if not valid_path:
-            return None, error
-            
-        file_name = os.path.basename(valid_path)
-        blob_path = f"{destination_folder}{file_name}"
-        blob = bucket.blob(blob_path)
-        
-        blob.upload_from_filename(valid_path)
-        
-        # Return just the blob path, not full URL
-        return blob_path, None
-        
-    except Exception as e:
-        logger.error(f"GCS upload failed: {str(e)}")
-        return None, f"Upload failed: {str(e)}"
 
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
@@ -89,7 +33,7 @@ def batch_upload_books(request):
     if request.method == "POST":
         csv_file = request.FILES.get("file")
 
-        if not csv_file.name.endswith('.csv'):
+        if not csv_file or not csv_file.name.endswith('.csv'):
             return JsonResponse({
                 "success": False,
                 "message": "Please upload a valid CSV file"
@@ -106,33 +50,32 @@ def batch_upload_books(request):
                 try:
                     title = row.get("title", "").strip()
                     file_path = row.get("file_path", "").strip()
+                    book_type_name = row.get("book_type", "").strip()
+                    category_name = row.get("category", "").strip()
 
-                    if not title or not file_path:
-                        errors.append(f"Row {row_num}: Missing 'title' or 'file_path'")
+                    # Validate required fields
+                    if not title or not file_path or not book_type_name or not category_name:
+                        errors.append(f"Row {row_num}: Missing required fields (title, file_path, book_type, category)")
                         continue
 
                     if Book.objects.filter(title__iexact=title).exists():
                         errors.append(f"Row {row_num}: Book '{title}' already exists")
                         continue
 
-                    # Upload to GCS
-                    book_url, upload_error = upload_to_gcs(file_path, BOOKS_FOLDER)
-                    if upload_error:
-                        errors.append(f"Row {row_num}: {upload_error}")
+                    if not gcs_blob_exists(file_path):
+                        errors.append(f"Row {row_num}: GCS file '{file_path}' does not exist")
                         continue
 
-                    book_type_name = row.get("book_type", "").strip()
-                    category_name = row.get("category", "").strip()
-
-                    if not book_type_name or not category_name:
-                        errors.append(f"Row {row_num}: Missing 'book_type' or 'category'")
-                        continue
-
+                    # Get or create book type
                     book_type, _ = BookType.objects.get_or_create(name=book_type_name)
-                  
+
+                    # Get or create category and link to book type
                     try:
-                        category, created = Category.objects.get_or_create(name=category_name)
-                        if category.book_type != book_type:
+                        category, created = Category.objects.get_or_create(
+                            name=category_name,
+                            defaults={"book_type": book_type}
+                        )
+                        if not created and category.book_type != book_type:
                             category.book_type = book_type
                             category.save()
                     except Category.MultipleObjectsReturned:
@@ -143,6 +86,7 @@ def batch_upload_books(request):
                         errors.append(f"Row {row_num}: Error creating category - {str(e)}")
                         continue
 
+                    # Create Book
                     Book.objects.create(
                         title=title,
                         description=row.get("description", "").strip(),
@@ -150,8 +94,8 @@ def batch_upload_books(request):
                         book_type=book_type,
                         category=category,
                         price=5000,
-                        file=book_url,
-                        is_approved=row.get("is_approved", "False").lower() == "true",
+                        file=file_path,
+                        is_approved=row.get("is_approved", "False").strip().lower() == "true",
                         user=request.user
                     )
 
@@ -161,7 +105,7 @@ def batch_upload_books(request):
                     logger.exception(f"Row {row_num}: Unexpected error")
                     errors.append(f"Row {row_num}: Unexpected error - {str(e)}")
 
-            # Log admin action
+            # Log admin activity
             if success_count > 0:
                 AdminLog.objects.create(
                     user=request.user,
@@ -181,5 +125,4 @@ def batch_upload_books(request):
                 "message": f"Failed to process CSV file: {str(e)}"
             }, status=500)
 
-    # GET request or no file uploaded
     return render(request, "admin_app/batch_upload_books.html")

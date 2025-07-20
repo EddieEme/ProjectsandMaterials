@@ -71,41 +71,43 @@ class Book(models.Model):
         bucket = client.bucket(settings.GS_BUCKET_NAME)
         blob = bucket.blob(self.file.name)  # self.file.name is the file path in GCS
 
-        # Download the file to a temporary location
-        with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(self.file.name)[1]) as temp_file:
-            blob.download_to_filename(temp_file.name)
-            file_path = temp_file.name
-
-        file_extension = os.path.splitext(file_path)[1].lower()
-
         try:
-            if file_extension == ".pdf":
-                logger.info("Processing PDF file: %s", file_path)
+            # Get file extension
+            file_ext = os.path.splitext(self.file.name)[1].lower()
+
+            # Connect to GCS
+            client = storage.Client(credentials=settings.GS_CREDENTIALS)
+            bucket = client.bucket(settings.GS_BUCKET_NAME)
+            blob = bucket.blob(self.file.name)
+
+            # Download file to temp path
+            with tempfile.NamedTemporaryFile(delete=False, suffix=file_ext) as temp_file:
+                blob.download_to_filename(temp_file.name)
+                file_path = temp_file.name
+
+            # Process file
+            if file_ext == ".pdf":
                 return self._extract_pdf_stats(file_path)
 
-            elif file_extension == ".docx":
-                logger.info("Processing DOCX file: %s", file_path)
+            elif file_ext == ".docx":
                 pdf_path = convert_docx_to_pdf(file_path)
                 if pdf_path:
-                    logger.info("DOCX to PDF conversion successful: %s", pdf_path)
                     return self._extract_pdf_stats(pdf_path)
                 else:
-                    logger.error("DOCX to PDF conversion failed for file: %s", file_path)
                     return {"pages": "Conversion failed", "words": "Conversion failed"}
 
             else:
-                logger.warning("Unsupported file format: %s", file_extension)
-                return {"pages": "Unsupported file format", "words": "Unsupported file format"}
+                return {"pages": "Unsupported format", "words": "Unsupported format"}
 
         except Exception as e:
-            logger.error("Error processing file: %s", e)
-            return {"pages": f"Error reading file: {e}", "words": f"Error reading file: {e}"}
+            logger.error(f"Error extracting stats: {e}")
+            return {"pages": f"Error: {e}", "words": f"Error: {e}"}
 
         finally:
-            # Clean up temporary files
+            # Always clean up the downloaded file
             if os.path.exists(file_path):
-                logger.info("Cleaning up temporary file: %s", file_path)
                 os.remove(file_path)
+
 
     def _extract_pdf_stats(self, file_path):
         """Extracts page count and word count from a PDF."""
