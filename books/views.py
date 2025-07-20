@@ -32,8 +32,8 @@ from .models import BookType, Category
 
 def home(request):
     # Retrieve the first 12 BookTypes and 20 Categories in alphabetical order
-    faculties = BookType.objects.order_by('name')[:12]
-    categories = Category.objects.order_by('name')[:20]
+    faculties = BookType.objects.order_by('name')[:40]
+    categories = Category.objects.order_by('name')[:40]
     
     context = {
         'faculties': faculties,
@@ -51,7 +51,10 @@ def services(request):
     return render(request, template, context)
     
 
-
+def resources(request):
+    template = 'books/login-resources.html' if request.user.is_authenticated else 'books/resources.html'
+    context = {}
+    return render(request, template, context)
 
 
 def faculty(request, book_type_id):
@@ -127,8 +130,8 @@ def projects(request):
     books_list = Book.objects.filter(is_approved=True)
 
     # Pagination: Show 5 books per page
-    paginator = Paginator(books_list, 5)  # Show 5 books per page
-    page_number = request.GET.get('page', 1)
+    paginator = Paginator(books_list, 20)  # Show 5 books per page
+    page_number = request.GET.get('page')
 
     try:
         books = paginator.get_page(page_number)

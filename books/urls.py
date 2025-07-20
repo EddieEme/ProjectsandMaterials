@@ -18,6 +18,7 @@ router = routers.DefaultRouter()
 web_urlpatterns = [
     path('', views.home, name='home'),
     path('services/', views.services, name='services'),
+    path('resources/', views.resources, name='resources'),
     path('projects/', views.projects, name='projects'),
     path('project-list/', views.projectList, name='project-list'),
     path('product-details/<int:id>/', views.product_details, name='product-details'),
@@ -32,6 +33,7 @@ web_urlpatterns = [
     path('verification-error/', views.verification_error, name='verification-error'),
     path('upload-book/', views.upload_book, name='upload-book'),
     path('download/<uuid:token>/', download_book, name='download-book'),
+    
 ]
 
 # API authentication URLs

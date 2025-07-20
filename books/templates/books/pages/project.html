@@ -100,7 +100,7 @@
             <!-- Pagination -->
             {% if books.has_other_pages %}
                 <nav aria-label="Page navigation">
-                    <ul class="pagination">
+                    <ul class="pagination" style ="margin-top: 25px;">
                         {% if books.has_previous %}
                             <li class="page-item">
                                 <a class="page-link" href="?page={{ books.previous_page_number }}">Previous</a>

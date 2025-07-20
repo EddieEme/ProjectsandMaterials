@@ -35,16 +35,18 @@ class Category(models.Model):
     name = models.CharField(max_length=50, unique=True)
     book_type = models.ForeignKey(BookType, on_delete=models.CASCADE, related_name="categories")
 
+    class Meta:
+        unique_together = ('name', 'book_type')  # Ensures category name is unique per book type
+
     def __str__(self):
         return self.name
-
 
 class Book(models.Model):
     cover_image = models.ImageField(upload_to='book_covers', blank=True, null=True)
     title = models.CharField(max_length=225)
     description = models.TextField()
     book_type = models.ForeignKey(BookType, on_delete=models.CASCADE)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name ='book')
     file = models.FileField(upload_to='book_files/', blank=True, null=True)
     author = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=5000)

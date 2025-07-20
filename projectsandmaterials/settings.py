@@ -12,10 +12,9 @@ from datetime import timedelta
 from django.urls import reverse_lazy
 import os
 
-
-
 import pymysql
 pymysql.install_as_MySQLdb()
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -152,41 +151,41 @@ DEFAULT_FROM_EMAIL = 'Projects&Materials <edisonemeremnu@gmail.com>'
 # Security Settings
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_SSL_REDIRECT = False
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_SAMESITE = 'Lax'
 
 # Database Configuration
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
 
 # DATABASE_URL = config("DATABASE_URL", default="")
 # if DATABASE_URL:
 #     DATABASES["default"] = dj_database_url.parse(DATABASE_URL)
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'projec24_projectandmaterials_db',
-        'USER': 'projec24_projectandmaterials_db',
-        'PASSWORD': 'materialsProject@2025',  # the new password
-        'HOST': 'localhost',
-        'PORT': '3306',
-        #'OPTIONS': {
-        #    'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-        #},
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'projec24_projectandmaterials_db',
+#         'USER': 'projec24_projectandmaterials_db',
+#         'PASSWORD': 'materialsProject@2025',  # the new password
+#         'HOST': 'localhost',
+#         'PORT': '3306',
+#         #'OPTIONS': {
+#         #    'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+#         #},
+#     }
+# }
 
 
-GCS_CREDENTIALS_PATH = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+GCS_CREDENTIALS_PATH = config("GOOGLE_APPLICATION_CREDENTIALS")
 
 if not GCS_CREDENTIALS_PATH:
     raise Exception("GOOGLE_APPLICATION_CREDENTIALS not set")
@@ -242,8 +241,8 @@ USE_TZ = True
 
 # Static Files Configuration
 # URLs
-# STATIC_URL = f"https://storage.googleapis.com/{GS_BUCKET_NAME}/static/"
-# MEDIA_URL = f"https://storage.googleapis.com/{GS_BUCKET_NAME}/media/"
+STATIC_URL = f"https://storage.googleapis.com/{GS_BUCKET_NAME}/static/"
+MEDIA_URL = f"https://storage.googleapis.com/{GS_BUCKET_NAME}/media/"
 
 
 
@@ -255,8 +254,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 # # Media Files Configuration
-# MEDIA_URL = '/media/'
-# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default Primary Key Field Type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

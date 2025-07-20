@@ -1,0 +1,73 @@
+<!-- Create these partial templates in your templates/books/partials/ directory -->
+
+<!-- templates/books/partials/books_list.html -->
+<div class="row">
+    {% for book in books %}
+        <div class="col-lg-12 mb-4 book-item">
+            <a href="{% url 'books:product-details' book.id %}">
+                <div class="card blog-card project-content">
+                    <div class="card-body">
+                        <h5 class="card-title"><b>{{ book.title }}</b></h5>
+                        <p class="card-text">{{ book.description|unescape_html|truncatehtml:50|safe }}</p>
+                        <div class="text-muted small mb-2">
+                            <span class="slag">
+                                <span class="badge bg-primary category-badge">
+                                    {{ book.category.name }} - {{ book.book_type.name }}
+                                </span>
+                                <span>
+                                    <i class="bi bi-eye"></i> {{ book.views|default:0 }} views
+                                    <i class="bi bi-chat ms-2"></i> {{ book.comments|default:0 }} comments
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    {% empty %}
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5>No books available</h5>
+                    <p>There are no books in this category at the moment.</p>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<!-- templates/books/pages/pagination.html -->
+{% if books.paginator.num_pages > 1 %}
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            <!-- Previous Button -->
+            {% if books.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="#" onclick="loadPage({{ books.previous_page_number }}); return false;">Previous</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#">Previous</a>
+                </li>
+            {% endif %}
+
+            <!-- Page Numbers -->
+            {% for num in books.paginator.page_range %}
+                <li class="page-item {% if books.number == num %}active{% endif %}">
+                    <a class="page-link" href="#" onclick="loadPage({{ num }}); return false;">{{ num }}</a>
+                </li>
+            {% endfor %}
+
+            <!-- Next Button -->
+            {% if books.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="#" onclick="loadPage({{ books.next_page_number }}); return false;">Next</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#">Next</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+{% endif %}
