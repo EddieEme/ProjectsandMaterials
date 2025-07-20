@@ -201,18 +201,7 @@
                                     <div class="modal-body">
                                         {% comment %} <div class="document-content" id="pdf-container" style="width: 100%; height: 600px;"></div> {% endcomment %}
                                         <div class="document-content" id="pdf-container">
-                                             <p>Loading PDF...</p>
-                                        {% comment %} {% if preview_url %}
-                                            <iframe 
-                                                src="{{ preview_url }}#toolbar=0&navpanes=0&scrollbar=0"
-                                                width="100%" 
-                                                height="600px" 
-                                                style="border: none;"
-                                              
-                                            ></iframe>
-                                        {% else %}
-                                            <p>No preview available.</p>
-                                        {% endif %} {% endcomment %}
+                                            <p>Loading PDF...</p>
                                         </div>
                                         <img src="{% static 'books/images/hero_image_1.jpg' %}" alt="advert"/ style="width: 20%;">
                                     </div>
@@ -413,6 +402,7 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            
             // Prevent text selection
             document.body.addEventListener('selectstart', function (e) {
                 e.preventDefault();

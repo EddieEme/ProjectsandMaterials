@@ -189,59 +189,59 @@ def projectList(request):
 
 
 
-
-
 @cache_page(60 * 15)
 def product_details(request, id):
-    # Get the selected book with select_related to optimize related object access
     book = get_object_or_404(
         Book.objects.select_related('book_type', 'category', 'user'),
         id=id
     )
-    
+
     # Redirect authenticated users
     if request.user.is_authenticated:
         return redirect('books:login-product-details', id=book.id)
-    
-    # Defer statistics calculation to when it's actually needed in template
-    # (or consider caching these values in the model)
+
+    # Defer statistics calculation
     stats = book.get_file_statistics()
-    
-    # Optimize related books query
+
+    # Related books logic
     title_keywords = book.title.split()
-    if len(title_keywords) > 0:
-        # Use a more efficient query structure
-        first_keyword = title_keywords[0]
-        query = Q(title__icontains=first_keyword)
-        
+    related_books = Book.objects.none()
+    if title_keywords:
+        query = Q(title__icontains=title_keywords[0])
         if len(title_keywords) > 1:
-            last_keyword = title_keywords[-1]
-            if last_keyword != first_keyword:
-                query |= Q(title__icontains=last_keyword)
-        
+            if title_keywords[-1] != title_keywords[0]:
+                query |= Q(title__icontains=title_keywords[-1])
+
         related_books = (
             Book.objects
             .filter(query)
             .exclude(id=book.id)
-            .only('id', 'title', 'cover_image', 'price')  # Only fetch needed fields
-            .order_by('?')[:5]  # Random sample for variety
+            .only('id', 'title', 'cover_image', 'price')
+            .order_by('?')[:5]
         )
-    else:
-        related_books = Book.objects.none()
+
+    # Check for public preview file on GCS
+    preview_url = None
+    if book.file:
+        try:
+            client = storage.Client()
+            bucket = client.bucket('preview_projectandmaterials')
+            blob = bucket.blob(f'preview_{book.id}.pdf')
+            if blob.exists():
+                preview_url = f"https://storage.googleapis.com/preview_projectandmaterials/preview_{book.id}.pdf"
+        except Exception as e:
+            logger.error(f"Error checking preview blob: {e}")
+            preview_url = None
 
     context = {
         "book": book,
-        "preview_url": f"/preview/{book.id}/" if book.file else None,
+        "preview_url": preview_url,
         "page_count": stats.get("pages"),
         "word_count": stats.get("words"),
         "related_books": related_books,
     }
 
     return render(request, 'books/product-details.html', context)
-
-
-
-
 
 
 @login_required(login_url='users:user_login')

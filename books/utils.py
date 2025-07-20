@@ -93,159 +93,83 @@ def convert_docx_to_pdf(docx_path):
         print(f"Error during DOCX to PDF conversion: {e}")
         return None
 
+
 def serve_preview(request, book_id):
-    """
-    Serve the preview PDF inline instead of forcing a download.
-    Uses StreamingHttpResponse to ensure proper file handling.
-    """
     try:
         book = get_object_or_404(Book, id=book_id)
-        
-        # Define the preview file path
-        preview_filename = f"preview_{book_id}.pdf"
-        preview_path = os.path.join(settings.MEDIA_ROOT, "previews", preview_filename)
-        
-        logger.info(f"Looking for preview at: {preview_path}")
-        
-        # Check if preview exists
-        if not os.path.exists(preview_path):
-            logger.info(f"Preview not found for book {book_id}, attempting to generate it")
-            
-            # Try to generate preview if it doesn't exist
-            preview_url = extract_first_10_pages(book)
-            if not preview_url:
-                logger.error(f"Could not generate preview for book {book_id}")
-                return HttpResponseNotFound("Preview could not be generated.")
-            
-            # Re-check if the file exists now
-            if not os.path.exists(preview_path):
-                logger.error(f"Preview file not found at {preview_path} after generation")
-                return HttpResponseNotFound("Preview generation failed.")
-            
-            logger.info(f"Preview generated successfully at {preview_path}")
-        
-        # Use FileResponse with safe file handling
-        response = FileResponse(
-            open(preview_path, "rb"),
-            content_type="application/pdf",
-            as_attachment=False,
-            filename=f"preview_{book_id}.pdf"
-        )
-        
-        # FileResponse automatically sets Content-Disposition, but we can override if needed
-        # Setting inline ensures browser attempts to display the PDF
-        response["Content-Disposition"] = f"inline; filename=preview_{book_id}.pdf"
-        
-        # Important: Let FileResponse manage the file - don't close it manually
-        # The file will be automatically closed when the response is processed
-        return response
-            
-    except Exception as e:
-        logger.error(f"Error serving preview for book {book_id}: {str(e)}")
-        return HttpResponseNotFound(f"Error serving preview: {str(e)}")
 
-# Updated extract_first_10_pages function with consistent path usage
+        # Generate or reuse preview URL
+        preview_url = extract_first_10_pages(book)
+        if not preview_url:
+            return HttpResponseNotFound("Preview not available.")
+
+        return redirect(preview_url)  # ✅ No need for signed URL
+
+    except Exception as e:
+        logger.error(f"Error serving preview for book {book_id}: {e}")
+        return HttpResponseNotFound("Error occurred while serving preview.")
+
+
+
 def extract_first_10_pages(book):
-    """
-    Generates a preview PDF with the first 10 pages of a book.
-    Returns the relative URL path to the preview file or None if generation failed.
-    """
     if not book.file:
         logger.warning(f"Cannot generate preview for book {book.id}: No file attached")
         return None
 
-    # Ensure GCS settings exist
-    if not hasattr(settings, 'GS_CREDENTIALS') or not hasattr(settings, 'GS_BUCKET_NAME'):
-        logger.error("GCS settings missing: GS_CREDENTIALS or GS_BUCKET_NAME not configured")
-        return None
-
-    temp_file_path = None
-    converted_pdf_path = None
-    preview_path = None
-
     try:
-        preview_dir = os.path.join(settings.MEDIA_ROOT, "previews")
-        os.makedirs(preview_dir, exist_ok=True)
-
-        preview_filename = f"preview_{book.id}.pdf"
-        preview_path = os.path.join(preview_dir, preview_filename)
-        preview_url = f"/media/previews/{preview_filename}"
-
-        logger.info(f"Generating preview for book {book.id}")
-
-        # Download the file from GCS
         client = storage.Client(credentials=settings.GS_CREDENTIALS)
-        bucket = client.bucket(settings.GS_BUCKET_NAME)
-        blob = bucket.blob(book.file.name)
+        preview_bucket = client.bucket("preview_projectandmaterials")  # ✅ Use public bucket
 
-        with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(book.file.name)[1]) as temp_file:
-            blob.download_to_filename(temp_file.name)
-            temp_file_path = temp_file.name
+        original_name = os.path.splitext(os.path.basename(book.file.name))[0]
+        preview_filename = f"{original_name}_preview.pdf"
+        gcs_blob_path = f"{preview_filename}"
 
-        logger.info(f"Downloaded file from GCS to {temp_file_path}")
+        logger.info(f"Preparing to generate preview for: {preview_filename}")
 
-        # Determine file extension
+        with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(book.file.name)[1]) as temp_input_file:
+            bucket = client.bucket(settings.GS_BUCKET_NAME)  # Your main book bucket
+            blob = bucket.blob(book.file.name)
+            blob.download_to_filename(temp_input_file.name)
+            temp_file_path = temp_input_file.name
+
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_output_file:
+            preview_temp_path = temp_output_file.name
+
         file_extension = os.path.splitext(temp_file_path)[1].lower()
 
-        # Remove existing preview if it exists
-        if os.path.exists(preview_path):
-            os.remove(preview_path)
-
         if file_extension == ".pdf":
-            logger.info(f"Processing PDF file for book {book.id}")
             with fitz.open(temp_file_path) as doc, fitz.open() as new_doc:
                 for page_num in range(min(10, len(doc))):
                     new_doc.insert_pdf(doc, from_page=page_num, to_page=page_num)
-                new_doc.save(preview_path)
-                logger.info(f"Saved PDF preview with {min(10, len(doc))} pages")
-
-        elif file_extension in [".docx", ".doc"]:
-            logger.info(f"Processing DOCX file for book {book.id}")
-            converted_pdf_path = convert_docx_to_pdf(temp_file_path)
+                new_doc.save(preview_temp_path)
+        elif file_extension in [".doc", ".docx"]:
+            converted_pdf_path = convert_docx_to_pdf(temp_input_file.name)
             if not converted_pdf_path:
-                logger.error(f"Failed to convert DOCX to PDF for book {book.id}")
                 return None
-
-            logger.info(f"Successfully converted DOCX to PDF: {converted_pdf_path}")
-
-            # Now extract first 10 pages from the converted PDF
-            try:
-                with fitz.open(converted_pdf_path) as doc, fitz.open() as new_doc:
-                    for page_num in range(min(10, len(doc))):
-                        new_doc.insert_pdf(doc, from_page=page_num, to_page=page_num)
-                    new_doc.save(preview_path)
-                    logger.info(f"Saved DOCX preview with {min(10, len(doc))} pages")
-            except Exception as e:
-                logger.error(f"Error extracting pages from converted PDF: {str(e)}")
-                import shutil
-                shutil.copy(converted_pdf_path, preview_path)
-                logger.warning(f"Using full PDF as preview due to extraction error")
+            with fitz.open(converted_pdf_path) as doc, fitz.open() as new_doc:
+                for page_num in range(min(10, len(doc))):
+                    new_doc.insert_pdf(doc, from_page=page_num, to_page=page_num)
+                new_doc.save(preview_temp_path)
         else:
-            logger.warning(f"Unsupported file format for preview: {file_extension}")
             return None
 
-        # Verify the preview file exists
-        if os.path.exists(preview_path):
-            logger.info(f"Preview successfully created at {preview_path}")
-            return preview_url
-        else:
-            logger.error("Preview file was not created.")
-            return None
+        preview_blob = preview_bucket.blob(gcs_blob_path)
+        preview_blob.upload_from_filename(preview_temp_path, content_type="application/pdf")
+
+        logger.info(f"Uploaded preview to public bucket at {gcs_blob_path}")
+
+        # ✅ Public URL
+        public_url = f"https://storage.googleapis.com/preview_projectandmaterials/{preview_filename}"
+        return public_url
 
     except Exception as e:
-        logger.error(f"Error generating preview for book {book.id}: {str(e)}")
+        logger.error(f"Error generating preview for book {book.id}: {e}")
         return None
 
     finally:
-        # Clean up temporary files
-        for path in [temp_file_path, converted_pdf_path]:
+        for path in [temp_file_path, preview_temp_path]:
             if path and os.path.exists(path):
-                try:
-                    os.remove(path)
-                    logger.info(f"Removed temporary file: {path}")
-                except Exception as e:
-                    logger.warning(f"Failed to remove temporary file {path}: {str(e)}")
-
+                os.remove(path)
 
 def download_book(request, token):
     download = get_object_or_404(Download, download_token=token)
