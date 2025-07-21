@@ -20,6 +20,7 @@ web_urlpatterns = [
     path('services/', views.services, name='services'),
     path('resources/', views.resources, name='resources'),
     path('projects/', views.projects, name='projects'),
+    path('project_faculty/', views.projects_by_faculty, name='project_faculty'),
     path('project-list/', views.projectList, name='project-list'),
     path('product-details/<int:id>/', views.product_details, name='product-details'),
     path("category/<int:category_id>/", views.category_books, name="category_books"),

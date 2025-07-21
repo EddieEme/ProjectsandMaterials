@@ -40,13 +40,16 @@
 </div>
 
 <div class="container container-fluid">
-    <div class="row">
+    <div class="search-box">
+        <input type="text" class="form-control" placeholder="Search..." oninput="searchTopics()" id="searchInput">
+    </div>
+    <div class="row flex-column-reverse flex-md-row">
         <!-- Sidebar -->
         <div class="col-md-3 sidebar">
-            <div class="search-box">
+            {% comment %} <div class="search-box">
                 <input type="text" class="form-control" placeholder="Search..." oninput="searchTopics()" id="searchInput">
-            </div>
-            <h5 class="mb-3">CATEGORIES</h5>
+            </div> {% endcomment %}
+            <h5 class="mb-3">DEPARTMENT</h5>
             <div class="categories">
                 {% if categories %}
                     {% for category in categories %}

@@ -33,7 +33,7 @@ from .models import BookType, Category
 def home(request):
     # Retrieve the first 12 BookTypes and 20 Categories in alphabetical order
     faculties = BookType.objects.order_by('name')[:40]
-    categories = Category.objects.order_by('name')[:40]
+    categories = Category.objects.order_by('name')[:60]
     
     context = {
         'faculties': faculties,
@@ -58,32 +58,36 @@ def resources(request):
 
 
 def faculty(request, book_type_id):
-    
+    # Get all book types (faculties)
     faculties = BookType.objects.order_by('name')
+
+    # Get all categories
     categories = Category.objects.order_by('name')
+
+    # Get the selected book type (faculty)
     selected_book_type = get_object_or_404(BookType, id=book_type_id)
 
-    # Get all books for this book type
     books_list = Book.objects.filter(book_type=selected_book_type, is_approved=True)
 
-    # Pagination (10 books per page)
-    paginator = Paginator(books_list, 10)  # Change '10' to the number of books per page
+    # Paginate the books (10 per page)
+    paginator = Paginator(books_list, 10)
     page_number = request.GET.get("page")
     books = paginator.get_page(page_number)
 
-    # Count books in each category for this book type
-    category_book_counts = {
-        category.id: books_list.filter(category=category).count() for category in categories
+    # Count books per book_type (faculty) for display
+    faculty_book_counts = {
+        book_type.id: Book.objects.filter(book_type=book_type, is_approved=True).count()
+        for book_type in faculties
     }
-
 
     context = {
         'selected_book_type': selected_book_type,
-        'books': books,  # Paginated books
+        'books': books,
         'faculties': faculties,
         'categories': categories,
-        'category_book_counts': category_book_counts,
+        'faculty_book_counts': faculty_book_counts,
     }
+
     template = 'books/login_faculty.html' if request.user.is_authenticated else 'books/faculty.html'
     return render(request, template, context)
 
@@ -120,8 +124,8 @@ def category_books(request, category_id):
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 def projects(request):
-    if request.user.is_authenticated:
-        return redirect('books:login-project')
+    # if request.user.is_authenticated:
+    #     return redirect('books:login-project')
 
     # Get all categories
     categories = Category.objects.all()
@@ -153,6 +157,40 @@ def projects(request):
     template = 'books/login-project.html' if request.user.is_authenticated else 'books/project.html'
     return render(request,template , context)
 
+def projects_by_faculty(request):
+   
+    # Get all categories
+    categories = Category.objects.all()
+    
+    
+    
+    # Get all approved books
+    books_list = Book.objects.filter(is_approved=True)
+
+    # Pagination: Show 5 books per page
+    paginator = Paginator(books_list, 20)  # Show 5 books per page
+    page_number = request.GET.get('page')
+
+    try:
+        books = paginator.get_page(page_number)
+    except PageNotAnInteger:
+        books = paginator.get_page(1)  # If page is not an integer, deliver first page
+    except EmptyPage:
+        books = paginator.get_page(paginator.num_pages)  # If page is out of range, deliver last page
+
+    # Count books in each category
+    faculty_book_counts = {
+        book_type.id: Book.objects.filter(book_type=book_type, is_approved=True).count()
+        for book_type in faculties
+    }
+
+    context = {
+        'faculties': faculties,
+        'books': books,  # Paginated books
+        'faculty_book_counts': faculty_book_counts,
+    }
+    template = 'books/login-project_faculty.html' if request.user.is_authenticated else 'books/project_faculty.html'
+    return render(request,template , context)
 
 def projectList(request):
     if request.user.is_authenticated:

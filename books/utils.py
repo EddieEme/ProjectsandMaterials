@@ -16,8 +16,11 @@ import requests
 from django.conf import settings
 import datetime
 from datetime import timedelta
+from django.http import JsonResponse
+
 import logging
 
+BUCKET_NAME = "preview_projectandmaterials"
 logger = logging.getLogger(__name__)
 
 class Paystack:
@@ -36,38 +39,19 @@ class Paystack:
 
 
 
+def generate_missing_previews():
+    logger.info("🔄 Starting preview generation for all books...")
+    books = Book.objects.all()
 
-# def convert_docx_to_pdf(docx_path, pdf_path):
-#     """Converts a .docx file (paragraphs & tables) to PDF (Linux-friendly)."""
-#     doc = Document(docx_path)
-#     pdf_canvas = canvas.Canvas(pdf_path, pagesize=letter)
-    
-#     width, height = letter
-#     y_position = height - 50  # Start position
-
-#     def add_text(text):
-#         """Helper function to add text to PDF."""
-#         nonlocal y_position
-#         pdf_canvas.drawString(50, y_position, text)
-#         y_position -= 20  # Move down for the next line
-#         if y_position < 50:  # Create a new page if needed
-#             pdf_canvas.showPage()
-#             y_position = height - 50
-
-#     # Extract paragraphs
-#     for para in doc.paragraphs:
-#         text = para.text.strip()
-#         if text:
-#             add_text(text)
-
-#     # Extract tables
-#     for table in doc.tables:
-#         for row in table.rows:
-#             row_text = " | ".join(cell.text.strip() for cell in row.cells if cell.text.strip())
-#             if row_text:
-#                 add_text(row_text)
-
-#     pdf_canvas.save()
+    for book in books:
+        try:
+            preview_url = extract_first_10_pages(book)
+            if preview_url:
+                logger.info(f"✅ Preview created for book {book.id} at {preview_url}")
+            else:
+                logger.warning(f"⚠️ Preview skipped for book {book.id}")
+        except Exception as e:
+            logger.error(f"❌ Error processing book {book.id}: {e}")
 
 
 def convert_docx_to_pdf(docx_path):
@@ -97,17 +81,27 @@ def convert_docx_to_pdf(docx_path):
 def serve_preview(request, book_id):
     try:
         book = get_object_or_404(Book, id=book_id)
+        preview_filename = f"preview_{book.id}.pdf"
+        public_url = f"https://storage.googleapis.com/{BUCKET_NAME}/{preview_filename}"
 
-        # Generate or reuse preview URL
-        preview_url = extract_first_10_pages(book)
-        if not preview_url:
-            return HttpResponseNotFound("Preview not available.")
+        # Check if preview exists in public bucket
+        storage_client = storage.Client(credentials=settings.GS_CREDENTIALS)
+        bucket = storage_client.bucket(BUCKET_NAME)
+        blob = bucket.blob(preview_filename)
 
-        return redirect(preview_url)  # ✅ No need for signed URL
+        if blob.exists():
+            return JsonResponse({'preview_url': public_url}, status=200)
+        else:
+            # Try to generate preview if it doesn't exist
+            new_url = extract_first_10_pages(book)
+            if new_url:
+                return JsonResponse({'preview_url': new_url}, status=200)
+            else:
+                return JsonResponse({'error': 'Preview generation failed'}, status=500)
 
     except Exception as e:
-        logger.error(f"Error serving preview for book {book_id}: {e}")
-        return HttpResponseNotFound("Error occurred while serving preview.")
+        logger.error(f"Error serving preview: {e}")
+        return JsonResponse({'error': str(e)}, status=500)
 
 
 
@@ -170,6 +164,7 @@ def extract_first_10_pages(book):
         for path in [temp_file_path, preview_temp_path]:
             if path and os.path.exists(path):
                 os.remove(path)
+
 
 def download_book(request, token):
     download = get_object_or_404(Download, download_token=token)

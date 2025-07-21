@@ -34,7 +34,7 @@
  <!-- Navigation -->
      <nav class="navbar navbar-expand-lg">
         <div class="container">
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand" href="{% url 'books:home' %}">
                 <img src="{% static 'books/images/brand.jpg' %}" alt="Logo">
                 {% comment %} <span class="brand-title">Your Brand</span> {% endcomment %}
             </a>
@@ -50,10 +50,11 @@
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            Categories
+                            Projects
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{% url 'books:login-projects' %}">Projects</a></li>
+                            <li><a class="dropdown-item" href="{% url 'books:login-projects' %}">Departments</a></li>
+                            <li><a class="dropdown-item" href="{% url 'books:project_faculty' %}">Faculties</a></li>
                             <li><a class="dropdown-item" href="{% url 'books:services' %}">Services</a></li>
                         </ul>
                     </li>

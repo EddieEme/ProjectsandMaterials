@@ -35,21 +35,20 @@
             <div class="search-box">
                 <input type="text" class="form-control" placeholder="Search..." oninput="searchTopics()" id="searchInput">
             </div>
-            <h5 class="mb-3">CATEGORIES</h5>
+           <h5 class="mb-3">FACULTIES</h5>
             <div class="categories">
-                {% if categories %}
-                    {% for category in categories %}
-                        <a href="{% url 'books:category_books' category.id %}" class="category-item">
-                            <span>{{ category.name }}</span>
-                            <span class="count">{{ category_book_counts|get_item:category }}</span>
+                {% if faculties %}
+                    {% for faculty in faculties %}
+                        <a href="{% url 'books:faculty' faculty.id %}" class="category-item"> 
+                            <span>{{ faculty.name }}</span>
+                            <span class="count">{{ faculty_book_counts|get_item:faculty.id }}</span>
                         </a>
                     {% endfor %}
                 {% else %}
-                    <p>No categories available.</p>
+                    <p>No faculties available.</p>
                 {% endif %}
             </div>
         </div>
-
         <!-- Main Content -->
         <div class="col-md-9 content">
             <div class="row">
