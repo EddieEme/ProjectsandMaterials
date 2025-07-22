@@ -16,6 +16,7 @@ from .models import Book, Category, BookType
 from payments.models import  Order, Download
 from django.db.models import Sum, Avg, Q, Count
 from django.views.decorators.cache import cache_page
+from django.core.cache import cache
 import json
 import logging
 import bleach
@@ -161,8 +162,7 @@ def projects_by_faculty(request):
    
     # Get all categories
     categories = Category.objects.all()
-    
-    
+    faculties = BookType.objects.order_by('name')    
     
     # Get all approved books
     books_list = Book.objects.filter(is_approved=True)
@@ -227,59 +227,43 @@ def projectList(request):
 
 
 
+
 @cache_page(60 * 15)
 def product_details(request, id):
     book = get_object_or_404(
-        Book.objects.select_related('book_type', 'category', 'user'),
+        Book.objects.select_related('book_type', 'category', 'user')
+                   .defer('description', 'file'),  # Defer large fields
         id=id
     )
 
-    # Redirect authenticated users
     if request.user.is_authenticated:
         return redirect('books:login-product-details', id=book.id)
 
-    # Defer statistics calculation
-    stats = book.get_file_statistics()
-
-    # Related books logic
-    title_keywords = book.title.split()
-    related_books = Book.objects.none()
-    if title_keywords:
-        query = Q(title__icontains=title_keywords[0])
-        if len(title_keywords) > 1:
-            if title_keywords[-1] != title_keywords[0]:
-                query |= Q(title__icontains=title_keywords[-1])
-
+    # Related books logic (cached)
+    related_cache_key = f"related_books_{book.id}"
+    related_books = cache.get(related_cache_key)
+    if not related_books:
+        title_keywords = [word for word in book.title.split() if len(word) > 3][:3]
+        query = Q()
+        for word in title_keywords:
+            query |= Q(title__icontains=word) | Q(description__icontains=word)
+        
         related_books = (
             Book.objects
             .filter(query)
             .exclude(id=book.id)
             .only('id', 'title', 'cover_image', 'price')
-            .order_by('?')[:5]
+            .order_by('-created_at')[:5]  # More predictable than random
         )
-
-    # Check for public preview file on GCS
-    preview_url = None
-    if book.file:
-        try:
-            client = storage.Client()
-            bucket = client.bucket('preview_projectandmaterials')
-            blob = bucket.blob(f'preview_{book.id}.pdf')
-            if blob.exists():
-                preview_url = f"https://storage.googleapis.com/preview_projectandmaterials/preview_{book.id}.pdf"
-        except Exception as e:
-            logger.error(f"Error checking preview blob: {e}")
-            preview_url = None
+        cache.set(related_cache_key, related_books, 60 * 60 * 12)  # Cache for 12 hours
 
     context = {
         "book": book,
-        "preview_url": preview_url,
-        "page_count": stats.get("pages"),
-        "word_count": stats.get("words"),
         "related_books": related_books,
     }
 
     return render(request, 'books/product-details.html', context)
+
 
 
 @login_required(login_url='users:user_login')
@@ -374,28 +358,36 @@ def verification_error(request):
     """Render the template for verification errors"""
     return render(request, 'users/verification-error.html')
 
+
+@cache_page(60 * 15)
 @login_required(login_url='users:user_login')
 def login_product_details(request, id):
-    book = get_object_or_404(Book, id=id)
-    # Get book statistics
-    stats = book.get_file_statistics()
-    preview_url = f"/preview/{book.id}/" if book.file else None
+    book = get_object_or_404(
+        Book.objects.select_related('book_type', 'category', 'user')
+                   .defer('description', 'file'),  # Defer large fields
+        id=id
+    )
 
-    # Get related books based on the title
-    title_keywords = book.title.split()  # Split title into keywords
-    related_books = Book.objects.filter(
-        # Search for books with similar titles
-        Q(title__icontains=title_keywords[0]) |  # Match the first keyword
-        Q(title__icontains=title_keywords[-1]),  # Match the last keyword
-    ).exclude(id=book.id).distinct()[:8]  # Exclude the current book and limit to 5 results
+    related_cache_key = f"related_books_{book.id}"
+    related_books = cache.get(related_cache_key)
+    if not related_books:
+        title_keywords = [word for word in book.title.split() if len(word) > 3][:3]
+        query = Q()
+        for word in title_keywords:
+            query |= Q(title__icontains=word) | Q(description__icontains=word)
+        
+        related_books = (
+            Book.objects
+            .filter(query)
+            .exclude(id=book.id)
+            .only('id', 'title', 'cover_image', 'price')
+            .order_by('-created_at')[:5]  # More predictable than random
+        )
+        cache.set(related_cache_key, related_books, 60 * 60 * 12)  # Cache for 12 hours
 
-    # Prepare context
     context = {
         "book": book,
-        "preview_url": preview_url,
-        "page_count": stats["pages"],
-        "word_count": stats["words"],
-        "related_books": related_books,  # Add related books to the context
+        "related_books": related_books,
     }
 
     return render(request, 'books/login-product-details.html', context)
@@ -407,9 +399,6 @@ from django.contrib.auth.decorators import login_required
 from .models import Book, BookType, Category
 from django.core.files.storage import default_storage
 
-
-
-@login_required
 def upload_book(request):
     if request.method == "POST":
         title = request.POST.get("title")

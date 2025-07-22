@@ -1,4 +1,3 @@
-
 {% load static %}
 {% load custom_filters %}
 {% block link %}
@@ -160,37 +159,29 @@
 
         <div class="row">
             <div class="col-md-8 project-overview">
-                <!-- Navigation Tabs -->
                 <ul class="nav nav-tabs mb-4" id="paperTabs" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="overview-tab" data-bs-toggle="tab"
-                            data-bs-target="#overview" type="button" role="tab">Overview</button>
+                        <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">Overview</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews"
-                            type="button" role="tab">Reviews</button>
+                        <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab">Reviews</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="citations-tab" data-bs-toggle="tab" data-bs-target="#citations"
-                            type="button" role="tab">Cite Work</button>
+                        <button class="nav-link" id="citations-tab" data-bs-toggle="tab" data-bs-target="#citations" type="button" role="tab">Cite Work</button>
                     </li>
                 </ul>
 
-                <!-- Tab Content -->
                 <div class="tab-content" id="paperTabsContent">
-                    <!-- Overview Tab -->
-                    <div class="tab-pane fade show active" id="overview" role="tabpanel" >
+                    <div class="tab-pane fade show active" id="overview" role="tabpanel">
                         <div class="content mb-4">
                             <p class="lead">{{ book.description|unescape_html|truncatehtml:500|safe }}</p>
-                                <div class="container col-md-6 mt-5 align-items-center">
-                                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#documentModal">
-                                        Preview Document
-                                    </button>
-                                </div>
+                            <div class="container col-md-6 mt-5 align-items-center">
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#documentModal">
+                                    Preview Document
+                                </button>
+                            </div>
                         </div>
-                       
 
-                        <!-- Document Modal -->
                         <div class="modal fade" id="documentModal" tabindex="-1">
                             <div class="modal-dialog modal-lg modal-dialog-scrollable">
                                 <div class="modal-content no-select watermarked">
@@ -199,46 +190,37 @@
                                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                     </div>
                                     <div class="modal-body">
-                                        {% comment %} <div class="document-content" id="pdf-container" style="width: 100%; height: 600px;"></div> {% endcomment %}
                                         <div class="document-content" id="pdf-container">
-                                            <p>Loading PDF...</p>
+                                            <div class="text-center py-4">
+                                                <div class="spinner-border text-primary" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                                <p>Loading document preview...</p>
+                                            </div>
                                         </div>
-                                        <img src="{% static 'books/images/hero_image_1.jpg' %}" alt="advert"/ style="width: 20%;">
+                                        <img src="{% static 'books/images/hero_image_1.jpg' %}" alt="advert" style="width: 20%;">
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary"
-                                            data-bs-dismiss="modal">Close</button>
-                                  {% if request.user.is_authenticated %}
-                                    <a class="btn btn-success" id="downloadBtn" href="{% url 'subscriptions:buyorsubscribe' book.id %}">
-                                        <i class="fas fa-download"></i> Download
-                                    </a>
-                                {% else %}
-                                    <a class="btn btn-success" id="downloadBtn" href="{% url 'subscriptions:buyorsubscribe' book.id %}">
-                                        <i class="fas fa-download"></i> Download
-                                    </a>
-                                {% endif %}
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        {% if request.user.is_authenticated %}
+                                            <a class="btn btn-success" id="downloadBtn" href="{% url 'subscriptions:buyorsubscribe' book.id %}">
+                                                <i class="fas fa-download"></i> Download
+                                            </a>
+                                        {% else %}
+                                            <a class="btn btn-success" id="downloadBtn" href="{% url 'subscriptions:buyorsubscribe' book.id %}">
+                                                <i class="fas fa-download"></i> Download
+                                            </a>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Ayatutu Ontology Definition -->
-                        <div class="ayatutu-definition">
-                            
-                        </div>
-
-
-                        <!-- Ayatutu Ontology Word Generator -->
-                        <div class="ayatutu-definition">
-                      
-                        </div>
+                        <div class="ayatutu-definition"></div>
+                        <div class="ayatutu-definition"></div>
                     </div>
 
-                    <!-- Reviews Tab -->
                     <div class="tab-pane fade" id="reviews" role="tabpanel">
-                        
-
-                        <!-- Existing Reviews -->
                         <div class="review-card mb-3">
                             <div class="review-header">
                                 <div>
@@ -273,15 +255,12 @@
                             </div>
                         </div>
 
-
                         <div class="review-header">
                             <button class="btn btn-success" data-bs-toggle="collapse" data-bs-target="#addReviewForm">Add Review</button>
                         </div>
                         
-                        <!-- Add Review Collapse -->
                         <div class="collapse" id="addReviewForm">
                             <div class="add-review-section">
-                                {% comment %} <h4 class="mb-3">Write a Review</h4> {% endcomment %}
                                 <form>
                                     <div class="mb-3">
                                         <label for="reviewTitle" class="form-label">Review Title</label>
@@ -299,17 +278,14 @@
                                     </div>
                                     <div class="mb-3">
                                         <label for="reviewContent" class="form-label">Your Review</label>
-                                        <textarea class="form-control" id="reviewContent" rows="5"
-                                            placeholder="Write your detailed review here"></textarea>
+                                        <textarea class="form-control" id="reviewContent" rows="5" placeholder="Write your detailed review here"></textarea>
                                     </div>
                                     <button type="submit" class="btn btn-primary">Submit Review</button>
                                 </form>
                             </div>
                         </div>
-
                     </div>
 
-                    <!-- Citations Tab -->
                     <div class="tab-pane fade" id="citations" role="tabpanel">
                         <div class="citation-card">
                             <h4 class="mb-3">Citation Information</h4>
@@ -322,18 +298,15 @@
                                 <div class="row">
                                     <div class="col-md-4">
                                         <h6>APA</h6>
-                                        <pre
-                                            class="bg-light p-2">Akume, G. (2021). Ayatutu Ontology: The George Akume Leadership Recruitment Model. African and General Studies, 40, 14858.</pre>
+                                        <pre class="bg-light p-2">Akume, G. (2021). Ayatutu Ontology: The George Akume Leadership Recruitment Model. African and General Studies, 40, 14858.</pre>
                                     </div>
                                     <div class="col-md-4">
                                         <h6>MLA</h6>
-                                        <pre
-                                            class="bg-light p-2">Akume, George. "Ayatutu Ontology: The George Akume Leadership Recruitment Model." African and General Studies, vol. 40, 2021, pp. 14858.</pre>
+                                        <pre class="bg-light p-2">Akume, George. "Ayatutu Ontology: The George Akume Leadership Recruitment Model." African and General Studies, vol. 40, 2021, pp. 14858.</pre>
                                     </div>
                                     <div class="col-md-4">
                                         <h6>Chicago</h6>
-                                        <pre
-                                            class="bg-light p-2">Akume, George. "Ayatutu Ontology: The George Akume Leadership Recruitment Model." African and General Studies 40 (2021): 14858.</pre>
+                                        <pre class="bg-light p-2">Akume, George. "Ayatutu Ontology: The George Akume Leadership Recruitment Model." African and General Studies 40 (2021): 14858.</pre>
                                     </div>
                                 </div>
                             </div>
@@ -343,45 +316,40 @@
             </div>
 
             <div class="col-md-4">
-                <!-- Existing sidebar content remains the same -->
                 <div class="document-details mb-4">
                     <h4 class="mb-3">Document Details</h4>
-
                     <div class="mb-3">
                         <div class="field-label">BY:</div>
                         <span class="text-success">{{book.author}}</span>
                     </div>
-
                     <div class="mb-3">
                         <div class="field-label">FIELD:</div>
                         <span>{{book.category.name}}</span>
                     </div>
-
                     <div class="mb-3">
                         <div class="field-label">TYPE:</div>
                         <span>{{book.book_type.name}}</span>
                     </div>
-
                     <div class="mb-3">
                         <div class="field-label">PAGES:</div>
-                        <span>{{page_count}} PAGES ({{word_count}} WORDS)</span>
+                        <span id="page-count" class="stats-loading">Loading...</span>
                     </div>
                     <div class="mb-3">
                         <div class="field-label">CHAPTERS:</div>
                         <span>1 to 5 CHAPTERS</span>
                     </div>
-
                     
                     {% if request.user.is_authenticated %}
-                                    <a class="btn btn-success" id="downloadBtn" href="{% url 'subscriptions:buyorsubscribe' book.id %}">
-                                        <i class="fas fa-download"></i> Download
-                                    </a>
-                                {% else %}
-                                    <a class="btn btn-success" id="downloadBtn" href="{% url 'subscriptions:buyorsubscribe' book.id %}">
-                                        <i class="fas fa-download"></i> Download
-                                    </a>
-                                {% endif %}
+                        <a class="btn btn-success" id="downloadBtn" href="{% url 'subscriptions:buyorsubscribe' book.id %}">
+                            <i class="fas fa-download"></i> Download
+                        </a>
+                    {% else %}
+                        <a class="btn btn-success" id="downloadBtn" href="{% url 'subscriptions:buyorsubscribe' book.id %}">
+                            <i class="fas fa-download"></i> Download
+                        </a>
+                    {% endif %}
                 </div>
+                
                 <div class="related-works">
                     <h4 class="mb-3">Related Works</h4>
                     {% for related_book in related_books %}
@@ -394,89 +362,145 @@
                         <li class="related-work">No related books found.</li>
                     {% endfor %}
                 </div>
-
             </div>
         </div>
     </div>
 
-    
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            
-            // Prevent text selection
-            document.body.addEventListener('selectstart', function (e) {
-                e.preventDefault();
-            });
-
-            // Prevent right-click
-            //document.addEventListener('contextmenu', function (e) {
-            //    e.preventDefault();
-            //});
-
-            // Prevent screenshot (keyboard shortcuts)
-            document.addEventListener('keydown', function (e) {
-                // Prevent Print Screen, F12 (dev tools), and screenshot shortcuts
-                if (e.key === 'PrintScreen' ||
-                    (e.ctrlKey && e.shiftKey && e.key === 'I') ||
-                    (e.ctrlKey && e.shiftKey && e.key === 'C') ||
-                    (e.ctrlKey && e.key === 'p')) {
-                    e.preventDefault();
-                }
-            });
-
-            // Download button handler
-            document.getElementById('downloadBtn').addEventListener('click', function () {
-                // Redirect to payment gateway or trigger download purchase
-               // alert('Redirecting to purchase document...');
-            });
+    document.addEventListener('DOMContentLoaded', function() {
+        // Security measures
+        document.body.addEventListener('selectstart', function(e) {
+            e.preventDefault();
         });
 
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'PrintScreen' ||
+                (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+                (e.ctrlKey && e.shiftKey && e.key === 'C') ||
+                (e.ctrlKey && e.key === 'p')) {
+                e.preventDefault();
+            }
+        });
 
-        document.addEventListener("DOMContentLoaded", function () {
-        var previewUrl = "{{ preview_url|escapejs }}"; // Ensure Django passes the correct URL
-        if (!previewUrl) {
-            console.error("Preview URL is missing!");
-            document.getElementById('pdf-container').innerHTML = "<p>No preview available.</p>";
-            return;
+        // Load document stats via API
+        function loadDocumentStats() {
+            const bookId = JSON.parse('{{ book.id|safe|escapejs }}');
+            fetch(`/api/books/${bookId}/preview/`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.page_count && data.word_count) {
+                        document.getElementById('page-count').textContent = 
+                            `${data.page_count} PAGES (${data.word_count} WORDS)`;
+                        document.getElementById('page-count').classList.remove('stats-loading');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading document stats:', error);
+                    document.getElementById('page-count').textContent = 'Stats unavailable';
+                    document.getElementById('page-count').classList.remove('stats-loading');
+                });
         }
 
-        var url = previewUrl + "?v=" + new Date().getTime(); // Prevent browser caching
-        var container = document.getElementById('pdf-container');
+        // Initialize PDF viewer when modal opens
+        function initPDFViewer() {
+            const modal = document.getElementById('documentModal');
+            if (!modal) return;
 
-        // Load and render the PDF
-        pdfjsLib.getDocument(url).promise
-            .then(function (pdf) {
-                container.innerHTML = ''; // Clear "Loading PDF..." text
-                console.log("PDF Loaded: " + pdf.numPages + " pages");
-
-                for (let pageNum = 1; pageNum <= Math.min(pdf.numPages, 10); pageNum++) {
-                    pdf.getPage(pageNum).then(function (page) {
-                        var scale = window.innerWidth < 768 ? 0.8 : 1.2; // Adjust scale for mobile
-                        var viewport = page.getViewport({ scale: scale });
-
-                        var canvas = document.createElement('canvas');
-                        canvas.classList.add("pdf-page");
-                        container.appendChild(canvas);
-
-                        var context = canvas.getContext('2d');
-                        canvas.width = viewport.width;
-                        canvas.height = viewport.height;
-
-                        var renderContext = {
-                            canvasContext: context,
-                            viewport: viewport
-                        };
-
-                        page.render(renderContext);
-                    });
-                }
-            })
-            .catch(function (error) {
-                console.error("Error loading PDF:", error.message);
+            modal.addEventListener('shown.bs.modal', function() {
+                const container = document.getElementById('pdf-container');
+                
+                // Show loading state
                 container.innerHTML = `
-                    <p>Failed to load PDF. <a href="${url}" target="_blank">Download here</a></p>
-                    <p>Error: ${error.message}</p>`;
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p>Loading document preview...</p>
+                    </div>
+                `;
+                
+                // Fetch preview data from API
+                fetch(`/api/books/{{ book.id }}/preview/`)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Preview not available');
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (!data.preview_url) throw new Error('No preview URL returned');
+                        
+                        // Initialize PDF.js
+                        pdfjsLib.GlobalWorkerOptions.workerSrc = 
+                            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.worker.min.js';
+                        
+                        // Add cache buster
+                        const url = data.preview_url + (data.preview_url.includes('?') ? '&' : '?') + 'v=' + Date.now();
+                        
+                        return pdfjsLib.getDocument({
+                            url: url,
+                            cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@2.14.305/cmaps/',
+                            cMapPacked: true
+                        }).promise;
+                    })
+                    .then(pdf => {
+                        container.innerHTML = '';
+                        
+                        // Calculate optimal scale
+                        const isMobile = window.innerWidth < 768;
+                        const baseScale = isMobile ? 0.8 : 1.2;
+                        const maxWidth = isMobile ? window.innerWidth * 0.9 : 800;
+                        
+                        // Function to render individual page
+                        const renderPage = function(pageNum) {
+                            pdf.getPage(pageNum).then(function(page) {
+                                const viewport = page.getViewport({ scale: baseScale });
+                                const scale = Math.min(baseScale, maxWidth / viewport.width);
+                                const scaledViewport = page.getViewport({ scale: scale });
+                                
+                                const canvas = document.createElement('canvas');
+                                canvas.className = 'pdf-page mb-3 shadow border';
+                                container.appendChild(canvas);
+                                
+                                const context = canvas.getContext('2d');
+                                canvas.height = scaledViewport.height;
+                                canvas.width = scaledViewport.width;
+                                
+                                page.render({
+                                    canvasContext: context,
+                                    viewport: scaledViewport
+                                });
+                            }).catch(function(error) {
+                                console.error(`Error rendering page: ${error}`);
+                            });
+                        };
+                        
+                        // Render first 3 pages immediately
+                        for (let i = 1; i <= Math.min(3, pdf.numPages); i++) {
+                            renderPage(i);
+                        }
+                        
+                        // Render remaining pages with delay
+                        for (let i = 4; i <= Math.min(10, pdf.numPages); i++) {
+                            setTimeout(() => renderPage(i), 500 * (i-3));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading PDF preview:', error);
+                        container.innerHTML = `
+                            <div class="alert alert-danger">
+                                Failed to load preview. Please try again later.
+                                ${error.message ? `<small>Error: ${error.message}</small>` : ''}
+                            </div>
+                        `;
+                    });
             });
+        }
+
+        // Initialize everything
+        loadDocumentStats();
+        initPDFViewer();
     });
     </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

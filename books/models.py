@@ -10,6 +10,7 @@ import os
 import uuid
 import tempfile
 
+
 import fitz
 from docx import Document
 
@@ -48,6 +49,7 @@ class Book(models.Model):
     book_type = models.ForeignKey(BookType, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name ='book')
     file = models.FileField(upload_to='book_files/', blank=True, null=True)
+    preview_url = models.URLField(blank=True, null=True)
     author = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=5000)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
@@ -117,3 +119,15 @@ class Book(models.Model):
             word_count = len(text.split())
 
         return {"pages": page_count, "words": word_count}
+    
+def save(self, *args, **kwargs):
+    file_changed = 'file' in kwargs.get('update_fields', []) or not self.pk
+    super().save(*args, **kwargs)
+    
+    if self.file and (file_changed or not self.preview_url):
+        try:
+            from .utils import generate_preview
+            self.preview_url = generate_preview(self)
+            super().save(update_fields=['preview_url'])
+        except Exception as e:
+            logger.error(f"Failed to generate preview for book {self.id}: {e}")

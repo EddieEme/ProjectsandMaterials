@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework import routers
 from . import views
-from books.api_views import most_viewed_videos
+from books.api_views import most_viewed_videos, book_details_api
 from .utils import serve_preview, download_book
 
 
@@ -35,6 +35,10 @@ web_urlpatterns = [
     path('upload-book/', views.upload_book, name='upload-book'),
     path('download/<uuid:token>/', download_book, name='download-book'),
     
+    path('.well-known/appspecific/com.chrome.devtools.json', lambda r: HttpResponse(status=204)),
+    
+    
+    
 ]
 
 # API authentication URLs
@@ -44,6 +48,7 @@ auth_patterns = [
     # path('api/most-viewed-videos/<str:channel_id>/', MostViewedVideos.as_view(), name='most-viewed-videos'),
     path('api/most-viewed-videos/<str:channel_id>/', most_viewed_videos, name='most-viewed-videos'),
     path("preview/<int:book_id>/", serve_preview, name="preview"),
+    path("api/books/<int:id>/preview/", book_details_api, name="book-preview"),
 ]
 
 

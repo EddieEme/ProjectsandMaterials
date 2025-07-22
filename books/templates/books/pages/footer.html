@@ -168,7 +168,8 @@
         <div class="col-6">
             <ul>
                 <li><a href="{% url 'books:home' %}">Home</a></li>
-                <li><a href="{% url 'books:login-projects' %}">Projects</a></li>
+                <li><a class="dropdown-item" href="{% url 'books:login-projects' %}">Departments</a></li>
+                <li><a class="dropdown-item" href="{% url 'books:project_faculty' %}">Faculties</a></li>
                 <li><a href="{% url 'books:services' %}">Services</a></li>
                 <li><a href="#">Tutorial Videos</a></li>
                 <li><a href="#">Data Analysis Tools</a></li>
@@ -200,7 +201,8 @@
         <div class="col-6">
             <ul>
                 <li><a href="{% url 'books:home' %}">Home</a></li>
-                <li><a href="{% url 'books:projects' %}">Projects</a></li>
+                <li><a class="dropdown-item" href="{% url 'books:login-projects' %}">Departments</a></li>
+                <li><a class="dropdown-item" href="{% url 'books:project_faculty' %}">Faculties</a></li>
                 <li><a href="{% url 'books:services' %}">Services</a></li>
                 <li><a href="#">Tutorial Videos</a></li>
                 <li><a href="#">Data Analysis Tools</a></li>

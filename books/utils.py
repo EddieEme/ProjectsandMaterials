@@ -2,6 +2,7 @@ import os
 import fitz  # PyMuPDF
 from django.shortcuts import get_object_or_404, redirect
 from django.http import FileResponse, HttpResponseNotFound
+from django.views.decorators.cache import never_cache
 from docx import Document
 from django.http import HttpResponse
 from reportlab.pdfgen import canvas
@@ -16,11 +17,9 @@ import requests
 from django.conf import settings
 import datetime
 from datetime import timedelta
-from django.http import JsonResponse
-
 import logging
+from celery import shared_task
 
-BUCKET_NAME = "preview_projectandmaterials"
 logger = logging.getLogger(__name__)
 
 class Paystack:
@@ -36,22 +35,6 @@ class Paystack:
         }
         response = requests.get(url, headers=headers)
         return response.json()
-
-
-
-def generate_missing_previews():
-    logger.info("🔄 Starting preview generation for all books...")
-    books = Book.objects.all()
-
-    for book in books:
-        try:
-            preview_url = extract_first_10_pages(book)
-            if preview_url:
-                logger.info(f"✅ Preview created for book {book.id} at {preview_url}")
-            else:
-                logger.warning(f"⚠️ Preview skipped for book {book.id}")
-        except Exception as e:
-            logger.error(f"❌ Error processing book {book.id}: {e}")
 
 
 def convert_docx_to_pdf(docx_path):
@@ -77,32 +60,86 @@ def convert_docx_to_pdf(docx_path):
         print(f"Error during DOCX to PDF conversion: {e}")
         return None
 
-
-def serve_preview(request, book_id):
+    
+@shared_task(bind=True)
+def generate_preview_task(self, book_id):
     try:
-        book = get_object_or_404(Book, id=book_id)
-        preview_filename = f"preview_{book.id}.pdf"
-        public_url = f"https://storage.googleapis.com/{BUCKET_NAME}/{preview_filename}"
+        book = Book.objects.get(id=book_id)
+        client = storage.Client(credentials=settings.GS_CREDENTIALS)
+        preview_bucket = client.bucket("preview_projectandmaterials")
+        
+        preview_filename = f"previews/{book.id}/preview.pdf"
+        preview_blob = preview_bucket.blob(preview_filename)
+        
+        if preview_blob.exists():
+            url = f"https://storage.googleapis.com/preview_projectandmaterials/{preview_filename}"
+            book.preview_url = url
+            book.save(update_fields=['preview_url'])
+            return url
 
-        # Check if preview exists in public bucket
-        storage_client = storage.Client(credentials=settings.GS_CREDENTIALS)
-        bucket = storage_client.bucket(BUCKET_NAME)
-        blob = bucket.blob(preview_filename)
-
-        if blob.exists():
-            return JsonResponse({'preview_url': public_url}, status=200)
-        else:
-            # Try to generate preview if it doesn't exist
-            new_url = extract_first_10_pages(book)
-            if new_url:
-                return JsonResponse({'preview_url': new_url}, status=200)
+        with tempfile.NamedTemporaryFile(suffix=os.path.splitext(book.file.name)[1]) as temp_input, \
+             tempfile.NamedTemporaryFile(suffix=".pdf") as temp_output:
+            
+            bucket = client.bucket(settings.GS_BUCKET_NAME)
+            blob = bucket.blob(book.file.name)
+            blob.download_to_filename(temp_input.name)
+            
+            file_ext = os.path.splitext(temp_input.name)[1].lower()
+            if file_ext == '.pdf':
+                pdf_path = temp_input.name
+            elif file_ext in ('.doc', '.docx'):
+                pdf_path = convert_docx_to_pdf(temp_input.name)
+                if not pdf_path:
+                    return None
             else:
-                return JsonResponse({'error': 'Preview generation failed'}, status=500)
+                return None
+
+            with fitz.open(pdf_path) as doc, fitz.open() as new_doc:
+                new_doc.insert_pdf(doc, to_page=min(9, len(doc)-1))
+                new_doc.save(temp_output.name)
+
+            preview_blob.upload_from_filename(
+                temp_output.name,
+                content_type="application/pdf",
+                predefined_acl="publicRead"
+            )
+
+        url = f"https://storage.googleapis.com/preview_projectandmaterials/{preview_filename}"
+        book.preview_url = url
+        book.save(update_fields=['preview_url'])
+        return url
 
     except Exception as e:
-        logger.error(f"Error serving preview: {e}")
-        return JsonResponse({'error': str(e)}, status=500)
+        logger.error(f"Error in generate_preview_task for book {book_id}: {e}")
+        return None
 
+@never_cache
+def serve_preview(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    
+    if not book.preview_url:
+        return HttpResponseNotFound("Preview not yet generated")
+    
+    try:
+        # Extract the path from the GCS URL
+        gcs_path = book.preview_url.replace("https://storage.googleapis.com/preview_projectandmaterials/", "")
+        
+        client = storage.Client(credentials=settings.GS_CREDENTIALS)
+        bucket = client.bucket("preview_projectandmaterials")
+        blob = bucket.blob(gcs_path)
+        
+        if not blob.exists():
+            return HttpResponseNotFound("Preview file missing")
+            
+        # Create a streaming response
+        file = blob.open('rb')
+        response = FileResponse(file, content_type='application/pdf')
+        response['Content-Disposition'] = f'inline; filename="{book.slug}_preview.pdf"'
+        return response
+        
+    except Exception as e:
+        logger.error(f"Error serving preview for book {book_id}: {e}")
+        return HttpResponseNotFound("Error serving preview")
 
 
 def extract_first_10_pages(book):
@@ -165,7 +202,6 @@ def extract_first_10_pages(book):
             if path and os.path.exists(path):
                 os.remove(path)
 
-
 def download_book(request, token):
     download = get_object_or_404(Download, download_token=token)
 
@@ -178,53 +214,3 @@ def download_book(request, token):
         return redirect(download.book.file.url)  # ✅ Redirect to GCS file URL
 
     return HttpResponse("Download failed", status=500)
-
-# import logging
-# logger = logging.getLogger(__name__)
-
-# def generate_signed_url(bucket_name, blob_name, expiration=3600):
-#     """Generate a signed URL for a GCS object."""
-#     try:
-#         # Use the credentials from Django settings
-#         storage_client = storage.Client(credentials=settings.GS_CREDENTIALS)
-#         bucket = storage_client.bucket(bucket_name)
-#         blob = bucket.blob(blob_name)
-        
-#         # Generate a signed URL with the specified expiration time
-#         url = blob.generate_signed_url(
-#             expiration=timedelta(seconds=expiration),
-#             version="v4"  # Use v4 signing
-#         )
-#         return url
-#     except Exception as e:
-#         logger.error(f"Error generating signed URL: {str(e)}")
-#         raise
-
-# def download_book(request, token):
-#     try:
-#         # Retrieve the download object
-#         download = get_object_or_404(Download, download_token=token)
-
-#         # Check if the book file exists
-#         if not download.book.file:
-#             logger.error(f"File not found for download token: {token}")
-#             return HttpResponse("File not found", status=404)
-
-#         # Extract the GCS file path
-#         gcs_url = download.book.file.url
-#         bucket_name = settings.GS_BUCKET_NAME  # Use the bucket name from settings
-
-#         # Extract the relative file path from the GCS URL
-#         if bucket_name not in gcs_url:
-#             logger.error(f"Invalid GCS URL for download token: {token}")
-#             return HttpResponse("Invalid GCS URL", status=400)
-#         file_path = gcs_url.split(bucket_name + "/")[-1]  # Get only the relative path
-
-#         # Generate a signed URL (valid for 1 hour)
-#         signed_url = generate_signed_url(bucket_name, file_path, expiration=3600)
-
-#         # Redirect to the signed URL for download
-#         return redirect(signed_url)
-#     except Exception as e:
-#         logger.error(f"Error processing download request for token {token}: {str(e)}")
-#         return HttpResponse("An error occurred while processing your request.", status=500)

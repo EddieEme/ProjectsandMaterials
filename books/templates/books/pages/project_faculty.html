@@ -54,7 +54,7 @@
                 {% if faculties %}
                     {% for faculty in faculties %}
                         <a href="{% url 'books:faculty' faculty.id %}" class="category-item">
-                            <span>{{ facylty.name }}</span>
+                            <span>{{ faculty.name }}</span>
                             <span class="count">{{ faculty_book_counts|get_item:faculty.id }}</span>
                         </a>
                     {% endfor %}
