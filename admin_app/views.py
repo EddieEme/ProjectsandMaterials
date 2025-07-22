@@ -91,7 +91,7 @@ def batch_upload_books(request):
                         # Create book record
                         book = Book.objects.create(
                             title=title,
-                            description=row.get("description", "").strip(),
+                            description=row.get("description", ""),
                             author=row.get("author", "").strip(),
                             book_type=book_type,
                             category=category,

@@ -175,11 +175,6 @@
                     <div class="tab-pane fade show active" id="overview" role="tabpanel">
                         <div class="content mb-4">
                             <p class="lead">{{ book.description|unescape_html|truncatehtml:500|safe }}</p>
-                            <div class="container col-md-6 mt-5 align-items-center">
-                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#documentModal">
-                                    Preview Document
-                                </button>
-                            </div>
                         </div>
 
                         <div class="modal fade" id="documentModal" tabindex="-1">
@@ -315,8 +310,15 @@
                 </div>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-4">   
                 <div class="document-details mb-4">
+                    <div>
+                        {% if book.cover_image %}
+                        <img src="{{ book.cover_image.url }}" alt="advert" style="width: 100%;">
+                        {% else %}
+                            <img src="{% static 'books/images/advert_cover.jpg' %}" alt="default advert" style="width: 100%;">
+                        {% endif %}
+                    </div>
                     <h4 class="mb-3">Document Details</h4>
                     <div class="mb-3">
                         <div class="field-label">BY:</div>
@@ -338,6 +340,9 @@
                         <div class="field-label">CHAPTERS:</div>
                         <span>1 to 5 CHAPTERS</span>
                     </div>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#documentModal">
+                                    Preview Document
+                    </button>
                     
                     {% if request.user.is_authenticated %}
                         <a class="btn btn-success" id="downloadBtn" href="{% url 'subscriptions:buyorsubscribe' book.id %}">
@@ -348,6 +353,7 @@
                             <i class="fas fa-download"></i> Download
                         </a>
                     {% endif %}
+                   
                 </div>
                 
                 <div class="related-works">
