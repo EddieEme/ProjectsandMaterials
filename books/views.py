@@ -125,8 +125,8 @@ def category_books(request, category_id):
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 def projects(request):
-    # if request.user.is_authenticated:
-    #     return redirect('books:login-project')
+    if request.user.is_authenticated:
+        return redirect('books:login-project')
 
     # Get all categories
     categories = Category.objects.all()

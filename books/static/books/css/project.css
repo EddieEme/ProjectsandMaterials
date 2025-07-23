@@ -64,7 +64,7 @@ a {
 
      .content {
         height: auto;
-        order: 1;
+        /* order: 1; */
      }
  }
 
