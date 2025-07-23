@@ -150,81 +150,73 @@
     .lead{
         text-align:justify;
     }
+.document-details-box {
+            border-left: 4px solid #28a745; /* green line */
+            background: #fff;
+            padding: 20px;
+            max-width: 500px;
+            font-family: Arial, sans-serif;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 6px;
+            margin-top:20;
+            margin-bottom:20;
+        }
 
-    .document-details-box {
-    border-left: 4px solid #28a745;
-    background: #fff;
-    padding: 20px;
-    max-width: 500px;
-    font-family: Arial, sans-serif;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-    border-radius: 6px;
-    margin-top: 20px;
-    margin-bottom: 20px;
-}
+        .document-details-box .title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
 
-.document-details-box .title {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 15px;
-}
+        .detail-item {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+        }
 
-.detail-item {
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    font-size: 14px;
-}
+        .detail-item .label {
+            font-weight: bold;
+            margin-right: 6px;
+        }
 
-.detail-item .label {
-    font-weight: bold;
-    margin-right: 6px;
-    min-width: 80px;
-}
+        .detail-item .value {
+            font-weight: normal;
+        }
 
-.detail-item .value {
-    font-weight: normal;
-}
+        .detail-item .field {
+            color: #28a745;
+            font-weight: 600;
+        }
 
-.field {
-    color: #28a745;
-    font-weight: 600;
-}
+        .detail-item .type {
+            color: #1e90ff;
+            font-weight: 600;
+        }
 
-.type {
-    color: #007bff;
-    font-weight: 600;
-}
+        .action-buttons {
+            margin-top: 15px;
+        }
 
-.action-buttons {
-    margin-top: 20px;
-}
+        .action-buttons .btn {
+            padding: 6px 14px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 13px;
+            margin-right: 8px;
+        }
 
-.action-buttons .btn {
-    padding: 6px 14px;
-    border: none;
-    cursor: pointer;
-    border-radius: 4px;
-    font-size: 13px;
-    margin-right: 8px;
-}
+        .save-btn {
+            background-color: #e9ecef;
+            color: #333;
+        }
 
-.save-btn {
-    background-color: #e9ecef;
-    color: #333;
-}
-
-.review-btn {
-    background-color: #007bff;
-    color: #fff;
-}
-
-.download-buttons .btn {
-    margin-top: 10px;
-    font-size: 14px;
-}
-
-
+        .review-btn {
+            background-color: #007bff;
+            color: #fff;
+        }
+        
 
 
     </style>
@@ -386,55 +378,64 @@
                 </div>
             </div>
 
-            <div class="col-md-4">   
+            <div class="col-md-4">
+                   
+               
                 <div class="document-details mb-4">
                     <div>
-                        {% if book.cover_image %}
-                        <img src="{{ book.cover_image.url }}" alt="advert" style="width: 100%;">
+                            {% if book.cover_image %}
+                            <img src="{{ book.cover_image.url }}" alt="advert" style="width: 100%;">
+                            {% else %}
+                                <img src="{% static 'books/images/advert_cover.jpg' %}" alt="default advert" style="width: 100%;">
+                            {% endif %}
+                    </div>
+
+                    <div class="document-details-box">
+                        <h4 class="mb-3 title">Document Details</h4>
+
+                        <div class="mb-3 detail-item">
+                            <span class="label"><i class="fas fa-users"></i></span>
+                            <span class="value text-uppercase">{{ book.author }}</span>
+                        </div>
+
+                        <div class="mb-3 detail-item">
+                            <span class="label">📁 FIELD:</span>
+                            <span class="value field text-uppercase">{{ book.category.name }}</span>
+                        </div>
+
+                        <div class="mb-3 detail-item">
+                            <span class="label">🏷️ TYPE:</span>
+                            <span class="value type text-uppercase">{{ book.book_type.name }}</span>
+                        </div>
+
+                        <div class="mb-3 detail-item">
+                            <span class="label"><i class="fas fa-file-alt"></i></span>
+                            <span class="value stats-loading" id="page-count">
+                                <i class="fas fa-file-pdf text-danger me-1"></i>
+                                Loading...
+                            </span>
+                        </div>
+
+                        <div class="mb-3 detail-item">
+                            <span class="label">📘 CHAPTERS:</span>
+                            <span class="value type text-uppercase">1 to 5 CHAPTERS</span>
+                        </div>
+
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#documentModal">
+                            Preview Document
+                        </button>
+
+                        {% if request.user.is_authenticated %}
+                            <a class="btn btn-success" id="downloadBtn" href="{% url 'subscriptions:buyorsubscribe' book.id %}">
+                                <i class="fas fa-download"></i> Download
+                            </a>
                         {% else %}
-                            <img src="{% static 'books/images/advert_cover.jpg' %}" alt="default advert" style="width: 100%;">
+                            <a class="btn btn-success" id="downloadBtn" href="{% url 'subscriptions:buyorsubscribe' book.id %}">
+                                <i class="fas fa-download"></i> Download
+                            </a>
                         {% endif %}
                     </div>
-                    <div class="document-details-box">
-                    <h4 class="mb-3 title">Document Details</h4>
-                    <div class="mb-3 detail-item">
-                        <span class="label"><i class="fas fa-users"></i></span>
-                        <span class="value text-uppercase">{{ book.author }}</span>
-                    </div>
-                    <div class="mb-3 detail-item">
-                        <span class="label">📁 FIELD:</span>
-                        <span class="value field text-uppercase">{{ book.category.name }}</span>
-                    </div>
-                    <div class="mb-3 detail-item">
-                        <span class="label">🏷️ TYPE:</span>
-                        <span class="value type text-uppercase">{{ book.book_type.name }}</span>
-                    </div>
-                    <div class="mb-3 detail-item">
-                        <span class="label"><i class="fas fa-file-alt"></i></span>
-                        <span class="value stats-loading" id="page-count">
-                            <i class="fas fa-file-pdf text-danger"></i> (PDF)
-                            Loading...
-                        </span>
-                    </div>
-                    <div class="mb-3 detail-item">
-                        <span class="label">🏷️ CHAPTERS:</span>
-                        <spaN class="value type text-uppercase">1 to 5 CHAPTERS</spaN>
-                    </div>
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#documentModal">
-                                    Preview Document
-                    </button>
-                    
-                    {% if request.user.is_authenticated %}
-                        <a class="btn btn-success" id="downloadBtn" href="{% url 'subscriptions:buyorsubscribe' book.id %}">
-                            <i class="fas fa-download"></i> Download
-                        </a>
-                    {% else %}
-                        <a class="btn btn-success" id="downloadBtn" href="{% url 'subscriptions:buyorsubscribe' book.id %}">
-                            <i class="fas fa-download"></i> Download
-                        </a>
-                    {% endif %}
-                            
-                   </div>
+                </div>
                 
                 <div class="related-works">
                     <h4 class="mb-3">Related Works</h4>
