@@ -124,7 +124,7 @@
             position: relative;
         }
         .watermarked::before {
-            content: "CONFIDENTIAL";
+            content: "";
             position: absolute;
             top: 50%;
             left: 50%;
@@ -150,6 +150,82 @@
     .lead{
         text-align:justify;
     }
+
+    .document-details-box {
+    border-left: 4px solid #28a745;
+    background: #fff;
+    padding: 20px;
+    max-width: 500px;
+    font-family: Arial, sans-serif;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    border-radius: 6px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.document-details-box .title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.detail-item {
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+}
+
+.detail-item .label {
+    font-weight: bold;
+    margin-right: 6px;
+    min-width: 80px;
+}
+
+.detail-item .value {
+    font-weight: normal;
+}
+
+.field {
+    color: #28a745;
+    font-weight: 600;
+}
+
+.type {
+    color: #007bff;
+    font-weight: 600;
+}
+
+.action-buttons {
+    margin-top: 20px;
+}
+
+.action-buttons .btn {
+    padding: 6px 14px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 13px;
+    margin-right: 8px;
+}
+
+.save-btn {
+    background-color: #e9ecef;
+    color: #333;
+}
+
+.review-btn {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.download-buttons .btn {
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+
+
 
     </style>
     {% endblock %}
@@ -319,26 +395,30 @@
                             <img src="{% static 'books/images/advert_cover.jpg' %}" alt="default advert" style="width: 100%;">
                         {% endif %}
                     </div>
-                    <h4 class="mb-3">Document Details</h4>
-                    <div class="mb-3">
-                        <div class="field-label">BY:</div>
-                        <span class="text-success">{{book.author}}</span>
+                    <div class="document-details-box">
+                    <h4 class="mb-3 title">Document Details</h4>
+                    <div class="mb-3 detail-item">
+                        <span class="label"><i class="fas fa-users"></i></span>
+                        <span class="value text-uppercase">{{ book.author }}</span>
                     </div>
-                    <div class="mb-3">
-                        <div class="field-label">FIELD:</div>
-                        <span>{{book.category.name}}</span>
+                    <div class="mb-3 detail-item">
+                        <span class="label">📁 FIELD:</span>
+                        <span class="value field text-uppercase">{{ book.category.name }}</span>
                     </div>
-                    <div class="mb-3">
-                        <div class="field-label">TYPE:</div>
-                        <span>{{book.book_type.name}}</span>
+                    <div class="mb-3 detail-item">
+                        <span class="label">🏷️ TYPE:</span>
+                        <span class="value type text-uppercase">{{ book.book_type.name }}</span>
                     </div>
-                    <div class="mb-3">
-                        <div class="field-label">PAGES:</div>
-                        <span id="page-count" class="stats-loading">Loading...</span>
+                    <div class="mb-3 detail-item">
+                        <span class="label"><i class="fas fa-file-alt"></i></span>
+                        <span class="value stats-loading" id="page-count">
+                            <i class="fas fa-file-pdf text-danger"></i> (PDF)
+                            Loading...
+                        </span>
                     </div>
-                    <div class="mb-3">
-                        <div class="field-label">CHAPTERS:</div>
-                        <span>1 to 5 CHAPTERS</span>
+                    <div class="mb-3 detail-item">
+                        <span class="label">🏷️ CHAPTERS:</span>
+                        <spaN class="value type text-uppercase">1 to 5 CHAPTERS</spaN>
                     </div>
                     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#documentModal">
                                     Preview Document
@@ -353,8 +433,8 @@
                             <i class="fas fa-download"></i> Download
                         </a>
                     {% endif %}
-                   
-                </div>
+                            
+                   </div>
                 
                 <div class="related-works">
                     <h4 class="mb-3">Related Works</h4>
