@@ -290,21 +290,31 @@ def payment_method(request, id):
 
 @login_required(login_url='users:user_login')
 def login_projects(request):
+  # Get all categories
     categories = Category.objects.all()
     
     # Get all approved books
-    books = Book.objects.filter(is_approved=True)
+    books_list = Book.objects.filter(is_approved=True)
+
+    # Pagination: Show 5 books per page
+    paginator = Paginator(books_list, 20)  # Show 5 books per page
+    page_number = request.GET.get('page')
+
+    try:
+        books = paginator.get_page(page_number)
+    except PageNotAnInteger:
+        books = paginator.get_page(1)  # If page is not an integer, deliver first page
+    except EmptyPage:
+        books = paginator.get_page(paginator.num_pages)  # If page is out of range, deliver last page
 
     # Count books in each category
     category_book_counts = {
-        category: books.filter(category=category).count() for category in categories
+        category: books_list.filter(category=category).count() for category in categories
     }
-    
-    print(f"this is the count {category_book_counts}")
 
     context = {
         'categories': categories,
-        'books': books,
+        'books': books,  # Paginated books
         'category_book_counts': category_book_counts,
     }
     
