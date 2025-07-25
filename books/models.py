@@ -120,14 +120,15 @@ class Book(models.Model):
 
         return {"pages": page_count, "words": word_count}
     
-def save(self, *args, **kwargs):
-    file_changed = 'file' in kwargs.get('update_fields', []) or not self.pk
-    super().save(*args, **kwargs)
     
-    if self.file and (file_changed or not self.preview_url):
-        try:
-            from .utils import generate_preview
-            self.preview_url = generate_preview(self)
-            super().save(update_fields=['preview_url'])
-        except Exception as e:
-            logger.error(f"Failed to generate preview for book {self.id}: {e}")
+    def save(self, *args, **kwargs):
+        file_changed = 'file' in kwargs.get('update_fields', []) or not self.pk
+        super().save(*args, **kwargs)
+        
+        if self.file and (file_changed or not self.preview_url):
+            try:
+                from .utils import generate_preview
+                self.preview_url = generate_preview(self)
+                super().save(update_fields=['preview_url'])
+            except Exception as e:
+                logger.error(f"Failed to generate preview for book {self.id}: {e}")
