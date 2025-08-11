@@ -1,7 +1,7 @@
 {% load static %}
 {% load custom_filters %}
 {% block link %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
+<!-- Remove PDF.js as we'll use iframe instead -->
 {% endblock %}
 
 
@@ -90,7 +90,6 @@
             white-space: pre-wrap;
         }
 
-
         .no-select {
             user-select: none;
             -webkit-user-select: none;
@@ -119,12 +118,27 @@
             max-height: 500px;
             overflow-y: auto;
         }
+        
+        /* PDF iframe styling */
+        .pdf-preview-container {
+            width: 100%;
+            height: 500px;
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .pdf-preview-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
         /* Watermark effect */
         .watermarked {
             position: relative;
         }
         .watermarked::before {
-            content: "";
+            content: "PREVIEW ONLY";
             position: absolute;
             top: 50%;
             left: 50%;
@@ -135,22 +149,11 @@
             z-index: 1;
         }
 
-    
-    #pdf-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 100%;
-    }
-    .pdf-page {
-        max-width: 100%;
-        height: auto;
-        margin-bottom: 10px;
-    }
-    .lead{
-        text-align:justify;
-    }
-.document-details-box {
+        .lead{
+            text-align:justify;
+        }
+        
+        .document-details-box {
             border-left: 4px solid #28a745; /* green line */
             background: #fff;
             padding: 20px;
@@ -216,9 +219,6 @@
             background-color: #007bff;
             color: #fff;
         }
-        
-
-
     </style>
     {% endblock %}
 
@@ -253,13 +253,8 @@
                                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                     </div>
                                     <div class="modal-body">
-                                        <div class="document-content" id="pdf-container">
-                                            <div class="text-center py-4">
-                                                <div class="spinner-border text-primary" role="status">
-                                                    <span class="visually-hidden">Loading...</span>
-                                                </div>
-                                                <p>Loading document preview...</p>
-                                            </div>
+                                        <div class="pdf-preview-container">
+                                            <iframe class="pdf-preview-iframe" id="pdfPreviewFrame" src="about:blank"></iframe>
                                         </div>
                                         <img src="{% static 'books/images/hero_image_1.jpg' %}" alt="advert" style="width: 20%;">
                                     </div>
@@ -284,6 +279,7 @@
                     </div>
 
                     <div class="tab-pane fade" id="reviews" role="tabpanel">
+                        <!-- Reviews content remains the same -->
                         <div class="review-card mb-3">
                             <div class="review-header">
                                 <div>
@@ -350,6 +346,7 @@
                     </div>
 
                     <div class="tab-pane fade" id="citations" role="tabpanel">
+                        <!-- Citations content remains the same -->
                         <div class="citation-card">
                             <h4 class="mb-3">Citation Information</h4>
                             <div class="citation-content">
@@ -379,8 +376,6 @@
             </div>
 
             <div class="col-md-4">
-                   
-               
                 <div class="document-details mb-4">
                     <div>
                             {% if book.cover_image %}
@@ -497,17 +492,10 @@
             if (!modal) return;
 
             modal.addEventListener('shown.bs.modal', function() {
-                const container = document.getElementById('pdf-container');
+                const iframe = document.getElementById('pdfPreviewFrame');
                 
                 // Show loading state
-                container.innerHTML = `
-                    <div class="text-center py-4">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                        <p>Loading document preview...</p>
-                    </div>
-                `;
+                iframe.src = "about:blank";
                 
                 // Fetch preview data from API
                 fetch(`/api/books/{{ book.id }}/preview/`)
@@ -518,63 +506,16 @@
                     .then(data => {
                         if (!data.preview_url) throw new Error('No preview URL returned');
                         
-                        // Initialize PDF.js
-                        pdfjsLib.GlobalWorkerOptions.workerSrc = 
-                            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.worker.min.js';
-                        
                         // Add cache buster
                         const url = data.preview_url + (data.preview_url.includes('?') ? '&' : '?') + 'v=' + Date.now();
                         
-                        return pdfjsLib.getDocument({
-                            url: url,
-                            cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@2.14.305/cmaps/',
-                            cMapPacked: true
-                        }).promise;
-                    })
-                    .then(pdf => {
-                        container.innerHTML = '';
-                        
-                        // Calculate optimal scale
-                        const isMobile = window.innerWidth < 768;
-                        const baseScale = isMobile ? 0.8 : 1.2;
-                        const maxWidth = isMobile ? window.innerWidth * 0.9 : 800;
-                        
-                        // Function to render individual page
-                        const renderPage = function(pageNum) {
-                            pdf.getPage(pageNum).then(function(page) {
-                                const viewport = page.getViewport({ scale: baseScale });
-                                const scale = Math.min(baseScale, maxWidth / viewport.width);
-                                const scaledViewport = page.getViewport({ scale: scale });
-                                
-                                const canvas = document.createElement('canvas');
-                                canvas.className = 'pdf-page mb-3 shadow border';
-                                container.appendChild(canvas);
-                                
-                                const context = canvas.getContext('2d');
-                                canvas.height = scaledViewport.height;
-                                canvas.width = scaledViewport.width;
-                                
-                                page.render({
-                                    canvasContext: context,
-                                    viewport: scaledViewport
-                                });
-                            }).catch(function(error) {
-                                console.error(`Error rendering page: ${error}`);
-                            });
-                        };
-                        
-                        // Render first 3 pages immediately
-                        for (let i = 1; i <= Math.min(3, pdf.numPages); i++) {
-                            renderPage(i);
-                        }
-                        
-                        // Render remaining pages with delay
-                        for (let i = 4; i <= Math.min(10, pdf.numPages); i++) {
-                            setTimeout(() => renderPage(i), 500 * (i-3));
-                        }
+                        // Use Google Docs viewer as a free PDF viewer
+                        // Alternatively, you can directly use the PDF URL if your server serves it with proper headers
+                        iframe.src = `https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`;
                     })
                     .catch(error => {
                         console.error('Error loading PDF preview:', error);
+                        const container = document.querySelector('.modal-body');
                         container.innerHTML = `
                             <div class="alert alert-danger">
                                 Failed to load preview. Please try again later.

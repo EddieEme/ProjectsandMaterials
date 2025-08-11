@@ -202,7 +202,7 @@ if not GCS_CREDENTIALS_PATH:
 
 # Django Storages + GCS
 DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
-STATICFILES_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
+#STATICFILES_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
 
 GS_BUCKET_NAME = config('GS_BUCKET_NAME')
 GS_PROJECT_ID = config('GS_PROJECT_ID')
@@ -251,8 +251,8 @@ USE_TZ = True
 
 # Static Files Configuration
 # URLs
-STATIC_URL = f"https://storage.googleapis.com/{GS_BUCKET_NAME}/static/"
-MEDIA_URL = f"https://storage.googleapis.com/{GS_BUCKET_NAME}/media/"
+#STATIC_URL = f"https://storage.googleapis.com/{GS_BUCKET_NAME}/static/"
+#MEDIA_URL = f"https://storage.googleapis.com/{GS_BUCKET_NAME}/media/"
 
 
 

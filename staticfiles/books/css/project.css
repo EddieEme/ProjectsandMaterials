@@ -63,7 +63,8 @@ a {
      }
 
      .content {
-         height: auto;
+        height: auto;
+        /* order: 1; */
      }
  }
 
