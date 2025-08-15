@@ -1,17 +1,16 @@
 {% load static %}
 {% load custom_filters %}
 
-
-    {% if products %}
+<div class="products-container">
+    {% if product_page_obj %}
         <div class="row g-4">
-            {% for product in products %}
+            {% for product in product_page_obj %}
             <div class="col-lg-4 col-md-6">
                 <div class="product-card">
-                    <img 
-                    src="{% if product.cover_image %}{{ product.cover_image.url }}{% else %}{% static 'books/images/advert_cover.jpg' %}{% endif %}" 
-                    class="card-img-top" 
-                    alt="{{ product.title }}"
-                    style="height: 200px; object-fit: cover;">
+                    <img src="{% if product.cover_image %}{{ product.cover_image.url }}{% else %}{% static 'books/images/advert_cover.jpg' %}{% endif %}" 
+                         class="card-img-top" 
+                         alt="{{ product.title }}"
+                         style="height: 200px; object-fit: cover;">
                     <div class="card-body">
                         <h5 class="card-title">{{ product.title }}</h5>
                         <p class="card-text">{{ product.description|unescape_html|truncatehtml:50|safe }}</p>
@@ -32,39 +31,51 @@
             {% endfor %}
         </div>
         
-        {% if products.paginator.num_pages > 1 %}
+        {% if product_page_obj.paginator.num_pages > 1 %}
         <nav aria-label="Products pagination" class="mt-4">
             <ul class="pagination justify-content-center">
-                {% if products.has_previous %}
+                {% if product_page_obj.has_previous %}
                     <li class="page-item">
-                        <a class="page-link" href="?page=1" aria-label="First">
-                            <span aria-hidden="true">&laquo;&laquo;</span>
+                        <a class="page-link pagination-link" 
+                           href="?tab=products&product_page=1" 
+                           data-page-type="products">
+                            &laquo;&laquo;
                         </a>
                     </li>
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ products.previous_page_number }}" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
+                        <a class="page-link pagination-link" 
+                           href="?tab=products&product_page={{ product_page_obj.previous_page_number }}" 
+                           data-page-type="products">
+                            &laquo;
                         </a>
                     </li>
                 {% endif %}
 
-                {% for num in products.paginator.page_range %}
-                    {% if num > products.number|add:'-3' and num < products.number|add:'3' %}
-                        <li class="page-item {% if products.number == num %}active{% endif %}">
-                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                {% for num in product_page_obj.paginator.page_range %}
+                    {% if num > product_page_obj.number|add:'-3' and num < product_page_obj.number|add:'3' %}
+                        <li class="page-item {% if product_page_obj.number == num %}active{% endif %}">
+                            <a class="page-link pagination-link" 
+                               href="?tab=products&product_page={{ num }}" 
+                               data-page-type="products">
+                                {{ num }}
+                            </a>
                         </li>
                     {% endif %}
                 {% endfor %}
 
-                {% if products.has_next %}
+                {% if product_page_obj.has_next %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ products.next_page_number }}" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
+                        <a class="page-link pagination-link" 
+                           href="?tab=products&product_page={{ product_page_obj.next_page_number }}" 
+                           data-page-type="products">
+                            &raquo;
                         </a>
                     </li>
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ products.paginator.num_pages }}" aria-label="Last">
-                            <span aria-hidden="true">&raquo;&raquo;</span>
+                        <a class="page-link pagination-link" 
+                           href="?tab=products&product_page={{ product_page_obj.paginator.num_pages }}" 
+                           data-page-type="products">
+                            &raquo;&raquo;
                         </a>
                     </li>
                 {% endif %}
@@ -81,3 +92,4 @@
             </a>
         </div>
     {% endif %}
+</div>

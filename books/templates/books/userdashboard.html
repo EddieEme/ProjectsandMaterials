@@ -531,7 +531,7 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    {% include 'books/user_product.html' with products=product_page_obj %}
+                    {% include 'books/user_product.html' %}
                 </div>
             </div>
         </div>
@@ -585,40 +585,65 @@
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     // Handle AJAX pagination
-    const container = document.querySelector('.products-container');
-    
-    if (container) {
-        container.addEventListener('click', function(e) {
-            const pageLink = e.target.closest('.page-link');
-            if (pageLink) {
-                e.preventDefault();
-                const url = pageLink.getAttribute('href');
-                
-                // Show loading state
-                container.style.opacity = '0.6';
-                container.style.pointerEvents = 'none';
-                
-                fetch(url, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                .then(response => response.text())
-                .then(html => {
-                    container.innerHTML = html;
-                    window.history.pushState({}, '', url);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    window.location.href = url; // Fallback to normal navigation
-                })
-                .finally(() => {
-                    container.style.opacity = '1';
-                    container.style.pointerEvents = 'auto';
-                });
+    document.addEventListener('click', function(e) {
+        const paginationLink = e.target.closest('.pagination-link');
+        if (paginationLink) {
+            e.preventDefault();
+            const url = paginationLink.href;
+            const pageType = paginationLink.dataset.pageType;
+            
+            // Show loading state
+            const container = document.querySelector(`.${pageType}-container`);
+            if (container) {
+                container.innerHTML = `
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Loading ${pageType}...</p>
+                    </div>
+                `;
             }
-        });
-    }
+            
+            fetch(url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.text();
+            })
+            .then(html => {
+                // Parse the response
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newContent = doc.querySelector(`.${pageType}-container`).innerHTML;
+                
+                // Update content
+                if (container) {
+                    container.innerHTML = newContent;
+                }
+                
+                // Update URL without reload
+                window.history.pushState({}, '', url);
+                
+                // Scroll to top of container
+                if (container) {
+                    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                window.location.href = url;
+            });
+        }
+    });
+
+    // Handle browser back/forward buttons
+    window.addEventListener('popstate', function() {
+        window.location.reload();
+    });
 });
 </script>
 {% endblock %}

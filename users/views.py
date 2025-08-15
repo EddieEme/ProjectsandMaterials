@@ -316,54 +316,56 @@ def user_settings(request):
 @login_required(login_url='books:user_login')
 def user_dashboard(request):
     user = request.user
+    active_tab = request.GET.get('tab', 'products')
 
-    # Get paginated orders
+    # Products Pagination
+    products = Book.objects.filter(user=user).annotate(
+        sales_count=Count('order', filter=Q(order__status='completed'))
+    ).order_by('-created_at')
+    product_paginator = Paginator(products, 10)  # 10 items per page
+    product_page = request.GET.get('product_page', 1)
+    product_page_obj = product_paginator.get_page(product_page)
+
+    # Orders Pagination
     orders_qs = Order.objects.filter(user=user).order_by('-created_at')
     orders_paginator = Paginator(orders_qs, 10)
     orders_page = request.GET.get('orders_page', 1)
     orders_page_obj = orders_paginator.get_page(orders_page)
 
-    # Get paginated downloads
+    # Downloads Pagination
     downloads_qs = Download.objects.filter(user=user).order_by('-downloaded_at')
     downloads_paginator = Paginator(downloads_qs, 10)
-    downloads_page = request.GET.get('downloads_page', 1) 
+    downloads_page = request.GET.get('downloads_page', 1)
     downloads_page_obj = downloads_paginator.get_page(downloads_page)
-
-    # Get latest download URL (if available)
-    latest_download = downloads_qs.first()
-    download_url = latest_download.get_download_url() if latest_download else None
-
-    # Retrieve user's uploaded books with sales count
-    products = Book.objects.filter(user=user).annotate(
-        sales_count=Count('order', filter=Q(order__status='completed'))
-    ).order_by('-created_at')
-
-    product_paginator = Paginator(products, 10)
-    product_page = request.GET.get('product_page', 1)
-    product_page_obj = product_paginator.get_page(product_page)
     
     total_products = products.count()
     total_sales_count = Order.objects.filter(book__user=user, status='completed').count() or 0
-
     
     total_earnings = (
         Order.objects.filter(book__user=user, status='completed')
         .aggregate(total=Sum('uploader_earning'))['total'] or 0
     )
 
-    # Prepare context
     context = {
         'total_sales': total_sales_count,
         'total_products': total_products,
         'total_earnings': f"{total_earnings:,.2f}",
         'user': user,
-        'products': products,
+        'active_tab': active_tab,
         'product_page_obj': product_page_obj,
         'orders_page_obj': orders_page_obj,
         'downloads_page_obj': downloads_page_obj,
-        'download_url': download_url,
     }
 
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        # For AJAX requests, return only the relevant template
+        template_name = {
+            'products': 'books/user_products.html',
+            'orders': 'books/user_orders.html',
+            'downloads': 'books/user_downloads.html',
+        }.get(active_tab, 'books/user_products.html')
+        return render(request, template_name, context)
+    
     return render(request, 'books/userdashboard.html', context)
 
 
