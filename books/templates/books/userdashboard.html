@@ -537,7 +537,7 @@
                             <div class="col-lg-4 col-md-6">
                                 <div class="product-card">
                                     <img 
-                                    src="{% if product.cover_image %}{{ product.cover_image.url}} {% else %} {% static 'images/advert_cover.jpg' %} {% endif %}" class="card-img-top" alt="{{ product.title }}">
+                                    src="{% if product.cover_image %}{{ product.cover_image.url}} {% else %} {% static 'books/images/advert_cover.jpg' %} {% endif %}" class="card-img-top" alt="{{ product.title }}">
                                     <div class="card-body">
                                         <h5 class="card-title">{{ product.title }}</h5>
                                         <p class="card-text">{{ product.description|unescape_html|truncatehtml:50|safe }}</p>
