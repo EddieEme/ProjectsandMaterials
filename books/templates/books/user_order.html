@@ -1,0 +1,77 @@
+{% load static %}
+{% load custom_filters %}
+ <div class="table-responsive">
+                        <table class="table" id="orders-table">
+                            <thead>
+                                <tr>
+                                    <th><i class="fas fa-hashtag me-2"></i>Order ID</th>
+                                    <th><i class="fas fa-book me-2"></i>Product</th>
+                                    <th><i class="fas fa-calendar me-2"></i>Date</th>
+                                    <th><i class="fas fa-dollar-sign me-2"></i>Amount</th>
+                                    <th><i class="fas fa-info-circle me-2"></i>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orders-body">
+                                {% for order in orders_page_obj %}
+                                <tr>
+                                    <td><strong>#ORD-{{ order.id }}</strong></td>
+                                    <td>{{ order.book.title }}</td>
+                                    <td>{{ order.created_at|date:'M d, Y' }}</td>
+                                    <td><strong>${{ order.price }}</strong></td>
+                                    <td>
+                                        <span class="badge 
+                                        {% if order.status == 'completed' %}bg-success
+                                        {% elif order.status == 'pending' %}bg-warning
+                                        {% elif order.status == 'cancelled' %}bg-danger
+                                        {% endif %}">
+                                            {{ order.status|title }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5">
+                                        <div class="empty-state">
+                                            <i class="fas fa-shopping-cart"></i>
+                                            <h5>No Orders Yet</h5>
+                                            <p>Your orders will appear here once customers start purchasing.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if orders_page_obj.paginator.num_pages > 1 %}
+                    <div class="px-4 pb-4">
+                        <nav aria-label="Orders pagination">
+                            <ul class="pagination justify-content-center" id="orders-pagination">
+                                {% if orders_page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1">&laquo;&laquo;</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ orders_page_obj.previous_page_number }}">&laquo;</a>
+                                </li>
+                                {% endif %}
+
+                                {% for num in orders_page_obj.paginator.page_range %}
+                                <li class="page-item {% if orders_page_obj.number == num %}active{% endif %}">
+                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                </li>
+                                {% endfor %}
+
+                                {% if orders_page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ orders_page_obj.next_page_number }}">&raquo;</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ orders_page_obj.paginator.num_pages }}">&raquo;&raquo;</a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                    {% endif %}

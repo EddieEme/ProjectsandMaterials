@@ -545,81 +545,7 @@
                     </h5>
                 </div>
                 <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table" id="orders-table">
-                            <thead>
-                                <tr>
-                                    <th><i class="fas fa-hashtag me-2"></i>Order ID</th>
-                                    <th><i class="fas fa-book me-2"></i>Product</th>
-                                    <th><i class="fas fa-calendar me-2"></i>Date</th>
-                                    <th><i class="fas fa-dollar-sign me-2"></i>Amount</th>
-                                    <th><i class="fas fa-info-circle me-2"></i>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="orders-body">
-                                {% for order in orders_page_obj %}
-                                <tr>
-                                    <td><strong>#ORD-{{ order.id }}</strong></td>
-                                    <td>{{ order.book.title }}</td>
-                                    <td>{{ order.created_at|date:'M d, Y' }}</td>
-                                    <td><strong>${{ order.price }}</strong></td>
-                                    <td>
-                                        <span class="badge 
-                                        {% if order.status == 'completed' %}bg-success
-                                        {% elif order.status == 'pending' %}bg-warning
-                                        {% elif order.status == 'cancelled' %}bg-danger
-                                        {% endif %}">
-                                            {{ order.status|title }}
-                                        </span>
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="5">
-                                        <div class="empty-state">
-                                            <i class="fas fa-shopping-cart"></i>
-                                            <h5>No Orders Yet</h5>
-                                            <p>Your orders will appear here once customers start purchasing.</p>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Pagination -->
-                    {% if orders_page_obj.paginator.num_pages > 1 %}
-                    <div class="px-4 pb-4">
-                        <nav aria-label="Orders pagination">
-                            <ul class="pagination justify-content-center" id="orders-pagination">
-                                {% if orders_page_obj.has_previous %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page=1">&laquo;&laquo;</a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ orders_page_obj.previous_page_number }}">&laquo;</a>
-                                </li>
-                                {% endif %}
-
-                                {% for num in orders_page_obj.paginator.page_range %}
-                                <li class="page-item {% if orders_page_obj.number == num %}active{% endif %}">
-                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                                </li>
-                                {% endfor %}
-
-                                {% if orders_page_obj.has_next %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ orders_page_obj.next_page_number }}">&raquo;</a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ orders_page_obj.paginator.num_pages }}">&raquo;&raquo;</a>
-                                </li>
-                                {% endif %}
-                            </ul>
-                        </nav>
-                    </div>
-                    {% endif %}
+                    {% include 'books/user_order.html' %}
                 </div>
             </div>
         </div>
@@ -633,32 +559,7 @@
                     </h5>
                 </div>
                 <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th><i class="fas fa-hashtag me-2"></i>Transaction ID</th>
-                                    <th><i class="fas fa-exchange-alt me-2"></i>Type</th>
-                                    <th><i class="fas fa-calendar me-2"></i>Date</th>
-                                    <th><i class="fas fa-dollar-sign me-2"></i>Amount</th>
-                                    <th><i class="fas fa-info-circle me-2"></i>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><strong>#TRX-456</strong></td>
-                                    <td>
-                                        <span class="badge bg-info">
-                                            <i class="fas fa-arrow-down me-1"></i>Withdrawal
-                                        </span>
-                                    </td>
-                                    <td>Feb 01, 2024</td>
-                                    <td><strong>$500.00</strong></td>
-                                    <td><span class="badge bg-success">Completed</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                   {% include 'books/user_transaction.html' %}
                 </div>
             </div>
         </div>
@@ -672,91 +573,13 @@
                     </h5>
                 </div>
                 <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table" id="downloads-table">
-                            <thead>
-                                <tr>
-                                    <th><i class="fas fa-hashtag me-2"></i>S/N</th>
-                                    <th><i class="fas fa-file me-2"></i>Name</th>
-                                    <th><i class="fas fa-tag me-2"></i>Type</th>
-                                    <th><i class="fas fa-book me-2"></i>Title</th>
-                                    <th><i class="fas fa-clock me-2"></i>Date & Time</th>
-                                    <th><i class="fas fa-info-circle me-2"></i>Status</th>
-                                    <th><i class="fas fa-download me-2"></i>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for download in downloads_page_obj %}
-                                <tr>
-                                    <td><strong>#DL-{{ download.id }}</strong></td>
-                                    <td>{{ download.book }}</td>
-                                    <td>
-                                        <span class="badge bg-secondary">{{ download.book.category }}</span>
-                                    </td>
-                                    <td>{{ download.book.title }}</td>
-                                    <td>{{ download.downloaded_at|date:'M d, Y H:i:s' }}</td>
-                                    <td>
-                                        <span class="badge bg-success">{{ download.payment.status|title }}</span>
-                                    </td>
-                                    <td>
-                                        <a href="{{ download.get_download_url }}" class="btn btn-primary btn-sm" download>
-                                            <i class="fas fa-download me-1"></i>Download
-                                        </a>
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="7">
-                                        <div class="empty-state">
-                                            <i class="fas fa-download"></i>
-                                            <h5>No Downloads Yet</h5>
-                                            <p>Your download history will appear here.</p>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Pagination -->
-                    {% if downloads_page_obj.paginator.num_pages > 1 %}
-                    <div class="px-4 pb-4">
-                        <nav aria-label="Downloads pagination">
-                            <ul class="pagination justify-content-center">
-                                {% if downloads_page_obj.has_previous %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?downloads_page=1">&laquo;&laquo;</a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="?downloads_page={{ downloads_page_obj.previous_page_number }}">&laquo;</a>
-                                </li>
-                                {% endif %}
-
-                                {% for num in downloads_page_obj.paginator.page_range %}
-                                <li class="page-item {% if downloads_page_obj.number == num %}active{% endif %}">
-                                    <a class="page-link" href="?downloads_page={{ num }}">{{ num }}</a>
-                                </li>
-                                {% endfor %}
-
-                                {% if downloads_page_obj.has_next %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?downloads_page={{ downloads_page_obj.next_page_number }}">&raquo;</a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="?downloads_page={{ downloads_page_obj.paginator.num_pages }}">&raquo;&raquo;</a>
-                                </li>
-                                {% endif %}
-                            </ul>
-                        </nav>
-                    </div>
-                    {% endif %}
+                    {% include 'books/user_download.html' %}
                 </div>
             </div>
         </div>
     </div>
 </div>
-
+{% include 'books/pages/footer.html' %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>

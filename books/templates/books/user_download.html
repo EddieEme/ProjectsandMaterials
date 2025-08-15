@@ -1,0 +1,81 @@
+{% load static %}
+{% load custom_filters %}
+<div class="table-responsive">
+                        <table class="table" id="downloads-table">
+                            <thead>
+                                <tr>
+                                    <th><i class="fas fa-hashtag me-2"></i>S/N</th>
+                                    <th><i class="fas fa-file me-2"></i>Name</th>
+                                    <th><i class="fas fa-tag me-2"></i>Type</th>
+                                    <th><i class="fas fa-book me-2"></i>Title</th>
+                                    <th><i class="fas fa-clock me-2"></i>Date & Time</th>
+                                    <th><i class="fas fa-info-circle me-2"></i>Status</th>
+                                    <th><i class="fas fa-download me-2"></i>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for download in downloads_page_obj %}
+                                <tr>
+                                    <td><strong>#DL-{{ download.id }}</strong></td>
+                                    <td>{{ download.book }}</td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ download.book.category }}</span>
+                                    </td>
+                                    <td>{{ download.book.title }}</td>
+                                    <td>{{ download.downloaded_at|date:'M d, Y H:i:s' }}</td>
+                                    <td>
+                                        <span class="badge bg-success">{{ download.payment.status|title }}</span>
+                                    </td>
+                                    <td>
+                                        <a href="{{ download.get_download_url }}" class="btn btn-primary btn-sm" download>
+                                            <i class="fas fa-download me-1"></i>Download
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7">
+                                        <div class="empty-state">
+                                            <i class="fas fa-download"></i>
+                                            <h5>No Downloads Yet</h5>
+                                            <p>Your download history will appear here.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if downloads_page_obj.paginator.num_pages > 1 %}
+                    <div class="px-4 pb-4">
+                        <nav aria-label="Downloads pagination">
+                            <ul class="pagination justify-content-center">
+                                {% if downloads_page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?downloads_page=1">&laquo;&laquo;</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?downloads_page={{ downloads_page_obj.previous_page_number }}">&laquo;</a>
+                                </li>
+                                {% endif %}
+
+                                {% for num in downloads_page_obj.paginator.page_range %}
+                                <li class="page-item {% if downloads_page_obj.number == num %}active{% endif %}">
+                                    <a class="page-link" href="?downloads_page={{ num }}">{{ num }}</a>
+                                </li>
+                                {% endfor %}
+
+                                {% if downloads_page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?downloads_page={{ downloads_page_obj.next_page_number }}">&raquo;</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?downloads_page={{ downloads_page_obj.paginator.num_pages }}">&raquo;&raquo;</a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                    {% endif %}
