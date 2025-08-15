@@ -1,7 +1,7 @@
 {% load static %}
 {% load custom_filters %}
 
-<div class="products-container">
+
     {% if products %}
         <div class="row g-4">
             {% for product in products %}
@@ -22,7 +22,7 @@
                             </span>
                         </div>
                         <div class="mt-2">
-                            <a href="{% url 'books:edit-book' product.id %}" class="btn btn-sm btn-primary">
+                            {% comment %} <a href="{% url 'books:edit-book' product.id %}" class="btn btn-sm btn-primary"> {% endcomment %}
                                 <i class="fas fa-edit me-1"></i> Edit
                             </a>
                         </div>
@@ -81,44 +81,3 @@
             </a>
         </div>
     {% endif %}
-</div>
-
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    // Handle AJAX pagination
-    const container = document.querySelector('.products-container');
-    
-    if (container) {
-        container.addEventListener('click', function(e) {
-            const pageLink = e.target.closest('.page-link');
-            if (pageLink) {
-                e.preventDefault();
-                const url = pageLink.getAttribute('href');
-                
-                // Show loading state
-                container.style.opacity = '0.6';
-                container.style.pointerEvents = 'none';
-                
-                fetch(url, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                .then(response => response.text())
-                .then(html => {
-                    container.innerHTML = html;
-                    window.history.pushState({}, '', url);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    window.location.href = url; // Fallback to normal navigation
-                })
-                .finally(() => {
-                    container.style.opacity = '1';
-                    container.style.pointerEvents = 'auto';
-                });
-            }
-        });
-    }
-});
-</script>
