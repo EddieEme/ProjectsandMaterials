@@ -1,0 +1,33 @@
+{% load static %}
+{% load custom_filters %}
+{% if products %}
+                        <div class="row g-4">
+                            {% for product in products %}
+                            <div class="col-lg-4 col-md-6">
+                                <div class="product-card">
+                                    <img 
+                                    src="{% if product.cover_image %}{{ product.cover_image.url}} {% else %} {% static 'books/images/advert_cover.jpg' %} {% endif %}" class="card-img-top" alt="{{ product.title }}">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ product.title }}</h5>
+                                        <p class="card-text">{{ product.description|unescape_html|truncatehtml:50|safe }}</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="product-price">${{ product.price }}</span>
+                                            <span class="sales-count">
+                                                <i class="fas fa-shopping-bag me-1"></i>{{ product.sales_count }} sales
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-box-open"></i>
+                            <h5>No Products Yet</h5>
+                            <p>Start by adding your first product to showcase your work.</p>
+                            <a href="{% url 'books:upload-book' %}" class="btn btn-primary mt-3">
+                                <i class="fas fa-plus me-2"></i>Add Your First Product
+                            </a>
+                        </div>
+                    {% endif %}
