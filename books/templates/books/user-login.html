@@ -73,7 +73,13 @@ background-color: #bfc2b7;
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
-                <input type="password" name="password" class="form-control" id="password" required>
+                <div class="input-group">
+                <input type="password" id="password" class="form-control" placeholder="Enter password" required>
+                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                    <i class="bi bi-eye"></i>
+                </button>
+                </div>
+                {% comment %} <input type="password" name="password" class="form-control" id="password" required> {% endcomment %}
             </div>
             <button type="submit" class="btn btn-primary w-100">Login</button>
         </form>
@@ -106,5 +112,16 @@ background-color: #bfc2b7;
             flashMessages.style.display = 'none';
         }
     }, 2000);
-    
+
+    const passwordInput = document.getElementById('password');
+    const togglePassword = document.getElementById('togglePassword');
+    const toggleIcon = togglePassword.querySelector('i');
+
+    togglePassword.addEventListener('click', () => {
+        const isPassword = passwordInput.type === 'password';
+        passwordInput.type = isPassword ? 'text' : 'password';
+        toggleIcon.classList.toggle('bi-eye');
+        toggleIcon.classList.toggle('bi-eye-slash');
+    });
 </script>
+

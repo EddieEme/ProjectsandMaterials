@@ -301,7 +301,7 @@ def password_reset_confirm(request, uidb64, token):
 
 # Password Reset Complete View
 def password_reset_complete(request):
-    return redirect(reverse('books:user_login'))
+    return redirect(reverse('users:user_login'))
 
 
 
@@ -320,13 +320,13 @@ def user_dashboard(request):
     # Get paginated orders
     orders_qs = Order.objects.filter(user=user).order_by('-created_at')
     orders_paginator = Paginator(orders_qs, 10)
-    orders_page = request.GET.get('orders_page', 1)  # Get order page number
+    orders_page = request.GET.get('orders_page', 1)
     orders_page_obj = orders_paginator.get_page(orders_page)
 
     # Get paginated downloads
     downloads_qs = Download.objects.filter(user=user).order_by('-downloaded_at')
     downloads_paginator = Paginator(downloads_qs, 10)
-    downloads_page = request.GET.get('downloads_page', 1)  # Get download page number
+    downloads_page = request.GET.get('downloads_page', 1) 
     downloads_page_obj = downloads_paginator.get_page(downloads_page)
 
     # Get latest download URL (if available)
@@ -338,10 +338,14 @@ def user_dashboard(request):
         sales_count=Count('order', filter=Q(order__status='completed'))
     ).order_by('-created_at')
 
+    product_paginator = Paginator(products, 10)
+    product_page = request.GET.get('product_page', 1)
+    product_page_obj = product_paginator.get_page(product_page)
+    
     total_products = products.count()
     total_sales_count = Order.objects.filter(book__user=user, status='completed').count() or 0
 
-    # Calculate total earnings from completed orders
+    
     total_earnings = (
         Order.objects.filter(book__user=user, status='completed')
         .aggregate(total=Sum('uploader_earning'))['total'] or 0
@@ -354,6 +358,7 @@ def user_dashboard(request):
         'total_earnings': f"{total_earnings:,.2f}",
         'user': user,
         'products': products,
+        'product_page_obj': product_page_obj,
         'orders_page_obj': orders_page_obj,
         'downloads_page_obj': downloads_page_obj,
         'download_url': download_url,

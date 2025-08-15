@@ -16,6 +16,9 @@ from .models import Book, Category, BookType
 from payments.models import  Order, Download
 from django.db.models import Sum, Avg, Q, Count
 from django.views.decorators.cache import cache_page
+from django.contrib import messages
+from .models import Book, BookType, Category
+from django.core.files.storage import default_storage
 from django.core.cache import cache
 import json
 import logging
@@ -403,11 +406,7 @@ def login_product_details(request, id):
     return render(request, 'books/login-product-details.html', context)
 
 
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from .models import Book, BookType, Category
-from django.core.files.storage import default_storage
+
 
 def upload_book(request):
     if request.method == "POST":

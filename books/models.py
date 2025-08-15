@@ -44,7 +44,7 @@ class Category(models.Model):
 
 class Book(models.Model):
     cover_image = models.ImageField(upload_to='book_covers', blank=True, null=True)
-    title = models.CharField(max_length=225)
+    title = models.CharField(max_length=5000)
     description = models.TextField()
     book_type = models.ForeignKey(BookType, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name ='book')
