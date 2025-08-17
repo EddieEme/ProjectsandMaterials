@@ -62,27 +62,34 @@ def resources(request):
 
 
 def faculty(request, book_type_id):
-    # Get all book types (faculties)
     faculties = BookType.objects.order_by('name')
-
-    # Get all categories
     categories = Category.objects.order_by('name')
-
-    # Get the selected book type (faculty)
     selected_book_type = get_object_or_404(BookType, id=book_type_id)
 
     books_list = Book.objects.filter(book_type=selected_book_type, is_approved=True)
-
-    # Paginate the books (10 per page)
+    
+    # Pagination
     paginator = Paginator(books_list, 10)
     page_number = request.GET.get("page")
     books = paginator.get_page(page_number)
 
-    # Count books per book_type (faculty) for display
+    # Count books per faculty
     faculty_book_counts = {
         book_type.id: Book.objects.filter(book_type=book_type, is_approved=True).count()
         for book_type in faculties
     }
+
+    # Count books per category for each faculty
+    faculty_category_counts = {}
+    for faculty in faculties:
+        faculty_category_counts[faculty.id] = {
+            category.id: Book.objects.filter(
+                book_type=faculty,
+                category=category,  # ForeignKey lookup (not many-to-many)
+                is_approved=True
+            ).count()
+            for category in categories
+        }
 
     context = {
         'selected_book_type': selected_book_type,
@@ -90,10 +97,12 @@ def faculty(request, book_type_id):
         'faculties': faculties,
         'categories': categories,
         'faculty_book_counts': faculty_book_counts,
+        'faculty_category_counts': faculty_category_counts,
     }
 
     template = 'books/login_faculty.html' if request.user.is_authenticated else 'books/faculty.html'
     return render(request, template, context)
+
 
 
 

@@ -72,6 +72,7 @@
             z-index: 1;
             text-align: center;
             padding: 3rem 2rem;
+            margin-top: 4rem;
         }
 
         .search-content h1 {
@@ -412,7 +413,7 @@
                     {% for faculty in faculties %}
                         <a href="{% url 'books:faculty' faculty.id %}" class="category-item">
                             <span>{{ faculty.name }}</span>
-                            <span class="count">{{ faculty_book_counts|get_item:faculty.id }}</span>
+                            <span class="count">{{ faculty_category_counts.faculty_id.category_id }}</span>
                         </a>
                     {% endfor %}
                 {% endif %}
