@@ -1,43 +1,74 @@
 from django.db import models
 from django.shortcuts import render
+from django.utils.text import slugify
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.mail import send_mail
 from django.urls import reverse
 from django.core.cache import cache
+from django.utils.crypto import get_random_string
 import os
 import uuid
 import tempfile
-
-
 import fitz
 from docx import Document
-
 from google.cloud import storage
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from google.oauth2 import service_account
-
 import logging
 
 logger = logging.getLogger(__name__)
 
-
-
 class BookType(models.Model):
     name = models.CharField(max_length=50, unique=True)
+    slug = models.SlugField(max_length=200, unique=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.name)
+            if not base_slug:  # Handle empty slugs
+                base_slug = "booktype"
+            
+            self.slug = base_slug
+            counter = 1
+            # Check for duplicates excluding current instance
+            while BookType.objects.filter(slug=self.slug).exclude(id=self.id).exists():
+                self.slug = f"{base_slug}-{counter}"
+                counter += 1
+                if counter > 100:  # Safety check
+                    self.slug = f"{base_slug}-{get_random_string(4).lower()}"
+                    break
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
 
-
 class Category(models.Model):
     name = models.CharField(max_length=50, unique=True)
     book_type = models.ForeignKey(BookType, on_delete=models.CASCADE, related_name="categories")
-
+    slug = models.SlugField(max_length=100, unique=True, blank=True)
+     
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.name)
+            if not base_slug:  # Handle empty slugs
+                base_slug = "category"
+            
+            self.slug = base_slug
+            counter = 1
+            # Check for duplicates excluding current instance
+            while Category.objects.filter(slug=self.slug).exclude(id=self.id).exists():
+                self.slug = f"{base_slug}-{counter}"
+                counter += 1
+                if counter > 100:  # Safety check
+                    self.slug = f"{base_slug}-{get_random_string(4).lower()}"
+                    break
+        super().save(*args, **kwargs)
+        
     class Meta:
-        unique_together = ('name', 'book_type')  # Ensures category name is unique per book type
+        unique_together = ('name', 'book_type')
 
     def __str__(self):
         return self.name
@@ -47,10 +78,11 @@ class Book(models.Model):
     title = models.CharField(max_length=5000)
     description = models.TextField()
     book_type = models.ForeignKey(BookType, on_delete=models.CASCADE)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name ='book')
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='book')
     file = models.FileField(upload_to='book_files/', blank=True, null=True)
     preview_url = models.URLField(blank=True, null=True)
     author = models.CharField(max_length=50)
+    slug = models.SlugField(max_length=2000, unique=True, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=5000)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
     is_approved = models.BooleanField(default=False)
@@ -110,7 +142,6 @@ class Book(models.Model):
             if os.path.exists(file_path):
                 os.remove(file_path)
 
-
     def _extract_pdf_stats(self, file_path):
         """Extracts page count and word count from a PDF."""
         with fitz.open(file_path) as pdf:
@@ -120,9 +151,25 @@ class Book(models.Model):
 
         return {"pages": page_count, "words": word_count}
     
-    
     def save(self, *args, **kwargs):
         file_changed = 'file' in kwargs.get('update_fields', []) or not self.pk
+        
+        # Generate slug if not exists
+        if not self.slug:
+            base_slug = slugify(self.title)
+            if not base_slug:  # Handle empty slugs
+                base_slug = "book"
+            
+            self.slug = base_slug
+            counter = 1
+            # Check for duplicates excluding current instance
+            while Book.objects.filter(slug=self.slug).exclude(id=self.id).exists():
+                self.slug = f"{base_slug}-{counter}"
+                counter += 1
+                if counter > 100:  # Safety check
+                    self.slug = f"{base_slug}-{get_random_string(6).lower()}"
+                    break
+        
         super().save(*args, **kwargs)
         
         if self.file and (file_changed or not self.preview_url):

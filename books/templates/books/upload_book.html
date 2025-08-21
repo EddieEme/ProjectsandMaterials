@@ -38,6 +38,9 @@
             height: 300px;
             margin-bottom: 10px;
         }
+        .hidden-select {
+            display: none !important;
+        }
     </style>
 {% endblock %}
 {% block content %}
@@ -51,7 +54,7 @@
                 <select id="facultySelect" name="book_type" class="form-select" required>
                     <option value="">-- Select Faculty --</option>
                     {% for faculty in faculties %}
-                        <option value="{{ faculty.id }}">{{ faculty.name }}</option>
+                        <option value="{{ faculty.slug }}">{{ faculty.name }}</option>
                     {% endfor %}
                 </select>
                 <div id="newFacultyContainer" class="new-field-container">
@@ -70,7 +73,7 @@
                 <select id="departmentSelect" name="category" class="form-select" required>
                     <option value="">-- Select Department --</option>
                     {% for department in departments %}
-                        <option value="{{ department.id }}">{{ department.name }}</option>
+                        <option value="{{ department.slug }}" data-faculty="{{ department.book_type.slug }}">{{ department.name }}</option>
                     {% endfor %}
                 </select>
                 <div id="newDepartmentContainer" class="new-field-container">
@@ -129,7 +132,7 @@
         document.addEventListener("DOMContentLoaded", function () {
             // Initialize Quill
             const quill = new Quill('#quillEditor', {
-                theme: 'snow',  // Use the Snow theme
+                theme: 'snow',
                 modules: {
                     toolbar: [
                         ['bold', 'italic', 'underline', 'strike'],        // Text formatting
@@ -143,12 +146,13 @@
 
             // Sync Quill content with the hidden textarea before form submission
             const form = document.getElementById('bookForm');
+            const description = document.getElementById('description');
+            
             form.addEventListener('submit', function () {
-                const description = document.getElementById('description');
                 description.value = quill.root.innerHTML;  // Get the HTML content from Quill
             });
 
-            // Handle new faculty checkbox
+            // Handle new faculty checkbox - USE HIDING INSTEAD OF DISABLING
             const addNewFacultyCheckbox = document.getElementById("addNewFaculty");
             const newFacultyContainer = document.getElementById("newFacultyContainer");
             const facultySelect = document.getElementById("facultySelect");
@@ -156,16 +160,16 @@
             addNewFacultyCheckbox.addEventListener("change", function() {
                 if (this.checked) {
                     newFacultyContainer.style.display = "block";
-                    facultySelect.disabled = true;
+                    facultySelect.classList.add('hidden-select');
                     facultySelect.required = false;
                 } else {
                     newFacultyContainer.style.display = "none";
-                    facultySelect.disabled = false;
+                    facultySelect.classList.remove('hidden-select');
                     facultySelect.required = true;
                 }
             });
 
-            // Handle new department checkbox
+            // Handle new department checkbox - USE HIDING INSTEAD OF DISABLING
             const addNewDepartmentCheckbox = document.getElementById("addNewDepartment");
             const newDepartmentContainer = document.getElementById("newDepartmentContainer");
             const departmentSelect = document.getElementById("departmentSelect");
@@ -173,12 +177,41 @@
             addNewDepartmentCheckbox.addEventListener("change", function() {
                 if (this.checked) {
                     newDepartmentContainer.style.display = "block";
-                    departmentSelect.disabled = true;
+                    departmentSelect.classList.add('hidden-select');
                     departmentSelect.required = false;
                 } else {
                     newDepartmentContainer.style.display = "none";
-                    departmentSelect.disabled = false;
+                    departmentSelect.classList.remove('hidden-select');
                     departmentSelect.required = true;
+                }
+            });
+
+            // Filter departments based on selected faculty
+            facultySelect.addEventListener('change', function() {
+                const selectedFaculty = this.value;
+                const departmentOptions = departmentSelect.querySelectorAll('option');
+                
+                // Show all options first
+                departmentOptions.forEach(option => {
+                    if (option.value) {
+                        option.style.display = 'block';
+                    }
+                });
+                
+                // Hide departments that don't belong to selected faculty
+                if (selectedFaculty) {
+                    departmentOptions.forEach(option => {
+                        if (option.value && option.getAttribute('data-faculty') !== selectedFaculty) {
+                            option.style.display = 'none';
+                        }
+                    });
+                    
+                    // Reset department selection if it's not valid for this faculty
+                    const selectedDepartment = departmentSelect.value;
+                    const selectedOption = departmentSelect.querySelector(`option[value="${selectedDepartment}"]`);
+                    if (selectedDepartment && selectedOption && selectedOption.style.display === 'none') {
+                        departmentSelect.value = '';
+                    }
                 }
             });
 
@@ -265,30 +298,54 @@
                     credentials: "same-origin"
                 })
                 .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(err => {
-                            throw new Error(err.message || "Upload failed. Please try again.");
+                    console.log("Response status:", response.status);
+                    console.log("Content-Type:", response.headers.get('Content-Type'));
+                    
+                    // Check if response is JSON
+                    const contentType = response.headers.get('Content-Type');
+                    if (contentType && contentType.includes('application/json')) {
+                        return response.json().then(data => {
+                            if (!response.ok) {
+                                throw new Error(data.message || "Upload failed. Please try again.");
+                            }
+                            return data;
+                        });
+                    } else {
+                        // If not JSON, get text to see what's returned
+                        return response.text().then(text => {
+                            console.error("Non-JSON response:", text.substring(0, 200));
+                            throw new Error("Server returned an invalid response. Please try again.");
                         });
                     }
-                    return response.json();
                 })
                 .then(data => {
-                    messageContainer.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
-                    form.reset(); 
-                    previewImage.style.display = "none"; 
-                    quill.root.innerHTML = "";  
+                    console.log("Response data:", data);
+                    if (data.success) {
+                        messageContainer.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+                        form.reset(); 
+                        previewImage.style.display = "none"; 
+                        quill.root.innerHTML = "";  
 
-                    // Re-enable faculty and department selects if they were disabled
-                    facultySelect.disabled = false;
-                    departmentSelect.disabled = false;
-
-                    // Hide new field containers
-                    newFacultyContainer.style.display = "none";
-                    newDepartmentContainer.style.display = "none";
+                        // Reset UI state
+                        facultySelect.classList.remove('hidden-select');
+                        departmentSelect.classList.remove('hidden-select');
+                        addNewFacultyCheckbox.checked = false;
+                        addNewDepartmentCheckbox.checked = false;
+                        newFacultyContainer.style.display = "none";
+                        newDepartmentContainer.style.display = "none";
+                        
+                        // Reset department filtering
+                        const departmentOptions = departmentSelect.querySelectorAll('option');
+                        departmentOptions.forEach(option => {
+                            option.style.display = 'block';
+                        });
+                    } else {
+                        throw new Error(data.message);
+                    }
                 })
                 .catch(error => {
-                    messageContainer.innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
                     console.error("Error:", error);
+                    messageContainer.innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
                 })
                 .finally(() => {
                     // Re-enable submit button and hide loading spinner

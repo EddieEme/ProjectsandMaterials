@@ -311,7 +311,7 @@ a {
     <div class="books-list" id="booksList">
         {% for book in books %}
         <div class="book-item" style="animation-delay: {{ forloop.counter|divisibleby:3|yesno:'0.1s,0.2s,0.3s' }}">
-            <a href="/product-details/{{ book.id }}/" class="text-decoration-none">
+            <a href="/product-details/{{ book.slug }}/" class="text-decoration-none">
                 <div class="card book-card">
                     <div class="card-body">
                     <img src="{% if book.cover_image %}{{ book.cover_image.url }}{% else %}{% static 'books/images/advert_cover.jpg' %}{% endif %}" >

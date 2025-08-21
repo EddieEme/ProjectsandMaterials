@@ -417,9 +417,9 @@
             <div class="categories">
                 {% if faculties %}
                     {% for faculty in faculties %}
-                        <a href="{% url 'books:faculty' faculty.id %}" class="category-item">
+                        <a href="{% url 'books:faculty' faculty.slug %}" class="category-item">
                             <span>{{ faculty.name }}</span>
-                            <span class="count">{{ faculty_book_counts|get_item:faculty.id }}</span>
+                            <span class="count">{{ faculty_book_counts|get_item:faculty.slug }}</span>
                         </a>
                     {% endfor %}
                 {% endif %}
@@ -439,7 +439,7 @@
                 
                 {% for book in books %}
                     <div class="col-lg-12 mb-4 project-content">
-                        <a href="{% url 'books:product-details' id=book.id %}">
+                        <a href="{% url 'books:product-details' slug=book.slug %}">
                             <div class="card blog-card">
                                 <div class="card-body">
                                 <img src="{% if book.cover_image %}{{ book.cover_image.url }}{% else %}{% static 'books/images/advert_cover.jpg' %}{% endif %}" 

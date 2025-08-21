@@ -91,7 +91,7 @@
                 {% for faculty in faculties %}
                 <div class="col-md-6 col-lg-3" data-aos="fade-left" data-aos-delay="50">
                 {% if request.user.is_authenticated %}
-                    <a href="{% url 'books:faculty' faculty.id %}">
+                    <a href="{% url 'books:faculty' faculty.slug %}">
                         <div class="field-card">
                             <h3 class="field-title">
                                 <i class="fa-solid fa-book-open"></i>
@@ -100,7 +100,7 @@
                         </div>
                     </a>
                     {% else %}
-                    <a href="{% url 'books:faculty' faculty.id %}">
+                    <a href="{% url 'books:faculty' faculty.slug %}">
                         <div class="field-card">
                         <h3 class="field-title">
                             <i class="fa-solid fa-book-open"></i>
@@ -124,7 +124,7 @@
                 {% for category in categories %}
                 <div class="col-md-6 col-lg-3" data-aos="fade-left" data-aos-delay="50">
                 {% if request.user.is_authenticated %}
-                    <a href="{% url 'books:category_books' category.id %}">
+                    <a href="{% url 'books:category_books' category.slug %}">
                         <div class="field-card">
                             <h3 class="field-title">
                                 <i class="fa-solid fa-book-open"></i>
@@ -133,7 +133,7 @@
                         </div>
                     </a>
                     {% else %}
-                    <a href="{% url 'books:category_books' category.id %}">
+                    <a href="{% url 'books:category_books' category.slug %}">
                         <div class="field-card">
                         <h3 class="field-title">
                             <i class="fa-solid fa-book-open"></i>

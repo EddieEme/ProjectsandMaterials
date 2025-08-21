@@ -22,7 +22,7 @@
                     {% comment %} <h1 class="display-4 mb-4">Ayatutu Ontology</h1> {% endcomment %}
                     <p class="lead mb-4">{{book.title}}</p>
                     <div class="action-buttons">
-                        <a href="{% url 'books:payment-method' book.id %}" class="btn btn-success btn-lg" >Download
+                        <a href="{% url 'books:payment-method' book.slug %}" class="btn btn-success btn-lg" >Download
                             Now</a>
                         <a href="{% url 'subscriptions:subscription' %}" class="btn btn-outline-success btn-lg"
                            >Subscribe</a>

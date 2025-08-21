@@ -411,7 +411,7 @@
             <div class="categories">
                 {% if categories %}
                     {% for category in categories %}
-                        <a href="{% url 'books:category_books' category.id %}" class="category-item">
+                        <a href="{% url 'books:category_books' category.slug %}" class="category-item">
                             <span>{{ category.name }}</span>
                             <span class="count">{{ category_book_counts|get_item:category }}</span>
                         </a>
@@ -433,7 +433,7 @@
                 
                 {% for book in books %}
                     <div class="col-md-6 mb-4 project-content">
-                        <a href="{% url 'books:product-details' id=book.id %}">
+                        <a href="{% url 'books:product-details' slug=book.slug %}">
                             <div class="card blog-card">
                                 <div class="card-body">
                                 <img src="{% if book.cover_image %}{{ book.cover_image.url }}{% else %}{% static 'books/images/advert_cover.jpg' %}{% endif %}" 

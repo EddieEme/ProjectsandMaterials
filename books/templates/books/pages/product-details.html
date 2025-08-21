@@ -416,8 +416,10 @@
                             <span class="value type text-uppercase">1 to 5 CHAPTERS</span>
                         </div>
 
-                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#documentModal">
+                        <button class="btn btn-primary">
+                        <a href="{% url 'books:preview' slug=book.slug %}">
                             Preview Document
+                        </a>
                         </button>
 
                         {% if request.user.is_authenticated %}
@@ -436,7 +438,7 @@
                     <h4 class="mb-3">Related Works</h4>
                     {% for related_book in related_books %}
                         <li class="related-work">
-                            <a href="{% url 'books:product-details' related_book.id %}">
+                            <a href="{% url 'books:product-details' related_book.slug %}">
                                 {{ related_book.title }}
                             </a>
                         </li>

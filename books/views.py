@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404, redirect, render
+from django.conf import settings
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
@@ -11,13 +12,13 @@ from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
-from django.conf import settings
+
+
+from books.utils import generate_preview_task
 from .models import Book, Category, BookType
 from payments.models import  Order, Download
 from django.db.models import Sum, Avg, Q, Count
 from django.views.decorators.cache import cache_page
-from django.contrib import messages
-from .models import Book, BookType, Category
 from django.core.files.storage import default_storage
 from django.core.cache import cache
 import json
@@ -61,10 +62,10 @@ def resources(request):
     return render(request, template, context)
 
 
-def faculty(request, book_type_id):
+def faculty(request, slug):
     faculties = BookType.objects.order_by('name')
     categories = Category.objects.order_by('name')
-    selected_book_type = get_object_or_404(BookType, id=book_type_id)
+    selected_book_type = get_object_or_404(BookType, slug=slug)
 
     books_list = Book.objects.filter(book_type=selected_book_type, is_approved=True)
     
@@ -75,15 +76,15 @@ def faculty(request, book_type_id):
 
     # Count books per faculty
     faculty_book_counts = {
-        book_type.id: Book.objects.filter(book_type=book_type, is_approved=True).count()
+        book_type.slug: Book.objects.filter(book_type=book_type, is_approved=True).count()
         for book_type in faculties
     }
 
     # Count books per category for each faculty
     faculty_category_counts = {}
     for faculty in faculties:
-        faculty_category_counts[faculty.id] = {
-            category.id: Book.objects.filter(
+        faculty_category_counts[faculty.slug] = {
+            category.slug: Book.objects.filter(
                 book_type=faculty,
                 category=category,  # ForeignKey lookup (not many-to-many)
                 is_approved=True
@@ -100,6 +101,8 @@ def faculty(request, book_type_id):
         'faculty_category_counts': faculty_category_counts,
     }
 
+    print(f"here is the name of the faculty {selected_book_type.name}")
+
     template = 'books/login_faculty.html' if request.user.is_authenticated else 'books/faculty.html'
     return render(request, template, context)
 
@@ -107,8 +110,8 @@ def faculty(request, book_type_id):
 
 
 
-def category_books(request, category_id):
-    category = get_object_or_404(Category, id=category_id)
+def category_books(request, slug):
+    category = get_object_or_404(Category, slug=slug)
     books_list = Book.objects.filter(category=category, is_approved=True)  # Ensure only approved books
     categories = Category.objects.all()
 
@@ -119,7 +122,7 @@ def category_books(request, category_id):
 
     # Count books in each category using books_list (QuerySet)
     category_book_counts = {
-        cat.id: Book.objects.filter(category=cat, is_approved=True).count() for cat in categories
+        cat.slug: Book.objects.filter(category=cat, is_approved=True).count() for cat in categories
     }
 
     context = {
@@ -137,9 +140,6 @@ def category_books(request, category_id):
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 def projects(request):
-    if request.user.is_authenticated:
-        return redirect('books:login-project')
-
     # Get all categories
     categories = Category.objects.all()
     
@@ -192,7 +192,7 @@ def projects_by_faculty(request):
 
     # Count books in each category
     faculty_book_counts = {
-        book_type.id: Book.objects.filter(book_type=book_type, is_approved=True).count()
+        book_type.slug: Book.objects.filter(book_type=book_type, is_approved=True).count()
         for book_type in faculties
     }
 
@@ -208,19 +208,19 @@ def projectList(request):
     if request.user.is_authenticated:
         return redirect('books:login-project-list')
      # Get the selected book type and category from the request
-    book_type_id = request.GET.get('book_type', '')
-    category_id = request.GET.get('category', '')
+    book_type_slug = request.GET.get('book_type', '')
+    category_slug = request.GET.get('category', '')
 
     # Get all books initially
     books = Book.objects.filter(is_approved=True)
 
     # Filter by book type if selected
-    if book_type_id:
-        books = books.filter(book_type__id=book_type_id)
+    if book_type_slug:
+        books = books.filter(book_type__slug=book_type_slug)
 
     # Filter by category if selected
-    if category_id:
-        books = books.filter(category__id=category_id)
+    if category_slug:
+        books = books.filter(category__slug=category_slug)
 
     # Get all distinct book types and categories for the dropdown options
     book_types = BookType.objects.all()
@@ -229,8 +229,8 @@ def projectList(request):
     # Pass selected values to the template for retaining user selections
     context = {
         'books': books,
-        'selected_book_type': book_type_id,
-        'selected_category': category_id,
+        'selected_book_type': book_type_slug,
+        'selected_category': category_slug,
         'book_types': book_types,
         'categories': categories,
     }
@@ -241,18 +241,18 @@ def projectList(request):
 
 
 @cache_page(60 * 15)
-def product_details(request, id):
+def product_details(request, slug):
     book = get_object_or_404(
         Book.objects.select_related('book_type', 'category', 'user')
                    .defer('description', 'file'),  # Defer large fields
-        id=id
+        slug=slug
     )
 
     if request.user.is_authenticated:
-        return redirect('books:login-product-details', id=book.id)
+        return redirect('books:login-product-details', slug=book.slug)
 
     # Related books logic (cached)
-    related_cache_key = f"related_books_{book.id}"
+    related_cache_key = f"related_books_{book.slug}"
     related_books = cache.get(related_cache_key)
     if not related_books:
         title_keywords = [word for word in book.title.split() if len(word) > 3][:3]
@@ -263,8 +263,8 @@ def product_details(request, id):
         related_books = (
             Book.objects
             .filter(query)
-            .exclude(id=book.id)
-            .only('id', 'title', 'cover_image', 'price')
+            .exclude(slug=book.slug)
+            .only('slug', 'title', 'cover_image', 'price')
             .order_by('-created_at')[:5]  # More predictable than random
         )
         cache.set(related_cache_key, related_books, 60 * 60 * 12)  # Cache for 12 hours
@@ -285,9 +285,9 @@ def payment_checkout(request):
 
 
 @login_required(login_url='users:user_login')
-def payment_method(request, id):
-    # Fetch the book by its ID
-    book = get_object_or_404(Book, id=id)
+def payment_method(request, slug):
+    # Fetch the book by its slug
+    book = get_object_or_404(Book, slug=slug)
     
     # Prepare the context
     context = {
@@ -334,19 +334,19 @@ def login_projects(request):
 
 @login_required(login_url='users:user_login') 
 def login_projectList(request):
-    book_type_id = request.GET.get('book_type', '')
-    category_id = request.GET.get('category', '')
+    book_type_slug = request.GET.get('book_type', '')
+    category_slug = request.GET.get('category', '')
 
     # Get all books initially
     books = Book.objects.filter(is_approved=True)
 
     # Filter by book type if selected
-    if book_type_id:
-        books = books.filter(book_type__id=book_type_id)
+    if book_type_slug:
+        books = books.filter(book_type__slug=book_type_slug)
 
     # Filter by category if selected
-    if category_id:
-        books = books.filter(category__id=category_id)
+    if category_slug:
+        books = books.filter(category__slug=category_slug)
 
     # Get all distinct book types and categories for the dropdown options
     book_types = BookType.objects.all()
@@ -355,8 +355,8 @@ def login_projectList(request):
     # Pass selected values to the template for retaining user selections
     context = {
         'books': books,
-        'selected_book_type': book_type_id,
-        'selected_category': category_id,
+        'selected_book_type': book_type_slug,
+        'selected_category': category_slug,
         'book_types': book_types,
         'categories': categories,
     }
@@ -383,14 +383,14 @@ def verification_error(request):
 
 @cache_page(60 * 15)
 @login_required(login_url='users:user_login')
-def login_product_details(request, id):
+def login_product_details(request, slug):
     book = get_object_or_404(
         Book.objects.select_related('book_type', 'category', 'user')
-                   .defer('description', 'file'),  # Defer large fields
-        id=id
+                   .defer('description', 'file'),  
+        slug=slug
     )
 
-    related_cache_key = f"related_books_{book.id}"
+    related_cache_key = f"related_books_{book.slug}"
     related_books = cache.get(related_cache_key)
     if not related_books:
         title_keywords = [word for word in book.title.split() if len(word) > 3][:3]
@@ -401,8 +401,8 @@ def login_product_details(request, id):
         related_books = (
             Book.objects
             .filter(query)
-            .exclude(id=book.id)
-            .only('id', 'title', 'cover_image', 'price')
+            .exclude(slug=book.slug)
+            .only('slug', 'title', 'cover_image', 'price')
             .order_by('-created_at')[:5]  # More predictable than random
         )
         cache.set(related_cache_key, related_books, 60 * 60 * 12)  # Cache for 12 hours
@@ -415,119 +415,205 @@ def login_product_details(request, id):
     return render(request, 'books/login-product-details.html', context)
 
 
-
-
+@login_required(login_url='users:user_login')
 def upload_book(request):
+    # Check if it's an AJAX request
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    
     if request.method == "POST":
         title = request.POST.get("title")
         description = request.POST.get("description")
         author = request.POST.get("author")
-        book_type_id = request.POST.get("book_type")
-        category_id = request.POST.get("category")
+        book_type_value = request.POST.get("book_type") 
+        category_value = request.POST.get("category")    
         file = request.FILES.get("file")
         cover_image = request.FILES.get("cover_image")
 
-        # Sanitize the description field
-        cleaned_description = bleach.clean(
-            description,
-            tags=['p', 'strong', 'em', 'ul', 'li', 'a', 'br'],  # Allowed tags
-            attributes={'a': ['href', 'title']}  # Allowed attributes for <a>
-        )
-
-        # Check if a book with the same title exists (case-insensitive)
-        if Book.objects.filter(title__iexact=title).exists():
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({"success": False, "message": "A book with this title already exists."}, status=400)
+        # Validate required fields
+        missing_fields = []
+        if not title: missing_fields.append("title")
+        if not description: missing_fields.append("description")
+        if not author: missing_fields.append("author")
+        if not file: missing_fields.append("file")
+        if not book_type_value and not request.POST.get("book_type_name"): 
+            missing_fields.append("faculty")
+        if not category_value and not request.POST.get("category_name"): 
+            missing_fields.append("department")
+        
+        if missing_fields:
+            error_msg = f"Missing required fields: {', '.join(missing_fields)}"
+            if is_ajax:
+                return JsonResponse({"success": False, "message": error_msg}, status=400)
             else:
-                messages.error(request, "A book with this title already exists.")
+                messages.error(request, error_msg)
+                return redirect("books:upload-book")
+
+        # Check for duplicate title
+        if Book.objects.filter(title__iexact=title).exists():
+            error_msg = "A book with this title already exists."
+            if is_ajax:
+                return JsonResponse({"success": False, "message": error_msg}, status=400)
+            else:
+                messages.error(request, error_msg)
                 return redirect("books:upload-book")
 
         # Validate file type
         if file:
-            allowed_extensions = ["pdf", "docx"]
+            allowed_extensions = ["pdf", "docx", "doc"]
             file_extension = file.name.split(".")[-1].lower()
             if file_extension not in allowed_extensions:
-                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                    return JsonResponse({"success": False, "message": "Only PDF and DOCX files are allowed."}, status=400)
+                error_msg = "Only PDF and DOCX files are allowed."
+                if is_ajax:
+                    return JsonResponse({"success": False, "message": error_msg}, status=400)
                 else:
-                    messages.error(request, "Only PDF and DOCX files are allowed.")
+                    messages.error(request, error_msg)
                     return redirect("books:upload-book")
-        else:
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({"success": False, "message": "Book file is required."}, status=400)
-            else:
-                messages.error(request, "Book file is required.")
-                return redirect("books:upload-book")
 
         # Handle book type (faculty)
         try:
-            # Check if creating a new faculty
             if request.POST.get("book_type_name"):
-                book_type_name = request.POST.get("book_type_name")
-                # Check if a faculty with this name already exists
+                book_type_name = request.POST.get("book_type_name").strip()
+                if not book_type_name:
+                    raise ValueError("Faculty name cannot be empty")
+                
                 existing_type = BookType.objects.filter(name__iexact=book_type_name).first()
                 if existing_type:
                     book_type = existing_type
                 else:
                     book_type = BookType.objects.create(name=book_type_name)
             else:
-                book_type = BookType.objects.get(id=book_type_id)
-        except BookType.DoesNotExist:
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({"success": False, "message": "Selected faculty does not exist."}, status=400)
+                if not book_type_value:
+                    raise ValueError("Faculty selection is required")
+                
+                try:
+                    book_type = BookType.objects.get(slug=book_type_value)
+                except BookType.DoesNotExist:
+                    try:
+                        book_type = BookType.objects.get(id=int(book_type_value))
+                    except (ValueError, BookType.DoesNotExist):
+                        raise BookType.DoesNotExist("Selected faculty does not exist.")
+                        
+        except (BookType.DoesNotExist, ValueError) as e:
+            error_msg = str(e) if isinstance(e, ValueError) else "Selected faculty does not exist."
+            if is_ajax:
+                return JsonResponse({"success": False, "message": error_msg}, status=400)
             else:
-                messages.error(request, "Selected faculty does not exist.")
+                messages.error(request, error_msg)
                 return redirect("books:upload-book")
 
         # Handle category (department)
         try:
-            # Check if creating a new department
             if request.POST.get("category_name"):
-                category_name = request.POST.get("category_name")
-                # Check if a department with this name already exists
-                existing_category = Category.objects.filter(name__iexact=category_name).first()
+                category_name = request.POST.get("category_name").strip()
+                if not category_name:
+                    raise ValueError("Department name cannot be empty")
+                
+                existing_category = Category.objects.filter(
+                    name__iexact=category_name, 
+                    book_type=book_type
+                ).first()
+                
                 if existing_category:
                     category = existing_category
                 else:
                     category = Category.objects.create(name=category_name, book_type=book_type)
             else:
-                category = Category.objects.get(id=category_id)
-        except Category.DoesNotExist:
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({"success": False, "message": "Selected department does not exist."}, status=400)
+                if not category_value:
+                    raise ValueError("Department selection is required")
+                
+                try:
+                    category = Category.objects.get(slug=category_value, book_type=book_type)
+                except Category.DoesNotExist:
+                    try:
+                        category = Category.objects.get(id=int(category_value), book_type=book_type)
+                    except (ValueError, Category.DoesNotExist):
+                        raise Category.DoesNotExist("Selected department does not exist.")
+                        
+        except (Category.DoesNotExist, ValueError) as e:
+            error_msg = str(e) if isinstance(e, ValueError) else "Selected department does not exist."
+            if is_ajax:
+                return JsonResponse({"success": False, "message": error_msg}, status=400)
             else:
-                messages.error(request, "Selected department does not exist.")
+                messages.error(request, error_msg)
                 return redirect("books:upload-book")
 
+        # Create the book
         try:
-            # Save the book with a fixed price of ₦5,000
+            # Sanitize the description field
+            cleaned_description = bleach.clean(
+                description,
+                tags=['p', 'strong', 'em', 'ul', 'li', 'a', 'br'],
+                attributes={'a': ['href', 'title']},
+                strip=True
+            )
+
             book = Book.objects.create(
                 title=title,
-                description=cleaned_description,  # Use the sanitized description
+                description=cleaned_description,
                 author=author,
                 book_type=book_type,
                 category=category,
                 price=5000,
                 file=file,
                 cover_image=cover_image,
-                user=request.user
+                user=request.user,
+                preview_url=None 
             )
 
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({"success": True, "message": "Book uploaded successfully!"})
-            else:
-                messages.success(request, "Book uploaded successfully!")
+            # Generate preview asynchronously - IMPORTANT: Use .delay() for async
+            try:
+                generate_preview_task.delay(book.id)
+                print(f"Preview generation task queued for book {book.id}")
+            except Exception as e:
+                print(f"Failed to queue preview generation: {e}")
                 
+            if is_ajax:
+                return JsonResponse({
+                    "success": True, 
+                    "message": "Book uploaded successfully! Preview will be generated shortly.",
+                    "book_id": book.id
+                })
+            else:
+                messages.success(request, "Book uploaded successfully! Preview will be generated shortly.")
                 return redirect("books:upload-book")
 
         except Exception as e:
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({"success": False, "message": f"Error creating book: {str(e)}"}, status=500)
+            print(f"Error creating book: {str(e)}")
+            if is_ajax:
+                return JsonResponse({"success": False, "message": "Error creating book. Please try again."}, status=500)
             else:
-                messages.error(request, f"Error creating book: {str(e)}")
+                messages.error(request, "Error creating book. Please try again.")
                 return redirect("books:upload-book")
 
-    # Fetch all faculties and departments for the form
+    # GET request handling
+    if is_ajax:
+        return JsonResponse({"success": False, "message": "GET method not allowed"}, status=405)
+    
     faculties = BookType.objects.all()
     departments = Category.objects.all()
-    return render(request, "books/upload_book.html", {"faculties": faculties, "departments": departments})
+    
+    return render(request, "books/upload_book.html", {
+        "faculties": faculties, 
+        "departments": departments
+    })
+    
+    
+    
+def preview_pdf(request, slug):
+    # Only include actual relational fields in select_related
+    book = get_object_or_404(
+        Book.objects.select_related('book_type', 'category', 'user')
+                   .defer('description', 'file'),  
+        slug=slug
+    )
+    
+    file_stats = book.get_file_statistics()
+    
+    template = 'books/login-preview.html' if request.user.is_authenticated else 'books/preview.html'
+   
+    context = {
+        'book': book,
+        'file_stats': file_stats,
+    }
+   
+    return render(request, template, context)
