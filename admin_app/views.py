@@ -4,12 +4,14 @@ import logging
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.views.decorators.http import require_http_methods
 from google.cloud import storage
 from books.models import Book, BookType, Category
 from admin_app.models import AdminLog
 from django.conf import settings
 from books.utils import generate_preview_task
 from django.db import transaction
+from django.core.paginator import Paginator
 
 logger = logging.getLogger(__name__)
 
@@ -141,3 +143,58 @@ def batch_upload_books(request):
             }, status=500)
 
     return render(request, "admin_app/batch_upload_books.html")
+
+
+
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+@require_http_methods(["POST"])
+def regenerate_previews(request):
+    """
+    Regenerate preview URLs for all books (overwrite if exists).
+    Optional form data with book_id for a single book.
+    """
+    book_id = request.POST.get("book_id")
+    
+    if book_id:
+        books = Book.objects.filter(id=book_id)
+    else:
+        books = Book.objects.all()
+
+    total = books.count()
+    success, failed, errors = 0, 0, []
+
+    for book in books:
+        try:
+            preview_url = generate_preview_task(book.id)
+            if preview_url:
+                book.preview_url = preview_url
+                book.save(update_fields=["preview_url"])
+                success += 1
+            else:
+                failed += 1
+                errors.append(f"Book {book.id} - {book.title}: Preview generation failed")
+        except Exception as e:
+            failed += 1
+            errors.append(f"Book {book.id} - {book.title}: {str(e)}")
+            logger.error(f"Preview regeneration error for {book.id}: {e}")
+
+    return JsonResponse({
+        "success": success > 0,
+        "message": f"Completed {success} success, {failed} failed (Total: {total})",
+        "errors": errors,
+    })
+
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def regenerate_previews_page(request):
+    books = Book.objects.all().order_by("-id")
+    paginator = Paginator(books, 20)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, "admin_app/regenerate_previews.html", {
+        "page_obj": page_obj,
+    })

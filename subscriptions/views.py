@@ -42,10 +42,12 @@ def subscription(request):
 def buyorsubscribe(request, id):
     book = get_object_or_404(Book, id=id)
     stats = book.get_file_statistics()
+    current_path = request.get_full_path()
     context = {
         "book": book,
         "page_count": stats["pages"],
         "word_count": stats["words"],
+        "next": current_path,
         }
     template = 'books/login-buyorsubscribe.html' if request.user.is_authenticated  else 'books/buyorsubscribe.html'
     return render(request, template, context)

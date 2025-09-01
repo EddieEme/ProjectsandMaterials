@@ -1,3 +1,5 @@
+import os
+from re import template
 from django.shortcuts import get_object_or_404, redirect, render
 from django.conf import settings
 from django.http import JsonResponse
@@ -7,7 +9,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.core.paginator import Paginator
 from django.contrib import messages
 from django.urls import reverse
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMessage, send_mail
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
@@ -15,7 +17,7 @@ from django.contrib.auth.tokens import default_token_generator
 
 
 from books.utils import generate_preview_task
-from .models import Book, Category, BookType
+from .models import Book, Category, BookType, HireWriterRequest
 from payments.models import  Order, Download
 from django.db.models import Sum, Avg, Q, Count
 from django.views.decorators.cache import cache_page
@@ -48,6 +50,74 @@ def home(request):
 
     template = 'books/login-index.html' if request.user.is_authenticated else 'books/index.html'
     return render(request, template, context)
+
+@login_required(login_url='users:user_login')
+def hire(request):
+    if request.method == 'POST':
+        service = request.POST.get('service')
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        topic = request.POST.get('topic')
+        phone = request.POST.get('phone')
+        description = request.POST.get('description')
+        format_file = request.FILES.get('format')
+
+        # Validate required fields
+        if not all([service, name, email, topic, phone, description]):
+            return JsonResponse({'error': 'All required fields must be filled.'}, status=400)
+
+        # Validate email
+        from django.core.validators import validate_email
+        from django.core.exceptions import ValidationError
+        try:
+            validate_email(email)
+        except ValidationError:
+            return JsonResponse({'error': 'Please enter a valid email address.'}, status=400)
+
+        # Save to DB
+        writer_request = HireWriterRequest.objects.create(
+            user=request.user if request.user.is_authenticated else None,
+            service=service,
+            name=name,
+            email=email,
+            topic=topic,
+            phone=phone,
+            description=description,
+            upload_format=format_file
+        )
+
+        # Send email
+        try:
+            subject = f"New Writer Request from {name}"
+            message = f"""
+New request received:
+
+Name: {name}
+Email: {email}
+Phone: {phone}
+Service: {service}
+Topic: {topic}
+Description: {description}
+File Uploaded: {'Yes' if format_file else 'No'}
+"""
+            send_mail(
+                subject,
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                [settings.SERVER_EMAIL],
+                fail_silently=False,
+            )
+        except Exception as e:
+            return JsonResponse({'error': f'Failed to send request: {str(e)}'}, status=500)
+
+        return JsonResponse({
+            'message': 'Request submitted successfully!',
+            'redirect': '#successMessage'
+        })
+
+    return render(request, 'books/hire.html')
+
+
 
 
 def services(request):
@@ -105,8 +175,6 @@ def faculty(request, slug):
 
     template = 'books/login_faculty.html' if request.user.is_authenticated else 'books/faculty.html'
     return render(request, template, context)
-
-
 
 
 
@@ -204,12 +272,12 @@ def projects_by_faculty(request):
     template = 'books/login-project_faculty.html' if request.user.is_authenticated else 'books/project_faculty.html'
     return render(request,template , context)
 
+
 def projectList(request):
-    if request.user.is_authenticated:
-        return redirect('books:login-project-list')
-     # Get the selected book type and category from the request
+    # Get the selected book type, category, and search query
     book_type_slug = request.GET.get('book_type', '')
     category_slug = request.GET.get('category', '')
+    search_query = request.GET.get('q', '')
 
     # Get all books initially
     books = Book.objects.filter(is_approved=True)
@@ -222,20 +290,34 @@ def projectList(request):
     if category_slug:
         books = books.filter(category__slug=category_slug)
 
+    # Filter by search query if provided
+    if search_query:
+        books = books.filter(
+            Q(title__icontains=search_query) |
+            Q(description__icontains=search_query) |
+            Q(author__icontains=search_query)
+        )
+
+    # Pagination
+    paginator = Paginator(books, 12)  # 10 books per page
+    page_number = request.GET.get('page')
+    books_page = paginator.get_page(page_number)
+
     # Get all distinct book types and categories for the dropdown options
     book_types = BookType.objects.all()
     categories = Category.objects.all()
 
-    # Pass selected values to the template for retaining user selections
     context = {
-        'books': books,
+        'books': books_page,
         'selected_book_type': book_type_slug,
         'selected_category': category_slug,
+        'search_query': search_query,
         'book_types': book_types,
         'categories': categories,
     }
 
-    return render(request, 'books/list-project.html', context)
+    template = 'books/login-list-project.html' if request.user.is_authenticated else 'books/list-project.html'
+    return render(request, template, context)
 
 
 
@@ -384,6 +466,7 @@ def verification_error(request):
 @cache_page(60 * 15)
 @login_required(login_url='users:user_login')
 def login_product_details(request, slug):
+   
     book = get_object_or_404(
         Book.objects.select_related('book_type', 'category', 'user')
                    .defer('description', 'file'),  
@@ -403,9 +486,9 @@ def login_product_details(request, slug):
             .filter(query)
             .exclude(slug=book.slug)
             .only('slug', 'title', 'cover_image', 'price')
-            .order_by('-created_at')[:5]  # More predictable than random
+            .order_by('-created_at')[:5]
         )
-        cache.set(related_cache_key, related_books, 60 * 60 * 12)  # Cache for 12 hours
+        cache.set(related_cache_key, related_books, 60 * 60 * 12)
 
     context = {
         "book": book,
@@ -592,10 +675,7 @@ def upload_book(request):
     faculties = BookType.objects.all()
     departments = Category.objects.all()
     
-    return render(request, "books/upload_book.html", {
-        "faculties": faculties, 
-        "departments": departments
-    })
+    return render(request, "books/upload_book.html", {"faculties": faculties, "departments": departments, 'next': request.GET.get('next', 'books:upload-book')})
     
     
     
@@ -607,13 +687,18 @@ def preview_pdf(request, slug):
         slug=slug
     )
     
-    file_stats = book.get_file_statistics()
+    stats = book.get_file_statistics()
     
     template = 'books/login-preview.html' if request.user.is_authenticated else 'books/preview.html'
    
     context = {
         'book': book,
-        'file_stats': file_stats,
+        "page_count": stats["pages"],
+        "word_count": stats["words"],
+        'stats': stats,
     }
    
     return render(request, template, context)
+
+
+

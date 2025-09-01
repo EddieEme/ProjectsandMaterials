@@ -290,6 +290,16 @@
             letter-spacing: 0.5px;
         }
 
+
+        .services-table td, 
+        .services-table th {
+            padding: 1rem 1.5rem;
+            vertical-align: middle;
+        }
+        .services-table .badge {
+            text-transform: capitalize;
+        }
+
         /* Buttons */
         .btn {
             border-radius: 12px;
@@ -492,6 +502,7 @@
     </div>
 
     <!-- Navigation Tabs -->
+     <!-- Navigation Tabs -->
     <ul class="nav nav-tabs" id="myTab">
         <li class="nav-item">
             <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#products">
@@ -509,6 +520,11 @@
             </button>
         </li>
         <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#services">
+                <i class="fas fa-briefcase me-2"></i>My Services
+            </button>
+        </li>
+        <li class="nav-item">
             <button class="nav-link" data-bs-toggle="tab" data-bs-target="#downloads">
                 <i class="fas fa-download me-2"></i>Downloads
             </button>
@@ -520,15 +536,11 @@
         <!-- Products Tab -->
         <div class="tab-pane fade show active" id="products">
             <div class="content-card">
-                <div class="card-header">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="card-title">
-                            <i class="fas fa-box me-2 text-primary"></i>All Works
-                        </h5>
-                        <a href="{% url 'books:upload-book' %}" class="btn btn-primary">
-                            <i class="fas fa-plus me-2"></i>Add New Product
-                        </a>
-                    </div>
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title"><i class="fas fa-box me-2 text-primary"></i>All Works</h5>
+                    <a href="{% url 'books:upload-book' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Add New Product
+                    </a>
                 </div>
                 <div class="card-body">
                     {% include 'books/user_product.html' %}
@@ -540,9 +552,7 @@
         <div class="tab-pane fade" id="orders">
             <div class="content-card">
                 <div class="card-header">
-                    <h5 class="card-title">
-                        <i class="fas fa-shopping-cart me-2 text-primary"></i>Recent Orders
-                    </h5>
+                    <h5 class="card-title"><i class="fas fa-shopping-cart me-2 text-primary"></i>Recent Orders</h5>
                 </div>
                 <div class="card-body p-0">
                     {% include 'books/user_order.html' %}
@@ -554,9 +564,7 @@
         <div class="tab-pane fade" id="transactions">
             <div class="content-card">
                 <div class="card-header">
-                    <h5 class="card-title">
-                        <i class="fas fa-credit-card me-2 text-primary"></i>Transaction History
-                    </h5>
+                    <h5 class="card-title"><i class="fas fa-credit-card me-2 text-primary"></i>Transaction History</h5>
                 </div>
                 <div class="card-body p-0">
                    {% include 'books/user_transaction.html' %}
@@ -564,13 +572,101 @@
             </div>
         </div>
 
+        <!-- Services Tab -->
+        <div class="tab-pane fade {% if active_tab == 'services' %}show active{% endif %}" id="services">
+    <div class="content-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title">
+                <i class="fas fa-briefcase me-2 text-primary"></i>My Services
+            </h5>
+            <a href="#" class="btn btn-sm btn-primary">
+                <i class="fas fa-download me-1"></i>Download
+            </a>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table services-table mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Service</th>
+                            <th>Email</th>
+                            <th>Topic</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if services_page_obj %}
+                            {% for service in services_page_obj %}
+                            <tr>
+                                <td>{{ service.id }}</td>
+                                <td>{{ service.service }}</td>
+                                <td>{{ service.email }}</td>
+                                <td>{{ service.topic }}</td>
+                                <td>
+                                    <span class="badge 
+                                        {% if service.status == 'completed' %} bg-success 
+                                        {% elif service.status == 'in_progress' %} bg-info 
+                                        {% elif service.status == 'reviewing' %} bg-warning 
+                                        {% elif service.status == 'cancelled' %} bg-danger 
+                                        {% else %} bg-secondary {% endif %}">
+                                        {{ service.get_status_display }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">
+                                    <i class="fas fa-info-circle me-1"></i>No services found.
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        {% if services_page_obj.has_other_pages %}
+        <div class="card-footer">
+            <nav>
+                <ul class="pagination justify-content-center mb-0">
+                    {% if services_page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?tab=services&services_page={{ services_page_obj.previous_page_number }}">
+                                Previous
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    {% for num in services_page_obj.paginator.page_range %}
+                        {% if services_page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% elif num > services_page_obj.number|add:'-3' and num < services_page_obj.number|add:'3' %}
+                            <li class="page-item"><a class="page-link" href="?tab=services&services_page={{ num }}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if services_page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?tab=services&services_page={{ services_page_obj.next_page_number }}">
+                                Next
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
         <!-- Downloads Tab -->
         <div class="tab-pane fade" id="downloads">
             <div class="content-card">
                 <div class="card-header">
-                    <h5 class="card-title">
-                        <i class="fas fa-download me-2 text-primary"></i>Download History
-                    </h5>
+                    <h5 class="card-title"><i class="fas fa-download me-2 text-primary"></i>Download History</h5>
                 </div>
                 <div class="card-body p-0">
                     {% include 'books/user_download.html' %}

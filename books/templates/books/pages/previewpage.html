@@ -3,7 +3,9 @@
 {% endblock %}
 {% block style %}
   <style>
-       
+       a {
+        text-decoration:none;
+       }
        .doc-preview {
            background-color: #f5f7fa;
             min-height: 100vh;
@@ -184,6 +186,95 @@
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
+
+        /* Afribary Signup Banner Styles */
+        .signup-banner {
+            background: linear-gradient(135deg,rgb(145, 154, 163) 0%,rgb(128, 157, 201) 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            margin-top: 30px;
+            border-radius: 8px;
+        }
+        
+        .signup-banner h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .signup-banner p {
+            font-size: 18px;
+            margin-bottom: 25px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+        }
+        
+        .signup-banner ul {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 30px 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+        }
+        
+        .signup-banner li {
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .signup-banner li i {
+            color: #27ae60;
+            font-size: 20px;
+        }
+        
+        .signup-btn {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+        }
+        
+        .signup-btn:hover {
+            background-color: #219653;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+        }
+        
+        @media (max-width: 768px) {
+            .signup-banner {
+                padding: 30px 15px;
+            }
+            
+            .signup-banner h2 {
+                font-size: 24px;
+            }
+            
+            .signup-banner p {
+                font-size: 16px;
+            }
+            
+            .signup-banner ul {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .signup-btn {
+                padding: 12px 30px;
+                font-size: 16px;
+            }
         
         @keyframes spin {
             0% { transform: rotate(0deg); }
@@ -227,6 +318,7 @@
                 <span class="tag">Chapter 1 - 5</span>
                 <span class="tag">{{book.book_type.name}}</span>
                 <span class="tag">{{book.category.name}}</span>
+                <span class="tag" id="stat-pages">{{page_count}} Pages ({{word_count}} words)</span>
             </div>
             
             <div class="paper-tags">
@@ -239,12 +331,31 @@
             <div class="paper-actions">
                 <button class="action-btn"><i class="fas fa-edit"></i> Write a Review</button>
                 <button class="action-btn"><i class="fas fa-flag"></i> Report</button>
-                <button class="action-btn"><i class="fas fa-download"></i> Downloads</button>
+                {% if request.user.is_authenticated %}
+                    <a class="action-btn" href="{% url 'subscriptions:buyorsubscribe' book.id %}">
+                        <i class="fas fa-download"></i> Download
+                    </a>
+                {% else %}
+                    <a class="action-btn" href="{% url 'subscriptions:buyorsubscribe' book.id %}">
+                        <i class="fas fa-download"></i> Download
+                    </a>
+                {% endif %}
             </div>
         </div>
         
         <div class="viewer-section">
-            
+
+        {% comment %} <div class="pdf-controls">
+                    <div class="zoom-controls">
+                        <button class="control-btn" id="zoom-in"><i class="fas fa-search-plus"></i></button>
+                        <button class="control-btn" id="zoom-out"><i class="fas fa-search-minus"></i></button>
+                        <button class="control-btn" id="fit-width">Fit to Width</button>
+                        <span class="stat-value" id="stat-words">--</span>
+                    </div>
+                    
+                    <div class="page-info">Page 1 of <span id="total-pages">--</span></div>
+                </div>
+             {% endcomment %}
             <div class="pdf-container">
                 <div class="loading" id="loading">
                     <div class="spinner"></div>
@@ -256,9 +367,29 @@
             </div>
         </div>
     </div>
+
+     <div class="signup-banner">
+                    <h2>Join ProjectandMaterials to Unlock Full Content</h2>
+                    <p>Access thousands of academic, business, and legal documents. Share your quality papers and documents with a global community.</p>
+                    <ul>
+                        <li><i class="fas fa-check-circle"></i> Access to thousands of documents</li>
+                        <li><i class="fas fa-check-circle"></i> Share your work globally</li>
+                        <li><i class="fas fa-check-circle"></i> Connect with researchers</li>
+                    </ul>
+                      {% if request.user.is_authenticated %}
+                    <a class="signup-btn" href="{% url 'subscriptions:buyorsubscribe' book.id %}">
+                        Join For Free
+                    </a>
+                {% else %}
+                    <a class="signup-btn" href="{% url 'subscriptions:buyorsubscribe' book.id %}">
+                        Join For Free
+                    </a>
+                {% endif %}
+
+    </div>
 </div>
 
-    <script>
+      <script>
         document.addEventListener('DOMContentLoaded', function() {
             const pdfViewer = document.getElementById('pdf-viewer');
             const loadingElement = document.getElementById('loading');

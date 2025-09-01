@@ -1,4 +1,6 @@
 from django.core.mail import EmailMessage
+from django.http import HttpResponseRedirect
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.shortcuts import redirect, render
 from django.contrib.auth import get_user_model, login, logout, authenticate
 from django.contrib.auth.decorators import login_required
@@ -11,7 +13,7 @@ from django.urls import reverse
 from django.conf import settings
 from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
 from payments.models import Order, Download
-from books.models import Book
+from books.models import Book, HireWriterRequest
 from django.core.paginator import Paginator
 from django.db.models import Count, Sum, Q
 from allauth.socialaccount.views import SignupView
@@ -38,25 +40,40 @@ class CustomSocialSignupView(SignupView):
     def get(self, request, *args, **kwargs):
         return redirect("/")
 
+
 def user_login(request):
+    # Redirect authenticated users to next URL or dashboard
     if request.user.is_authenticated:
-        return redirect('users:user-dashboard')  # Redirect normal users
+        next_url = request.GET.get('next', '').strip() or reverse('users:user-dashboard')
+        if next_url and url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
+            return HttpResponseRedirect(next_url)
+        return redirect('users:user-dashboard')
 
     if request.method == "POST":
-        email = request.POST['email']
-        password = request.POST['password']
-
-        user = authenticate(email=email, password=password)
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        user = authenticate(request, email=email, password=password)
 
         if user is not None:
-            login(request, user) 
+            login(request, user)
+            # Get 'next' from POST or GET, default to dashboard
+            next_url = (request.POST.get('next', '') or request.GET.get('next', '')).strip() or reverse('users:user-dashboard')
+            if next_url and url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
+                return HttpResponseRedirect(next_url)
             return redirect('users:user-dashboard')
-
         else:
             messages.error(request, "Invalid login credentials.")
-            return redirect('users:user_login')
+            context = {
+                'next': request.POST.get('next', request.GET.get('next', '')),
+                'email': email,  # Preserve email input
+            }
+            return render(request, 'users/login.html', context)
 
-    return render(request, 'books/login.html')
+    # GET request: render login form
+    context = {
+        'next': request.GET.get('next', ''),
+    }
+    return render(request, 'books/login.html', context)
 
 
 
@@ -337,10 +354,16 @@ def user_dashboard(request):
     downloads_paginator = Paginator(downloads_qs, 10)
     downloads_page = request.GET.get('downloads_page', 1)
     downloads_page_obj = downloads_paginator.get_page(downloads_page)
-    
+
+    # Services Pagination (new)
+    services_qs = HireWriterRequest.objects.filter(user=user).order_by('-created_at')
+    services_paginator = Paginator(services_qs, 10)
+    services_page = request.GET.get('services_page', 1)
+    services_page_obj = services_paginator.get_page(services_page)
+
+    # Totals
     total_products = products.count()
     total_sales_count = Order.objects.filter(book__user=user, status='completed').count() or 0
-    
     total_earnings = (
         Order.objects.filter(book__user=user, status='completed')
         .aggregate(total=Sum('uploader_earning'))['total'] or 0
@@ -355,6 +378,7 @@ def user_dashboard(request):
         'product_page_obj': product_page_obj,
         'orders_page_obj': orders_page_obj,
         'downloads_page_obj': downloads_page_obj,
+        'services_page_obj': services_page_obj,  # ✅ add to context
     }
 
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -363,10 +387,12 @@ def user_dashboard(request):
             'products': 'books/user_products.html',
             'orders': 'books/user_orders.html',
             'downloads': 'books/user_downloads.html',
+            'services': 'books/user_services.html',  # ✅ new tab partial
         }.get(active_tab, 'books/user_products.html')
         return render(request, template_name, context)
     
     return render(request, 'books/userdashboard.html', context)
+
 
 
 

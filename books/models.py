@@ -8,6 +8,9 @@ from django.core.mail import send_mail
 from django.urls import reverse
 from django.core.cache import cache
 from django.utils.crypto import get_random_string
+from django.db import models
+from django.core.validators import EmailValidator
+from django.utils import timezone
 import os
 import uuid
 import tempfile
@@ -179,3 +182,51 @@ class Book(models.Model):
                 super().save(update_fields=['preview_url'])
             except Exception as e:
                 logger.error(f"Failed to generate preview for book {self.id}: {e}")
+                
+                
+
+
+class HireWriterRequest(models.Model):
+    # Service choices
+    SERVICE_CHOICES = [
+        ('Project/thesis writer', 'Project/thesis writer'),
+        ('Data analysis', 'Data analysis'),
+        ('Questionnaire', 'Questionnaire'),
+        ('Assignment', 'Assignment'),
+        ('Serminal', 'Serminal'),
+        ('General', 'General (if the service not included)'),
+    ]
+    
+    # Required fields
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
+    service = models.CharField(max_length=50, choices=SERVICE_CHOICES)
+    name = models.CharField(max_length=100)
+    email = models.EmailField(validators=[EmailValidator()])
+    topic = models.CharField(max_length=200)
+    phone = models.CharField(max_length=20)
+    description = models.TextField()
+    
+    # Optional field
+    upload_format = models.FileField(upload_to='writer_requests/%Y/%m/%d/', blank=True, null=True)
+    
+    # Timestamps
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    # Status tracking
+    STATUS_CHOICES = [
+        ('submitted', 'Submitted'),
+        ('reviewing', 'Reviewing'),
+        ('in_progress', 'In Progress'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+    ]
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='submitted')
+    
+    class Meta:
+        verbose_name = "Hire Writer Request"
+        verbose_name_plural = "Hire Writer Requests"
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return self.service

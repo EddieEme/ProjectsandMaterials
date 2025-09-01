@@ -1,0 +1,307 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+    .preview-wrapper {
+        max-width: 100%;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-radius: 12px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        overflow-x: auto;
+    }
+
+    .preview-wrapper h1 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 8px 14px;
+        margin: 4px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+        white-space: nowrap;
+    }
+
+    .btn-all {
+        background-color: #ff9800;
+        color: white;
+    }
+    .btn-all:hover { background-color: #e68900; }
+
+    .btn-single {
+        background-color: #0c7cd5;
+        color: white;
+    }
+    .btn-single:hover { background-color: #095a9e; }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        min-width: 600px;
+    }
+    table, th, td { border: 1px solid #ddd; }
+    th, td { padding: 10px; text-align: left; }
+
+    #messages { margin-top: 20px; text-align: center; }
+    .success { color: green; font-weight: bold; }
+    .error { color: red; font-weight: bold; }
+
+    .progress-container {
+        margin-top: 20px;
+        display: none;
+        text-align: center;
+    }
+    .progress-bar {
+        width: 0%;
+        height: 24px;
+        border-radius: 6px;
+        background-color: #4caf50;
+        color: white;
+        text-align: center;
+        line-height: 24px;
+        font-size: 13px;
+        font-weight: bold;
+        transition: width 0.3s ease;
+    }
+
+    .pagination {
+        margin-top: 20px;
+        text-align: center;
+    }
+    .pagination a, .pagination span {
+        display: inline-block;
+        padding: 8px 12px;
+        margin: 0 3px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        text-decoration: none;
+        color: #0c7cd5;
+    }
+    .pagination .active {
+        background-color: #0c7cd5;
+        color: white;
+        font-weight: bold;
+    }
+    .pagination .disabled {
+        color: #aaa;
+        border-color: #eee;
+        pointer-events: none;
+    }
+</style>
+
+<div class="preview-wrapper">
+    <h1>🔄 Regenerate Book Previews</h1>
+
+    <!-- Regenerate all -->
+    <form id="regenerate-all-form" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="regenerate_all">
+        <button type="submit" class="btn btn-all">Regenerate All</button>
+    </form>
+
+    <!-- Progress bar -->
+    <div id="progress-container" class="progress-container">
+        <div id="progress-bar" class="progress-bar">0%</div>
+        <p id="progress-status">Processing...</p>
+    </div>
+
+    <!-- Book table -->
+    <div style="overflow-x:auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Preview URL</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for book in page_obj %}
+                <tr>
+                    <td>{{ book.id }}</td>
+                    <td>{{ book.title }}</td>
+                    <td>
+                        {% if book.preview_url %}
+                            <a href="{{ book.preview_url }}" target="_blank">View</a>
+                        {% else %}
+                            <span class="error">No Preview</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <form class="regenerate-single-form" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="book_id" value="{{ book.id }}">
+                            <button type="submit" class="btn btn-single">Regenerate Preview</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ page_obj.previous_page_number }}">&lsaquo; prev</a>
+        {% else %}
+            <span class="disabled">&laquo; first</span>
+            <span class="disabled">&lsaquo; prev</span>
+        {% endif %}
+
+        <span class="active">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next &rsaquo;</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+        {% else %}
+            <span class="disabled">next &rsaquo;</span>
+            <span class="disabled">last &raquo;</span>
+        {% endif %}
+    </div>
+
+    <div id="messages"></div>
+</div>
+
+<script>
+function showMessage(success, message) {
+    const messagesDiv = document.getElementById("messages");
+    messagesDiv.innerHTML = `<div class="${success ? 'success' : 'error'}">${message}</div>`;
+    // Auto-hide message after 5 seconds
+    setTimeout(() => {
+        messagesDiv.innerHTML = '';
+    }, 5000);
+}
+
+// Fake progress updater
+function simulateProgress(progressBar, statusEl) {
+    let width = 0;
+    const interval = setInterval(() => {
+        if (width < 95) {
+            width += 5;
+            progressBar.style.width = width + "%";
+            progressBar.innerText = width + "%";
+        }
+    }, 400);
+    return interval;
+}
+
+// Handle form submissions with AJAX
+document.addEventListener('DOMContentLoaded', function() {
+    const regenerateUrl = "{% url 'admin_app:regenerate_previews' %}";
+    
+    // Regenerate ALL
+    const regenerateAllForm = document.getElementById("regenerate-all-form");
+    if (regenerateAllForm) {
+        regenerateAllForm.addEventListener("submit", function(e) {
+            e.preventDefault();
+            
+            const progressContainer = document.getElementById("progress-container");
+            const progressBar = document.getElementById("progress-bar");
+            const progressStatus = document.getElementById("progress-status");
+
+            progressContainer.style.display = "block";
+            progressBar.style.width = "0%";
+            progressBar.innerText = "0%";
+            progressStatus.innerText = "Processing...";
+
+            const fakeInterval = simulateProgress(progressBar, progressStatus);
+
+            // Use FormData to properly handle the form submission
+            const formData = new FormData(this);
+            
+            fetch(regenerateUrl, {
+                method: "POST",
+                body: formData,
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                clearInterval(fakeInterval);
+                progressBar.style.width = "100%";
+                progressBar.innerText = "100%";
+                progressStatus.innerText = "Completed";
+                showMessage(data.success, data.message);
+                
+                // Reload the page after a short delay to see updated preview URLs
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                clearInterval(fakeInterval);
+                progressStatus.innerText = "Failed";
+                showMessage(false, "Unexpected error occurred: " + error.message);
+            });
+        });
+    }
+
+    // Regenerate SINGLE
+    document.querySelectorAll(".regenerate-single-form").forEach(form => {
+        form.addEventListener("submit", function(e) {
+            e.preventDefault();
+            
+            const buttonElement = this.querySelector('button');
+            const originalText = buttonElement.textContent;
+            
+            // Show loading state
+            buttonElement.textContent = "Processing...";
+            buttonElement.disabled = true;
+            
+            // Use FormData to properly handle the form submission
+            const formData = new FormData(this);
+            
+            fetch(regenerateUrl, {
+                method: "POST",
+                body: formData,
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                showMessage(data.success, data.message);
+                
+                // Reload the page after a short delay to see updated preview URL
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                showMessage(false, "Unexpected error occurred: " + error.message);
+            })
+            .finally(() => {
+                // Restore button state
+                buttonElement.textContent = originalText;
+                buttonElement.disabled = false;
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

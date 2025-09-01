@@ -162,6 +162,7 @@ DEFAULT_FROM_EMAIL = config(
 )
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
+
 # Security Settings
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_SSL_REDIRECT = False
@@ -298,16 +299,22 @@ JAZZMIN_SETTINGS = {
         {"app": "books"},
     ],
     
-    "custom_links": {
-        "auth": [  # or use any registered app label
-            {
-                "name": "Batch Upload",
-                "url": reverse_lazy("admin_app:batch-upload"),
-                "icon": "fas fa-life-ring",
-                "new_window": True
-            }
-        ]
-    },
+ "custom_links": {
+    "auth": [  # or whichever app section you want this under
+        {
+            "name": "Batch Upload",
+            "url": reverse_lazy("admin_app:batch-upload"),
+            "icon": "fas fa-file-upload",
+            "new_window": True
+        },
+        {
+            "name": "Regenerate Preview Url",
+            "url": reverse_lazy("admin_app:regenerate_previews_page"),
+            "icon": "fas fa-sync",
+            "new_window": True
+        }
+    ]
+},
     
 "icons": {
         "auth.user": "fas fa-user",

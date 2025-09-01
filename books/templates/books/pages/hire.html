@@ -1,0 +1,363 @@
+{% load static %}
+{% block link %}{% endblock %}
+{% block style %}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+        background-color: #f5f7fa;
+        color: #333;
+        line-height: 1.6;
+    }
+
+    .hire-container {
+        max-width: 1000px;
+        margin: 77px auto;
+        padding: 20px;
+    }
+
+    header {
+        background: linear-gradient(135deg, #2c3e50, #4a6580);
+        color: white;
+        padding: 30px 0;
+        text-align: center;
+        border-radius: 8px 8px 0 0;
+        margin-bottom: 20px;
+    }
+
+    header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+    }
+
+    header p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+
+    .form-container {
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    input, select, textarea {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 16px;
+        transition: border 0.3s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+        outline: none;
+        border-color: #4a6580;
+        box-shadow: 0 0 0 2px rgba(74, 101, 128, 0.2);
+    }
+
+    textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    .required::after {
+        content: " *";
+        color: #e74c3c;
+    }
+
+    .btn {
+        background: linear-gradient(135deg, #2c3e50, #4a6580);
+        color: white;
+        border: none;
+        padding: 14px 25px;
+        font-size: 18px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-weight: 600;
+        display: block;
+        width: 100%;
+    }
+
+    .btn:hover {
+        background: linear-gradient(135deg, #4a6580, #2c3e50);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .success-message {
+        display: none;
+        text-align: center;
+        padding: 40px 20px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+    }
+
+    .success-message h2 {
+        color: #27ae60;
+        margin-bottom: 20px;
+        font-size: 28px;
+    }
+
+    .success-message p {
+        margin-bottom: 15px;
+        font-size: 18px;
+    }
+
+    .whatsapp-btn {
+        display: inline-block;
+        background: #25D366;
+        color: white;
+        padding: 12px 25px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-weight: 600;
+        margin-top: 20px;
+        transition: background 0.3s;
+    }
+
+    .whatsapp-btn:hover {
+        background: #128C7E;
+    }
+
+    .spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid #fff;
+        border-top: 2px solid transparent;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        vertical-align: middle;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Inline error styling */
+    .error-message {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+        padding: 12px;
+        border-radius: 4px;
+        margin-bottom: 15px;
+        font-size: 14px;
+        display: none;
+    }
+
+    @media (max-width: 768px) {
+        .hire-container {
+            padding: 15px;
+        }
+
+        header h1 {
+            font-size: 2rem;
+        }
+
+        .form-container {
+            padding: 20px;
+        }
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="hire-container">
+    <header>
+        <h1>Hire a Professional Writer</h1>
+        <p>Submit your request and we'll connect you with an expert writer for your project</p>
+    </header>
+
+    <div class="form-container">
+        <form id="hireWriterForm" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="service" class="required">Select Service</label>
+                <select id="service" name="service" required>
+                    <option value="">-- Choose a service --</option>
+                    <option value="Project/thesis writer">Project/thesis writer</option>
+                    <option value="Data analysis">Data analysis</option>
+                    <option value="Questionnaire">Questionnaire</option>
+                    <option value="Assignment">Assignment</option>
+                    <option value="Serminal">Serminal</option>
+                    <option value="General">General (if the service not included)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="name" class="required">Name</label>
+                <input type="text" id="name" name="name" placeholder="Your full name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email" class="required">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="Your email address" required>
+            </div>
+
+            <div class="form-group">
+                <label for="topic" class="required">Topic</label>
+                <input type="text" id="topic" name="topic" placeholder="Project topic or title" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone" class="required">Phone Number</label>
+                <input type="tel" id="phone" name="phone" placeholder="Your phone number" required>
+            </div>
+
+            <div class="form-group">
+                <label for="description" class="required">Description or Summary</label>
+                <textarea id="description" name="description" placeholder="Please describe your project requirements in detail..." required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="format">Upload Format (Optional)</label>
+                <input type="file" id="format" name="format" 
+                       accept=".pdf,.doc,.docx,.xls,.xlsx,.csv">
+            </div>
+
+            <!-- Inline error message -->
+            <div id="errorContainer" class="error-message"></div>
+
+            <button type="submit" class="btn">Submit Request</button>
+        </form>
+    </div>
+
+    <div class="success-message" id="successMessage">
+        <h2>Thank You for Your Submission!</h2>
+        <p>We have received your request and will contact you shortly via WhatsApp or email.</p>
+        <p>For quicker response, you can chat directly with our admin regarding your request.</p>
+        <a href="https://wa.me/+2349038349959?text=Hello%20I%20just%20submitted%20a%20writer%20request" 
+           class="whatsapp-btn">Chat on WhatsApp Now</a>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('hireWriterForm');
+    const successMessage = document.getElementById('successMessage');
+    const errorContainer = document.getElementById('errorContainer');
+    const submitButton = form.querySelector('button[type="submit"]');
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Basic form validation
+        const service = document.getElementById('service').value;
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const topic = document.getElementById('topic').value;
+        const phone = document.getElementById('phone').value;
+        const description = document.getElementById('description').value;
+        const formatFile = document.getElementById('format').files[0];
+
+        // Validate required fields
+        if (!service || !name || !email || !topic || !phone || !description) {
+            announceError('Please fill in all required fields.');
+            return;
+        }
+
+        // Email validation
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(email)) {
+            announceError('Please enter a valid email address.');
+            return;
+        }
+
+        // Phone number validation
+        const phonePattern = /^\+?\d{10,15}$/;
+        if (!phonePattern.test(phone)) {
+            announceError('Please enter a valid phone number (10-15 digits).');
+            return;
+        }
+
+        // File validation (max 5MB, allowed formats)
+        if (formatFile) {
+            const maxSize = 5 * 1024 * 1024; // 5MB
+            const allowedTypes = [
+                'application/pdf',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'application/vnd.ms-excel',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'text/csv'
+            ];
+
+            if (formatFile.size > maxSize) {
+                announceError('Uploaded file must be less than 5MB.');
+                return;
+            }
+            if (!allowedTypes.includes(formatFile.type)) {
+                announceError('Please upload a valid file (.pdf, .doc, .docx, .xls, .xlsx, .csv).');
+                return;
+            }
+        }
+
+        // Show loading state
+        submitButton.disabled = true;
+        submitButton.innerHTML = 'Submitting... <span class="spinner"></span>';
+
+        // Create FormData
+        const formData = new FormData(form);
+
+        // Submit via fetch
+        fetch('{% url "books:hire" %}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                announceError(data.error);
+            } else {
+                form.style.display = 'none';
+                errorContainer.style.display = 'none';
+                successMessage.style.display = 'block';
+                successMessage.scrollIntoView({ behavior: 'smooth' });
+                form.reset();
+            }
+        })
+        .catch(error => {
+            announceError('An error occurred while submitting the form. Please try again.');
+            console.error('Submission Error:', error);
+        })
+        .finally(() => {
+            submitButton.disabled = false;
+            submitButton.innerHTML = 'Submit Request';
+        });
+    });
+
+    function announceError(message) {
+        errorContainer.style.display = 'block';
+        errorContainer.textContent = message;
+        errorContainer.focus();
+    }
+});
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}

@@ -21,6 +21,7 @@ web_urlpatterns = [
     path('services/', views.services, name='services'),
     path('resources/', views.resources, name='resources'),
     path('projects/', views.projects, name='projects'),
+    path('hire/', views.hire, name='hire'),
     path('project_faculty/', views.projects_by_faculty, name='project_faculty'),
     path('project-list/', views.projectList, name='project-list'),
     path('product-details/<slug:slug>/', views.product_details, name='product-details'),

@@ -123,14 +123,14 @@ def book_preview(request, id):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def book_details_api(request, id):
+def book_details_api(request, slug):
     """
     Backward-compatible version of book stats API.
     Example: /api/book/623/details/
     """
-    book = get_object_or_404(Book.objects.only('id', 'preview_url'), id=id)
+    book = get_object_or_404(Book.objects.only('slug', 'preview_url'), slug=slug)
 
-    stats_cache_key = f"book_stats_{book.id}"
+    stats_cache_key = f"book_stats_{book.slug}"
     stats = cache.get(stats_cache_key)
     if not stats:
         try:
