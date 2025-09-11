@@ -1,3 +1,4 @@
+import datetime
 import os
 from re import template
 from django.shortcuts import get_object_or_404, redirect, render
@@ -14,11 +15,12 @@ from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
+from datetime import datetime, timedelta
 
 
 from books.utils import generate_preview_task
 from .models import Book, Category, BookType, HireWriterRequest
-from payments.models import  Order, Download
+from payments.models import  Order, Download, Payment
 from django.db.models import Sum, Avg, Q, Count
 from django.views.decorators.cache import cache_page
 from django.core.files.storage import default_storage
@@ -326,12 +328,9 @@ def projectList(request):
 def product_details(request, slug):
     book = get_object_or_404(
         Book.objects.select_related('book_type', 'category', 'user')
-                   .defer('description', 'file'),  # Defer large fields
+                   .defer('description', 'file'),
         slug=slug
     )
-
-    if request.user.is_authenticated:
-        return redirect('books:login-product-details', slug=book.slug)
 
     # Related books logic (cached)
     related_cache_key = f"related_books_{book.slug}"
@@ -347,16 +346,62 @@ def product_details(request, slug):
             .filter(query)
             .exclude(slug=book.slug)
             .only('slug', 'title', 'cover_image', 'price')
-            .order_by('-created_at')[:5]  # More predictable than random
+            .order_by('-created_at')[:5]
         )
-        cache.set(related_cache_key, related_books, 60 * 60 * 12)  # Cache for 12 hours
+        cache.set(related_cache_key, related_books, 60 * 60 * 12)
 
+    # Get preview attempts with 24-hour time-based reset
+    preview_data = get_preview_data(request)
+    preview_attempts_remaining = max(0, 3 - preview_data['count'])
+    reset_date = preview_data['reset_date']
+    
     context = {
         "book": book,
         "related_books": related_books,
+        "preview_attempts_remaining": preview_attempts_remaining,
+        "reset_date": reset_date,
     }
+    
+    template = 'books/login-product-details.html' if request.user.is_authenticated else 'books/product-details.html'
+    return render(request, template, context)
 
-    return render(request, 'books/product-details.html', context)
+
+
+
+
+# @cache_page(60 * 15)
+# @login_required(login_url='users:user_login')
+# def login_product_details(request, slug):
+   
+#     book = get_object_or_404(
+#         Book.objects.select_related('book_type', 'category', 'user')
+#                    .defer('description', 'file'),  
+#         slug=slug
+#     )
+
+#     related_cache_key = f"related_books_{book.slug}"
+#     related_books = cache.get(related_cache_key)
+#     if not related_books:
+#         title_keywords = [word for word in book.title.split() if len(word) > 3][:3]
+#         query = Q()
+#         for word in title_keywords:
+#             query |= Q(title__icontains=word) | Q(description__icontains=word)
+        
+#         related_books = (
+#             Book.objects
+#             .filter(query)
+#             .exclude(slug=book.slug)
+#             .only('slug', 'title', 'cover_image', 'price')
+#             .order_by('-created_at')[:5]
+#         )
+#         cache.set(related_cache_key, related_books, 60 * 60 * 12)
+
+#     context = {
+#         "book": book,
+#         "related_books": related_books,
+#     }
+
+#     return render(request, 'books/login-product-details.html', context)
 
 
 
@@ -463,39 +508,7 @@ def verification_error(request):
     return render(request, 'users/verification-error.html')
 
 
-@cache_page(60 * 15)
-@login_required(login_url='users:user_login')
-def login_product_details(request, slug):
-   
-    book = get_object_or_404(
-        Book.objects.select_related('book_type', 'category', 'user')
-                   .defer('description', 'file'),  
-        slug=slug
-    )
 
-    related_cache_key = f"related_books_{book.slug}"
-    related_books = cache.get(related_cache_key)
-    if not related_books:
-        title_keywords = [word for word in book.title.split() if len(word) > 3][:3]
-        query = Q()
-        for word in title_keywords:
-            query |= Q(title__icontains=word) | Q(description__icontains=word)
-        
-        related_books = (
-            Book.objects
-            .filter(query)
-            .exclude(slug=book.slug)
-            .only('slug', 'title', 'cover_image', 'price')
-            .order_by('-created_at')[:5]
-        )
-        cache.set(related_cache_key, related_books, 60 * 60 * 12)
-
-    context = {
-        "book": book,
-        "related_books": related_books,
-    }
-
-    return render(request, 'books/login-product-details.html', context)
 
 
 @login_required(login_url='users:user_login')
@@ -679,13 +692,48 @@ def upload_book(request):
     
     
     
+# def preview_pdf(request, slug):
+#     # Only include actual relational fields in select_related
+#     book = get_object_or_404(
+#         Book.objects.select_related('book_type', 'category', 'user')
+#                    .defer('description', 'file'),  
+#         slug=slug
+#     )
+    
+#     stats = book.get_file_statistics()
+    
+#     template = 'books/login-preview.html' if request.user.is_authenticated else 'books/preview.html'
+   
+#     context = {
+#         'book': book,
+#         "page_count": stats["pages"],
+#         "word_count": stats["words"],
+#         'stats': stats,
+#     }
+   
+#     return render(request, template, context)
+
+
 def preview_pdf(request, slug):
-    # Only include actual relational fields in select_related
     book = get_object_or_404(
         Book.objects.select_related('book_type', 'category', 'user')
                    .defer('description', 'file'),  
         slug=slug
     )
+    
+    # Get or update preview attempts with 24-hour time-based reset
+    preview_data = get_preview_data(request)
+    
+    # Check if user has exceeded global preview limit
+    if preview_data['count'] >= 3:
+        messages.warning(request, 'You have reached the maximum preview limit. Your previews will reset on {}.'.format(
+            preview_data['reset_date'].strftime('%Y-%m-%d at %H:%M')
+        ))
+        return redirect('books:product-details', slug=slug)
+    
+    # Increment global preview count
+    preview_data['count'] += 1
+    set_preview_data(request, preview_data)
     
     stats = book.get_file_statistics()
     
@@ -696,9 +744,58 @@ def preview_pdf(request, slug):
         "page_count": stats["pages"],
         "word_count": stats["words"],
         'stats': stats,
+        'preview_attempts_remaining': 3 - preview_data['count'],
+        'reset_date': preview_data['reset_date'],
     }
    
     return render(request, template, context)
 
 
+# Helper functions for 24-hour time-based preview tracking
+def get_preview_data(request):
+    """Get preview data with 24-hour time-based reset logic"""
+    now = datetime.now()
+    
+    if 'preview_data' not in request.session:
+        # Initialize new preview data with 24-hour reset
+        reset_date = now + timedelta(hours=24)
+        preview_data = {
+            'count': 0,
+            'reset_date': reset_date.isoformat(),
+            'created_date': now.isoformat()
+        }
+        request.session['preview_data'] = json.dumps(preview_data)
+        return preview_data
+    
+    # Load existing preview data
+    preview_data = json.loads(request.session['preview_data'])
+    reset_date = datetime.fromisoformat(preview_data['reset_date'])
+    created_date = datetime.fromisoformat(preview_data['created_date'])
+    
+    # Check if 24-hour reset period has passed
+    if now >= reset_date:
+        # Reset the counter and set new 24-hour reset date
+        new_reset_date = now + timedelta(hours=24)
+        preview_data = {
+            'count': 0,
+            'reset_date': new_reset_date.isoformat(),
+            'created_date': now.isoformat()
+        }
+        request.session['preview_data'] = json.dumps(preview_data)
+    
+    # Convert string dates back to datetime objects for return
+    preview_data['reset_date'] = datetime.fromisoformat(preview_data['reset_date'])
+    preview_data['created_date'] = datetime.fromisoformat(preview_data['created_date'])
+    
+    return preview_data
 
+
+def set_preview_data(request, preview_data):
+    """Store preview data in session"""
+    # Convert datetime objects to strings for JSON serialization
+    data_to_store = preview_data.copy()
+    data_to_store['reset_date'] = data_to_store['reset_date'].isoformat()
+    data_to_store['created_date'] = data_to_store['created_date'].isoformat()
+    
+    request.session['preview_data'] = json.dumps(data_to_store)
+    request.session.modified = True

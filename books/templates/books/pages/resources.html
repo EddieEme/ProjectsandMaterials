@@ -1,166 +1,182 @@
 {% load static %}
-<!-- News Section -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Latest Tutorials</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .news-section { padding: 60px 0; background: #f8f9fa; }
+        .section-title { font-size: 2.5rem; font-weight: bold; color: #2c3e50; text-align: center; margin-bottom: 20px; }
+        .section-subtitle { font-size: 1.1rem; color: #6c757d; text-align: center; margin-bottom: 40px; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .video-card { background: #fff; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); overflow: hidden; margin-bottom: 30px; transition: transform 0.3s ease, box-shadow 0.3s ease; height: 100%; }
+        .video-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        .video-content { padding: 20px; }
+        .video-category { background: linear-gradient(45deg, #ff6b6b, #ee5a24); color: white; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; display: inline-block; margin-bottom: 12px; }
+        .video-title { font-size: 18px; font-weight: 600; color: #2c3e50; margin-bottom: 12px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .video-meta { font-size: 13px; color: #7f8c8d; margin-bottom: 10px; }
+        .video-stats { display: flex; gap: 15px; margin-bottom: 15px; }
+        .stat-item { font-size: 13px; color: #636e72; display: flex; align-items: center; gap: 4px; }
+        .watch-more { display: inline-flex; align-items: center; background: linear-gradient(45deg, #3498db, #2980b9); color: white; padding: 10px 20px; text-decoration: none; border-radius: 25px; font-size: 14px; font-weight: 500; transition: all 0.3s ease; }
+        .watch-more:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3); color: white; }
+        .all-btn { background: linear-gradient(45deg, #e74c3c, #c0392b); color: white; padding: 12px 30px; border: none; border-radius: 25px; font-weight: 500; transition: all 0.3s ease; }
+        .all-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3); color: white; }
+    </style>
+</head>
+<body>
+    <!-- News Section -->
     <section class="news-section">
         <div class="container">
             <h2 class="section-title">OUR LATEST TUTORIALS</h2>
-            <p class="section-subtitle">Unlock the Secrets to Mastering Project Writing!<b></b> provide expert-led video tutorials designed to help you craft outstanding project reports with clarity and precision.</p>
+            <p class="section-subtitle">Unlock the Secrets to Mastering Project Writing! We provide expert-led video tutorials designed to help you craft outstanding project reports with clarity and precision.</p>
     
             <div class="row" id="videoContainer">
-                <div class="loading-spinner">
-                    Loading videos...
-                </div>
+                <!-- Videos will be loaded here -->
             </div>
+            
             <div class="row justify-content-center mt-4">
                 <div class="col-md-4 text-center">
-                    <a href="https://youtube.com/@project-and-materials?si=NyNDsJsYO15p1xfH" class="btn btn-primary all-btn">
-                        View More News
+                    <a href="https://youtube.com/@project-and-materials?si=NyNDsJsYO15p1xfH" class="btn all-btn">
+                        View More Videos
                         <i class="fas fa-arrow-right ms-2"></i>
                     </a>
                 </div>
             </div>
         </div>
     </section>
-    
-    
+
     <script>
-        // Initialize AOS
-        AOS.init({
-            duration: 1000,
-            once: true
-        });
-
-        // Navbar scroll effect
-        window.addEventListener('scroll', function () {
-            const navbar = document.querySelector('.navbar');
-            if (window.scrollY > 50) {
-                navbar.style.background = 'rgba(255, 255, 255, 0.95)';
-            } else {
-                navbar.style.background = 'white';
+    document.addEventListener('DOMContentLoaded', () => {
+        const videoContainer = document.getElementById('videoContainer');
+        
+        // Manual video data - 6 videos - no API needed!
+        const manualVideos = [
+            {
+                id: 'VIDEO_ID_1', // Replace with actual YouTube video IDs
+                title: 'Complete Guide to Project Writing: From Research to Final Draft',
+                published_at: '2024-01-15T00:00:00Z',
+                views: 15600,
+                likes: 920,
+                comments: 52
+            },
+            {
+                id: 'VIDEO_ID_2', // Replace with actual YouTube video IDs
+                title: 'Research Methodology Techniques for Academic Projects',
+                published_at: '2024-02-01T00:00:00Z',
+                views: 12500,
+                likes: 850,
+                comments: 45
+            },
+            {
+                id: 'VIDEO_ID_3', // Replace with actual YouTube video IDs
+                title: 'Citation and Referencing: APA, MLA, Chicago Styles',
+                published_at: '2024-02-15T00:00:00Z',
+                views: 18900,
+                likes: 1100,
+                comments: 68
+            },
+            {
+                id: 'VIDEO_ID_4', // Replace with actual YouTube video IDs
+                title: 'Literature Review: How to Analyze and Synthesize Research Papers',
+                published_at: '2024-03-01T00:00:00Z',
+                views: 14200,
+                likes: 780,
+                comments: 41
+            },
+            {
+                id: 'VIDEO_ID_5', // Replace with actual YouTube video IDs
+                title: 'Data Analysis and Interpretation for Research Projects',
+                published_at: '2024-03-15T00:00:00Z',
+                views: 16700,
+                likes: 950,
+                comments: 58
+            },
+            {
+                id: 'VIDEO_ID_6', // Replace with actual YouTube video IDs
+                title: 'Thesis Defense Preparation: Tips for Successful Presentation',
+                published_at: '2024-04-01T00:00:00Z',
+                views: 19800,
+                likes: 1200,
+                comments: 72
             }
-        });
+        ];
 
+        // Display the videos
+        const videoHtml = manualVideos.map(video => createVideoCard(video)).join('');
+        videoContainer.innerHTML = videoHtml;
 
-        document.addEventListener('DOMContentLoaded', function () {
-                const slides = document.querySelectorAll('.testimonial-slide');
-                const dots = document.querySelectorAll('.dot');
-                const prevButton = document.querySelector('.prev-slide');
-                const nextButton = document.querySelector('.next-slide');
-                let currentSlide = 0;
-
-                function showSlide(n) {
-                    slides.forEach(slide => slide.classList.remove('active'));
-                    dots.forEach(dot => dot.classList.remove('active'));
-
-                    currentSlide = (n + slides.length) % slides.length;
-                    slides[currentSlide].classList.add('active');
-                    dots[currentSlide].classList.add('active');
-                }
-
-                function nextSlide() {
-                    showSlide(currentSlide + 1);
-                }
-
-                function previousSlide() {
-                    showSlide(currentSlide - 1);
-                }
-
-                // Event listeners
-                prevButton.addEventListener('click', previousSlide);
-                nextButton.addEventListener('click', nextSlide);
-
-                dots.forEach((dot, index) => {
-                    dot.addEventListener('click', () => showSlide(index));
-                });
-
-                // Auto-advance slides every 5 seconds
-                setInterval(nextSlide, 5000);
+        function createVideoCard(video) {
+            const videoDate = new Date(video.published_at);
+            const formattedDate = videoDate.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
             });
 
-          document.getElementById('newsletterForm').addEventListener('submit', function (e) {
-                e.preventDefault();
-                const email = this.querySelector('input[type="email"]').value;
+            return `
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <article class="video-card">
+                        <div class="video-wrapper">
+                            <iframe 
+                                src="https://www.youtube.com/embed/${video.id}"
+                                title="${video.title}"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen
+                                loading="lazy"
+                            ></iframe>
+                        </div>
+                        <div class="video-content">
+                            <span class="video-category">Tutorial</span>
+                            <h3 class="video-title">${sanitizeHTML(video.title)}</h3>
+                            <div class="video-meta">
+                                ${formattedDate} • ${formatViewCount(video.views)} views
+                            </div>
+                            <div class="video-stats">
+                                <span class="stat-item">👍 ${formatCount(video.likes)}</span>
+                                <span class="stat-item">💬 ${formatCount(video.comments)}</span>
+                            </div>
+                            <a href="https://www.youtube.com/watch?v=${video.id}" 
+                               class="watch-more" 
+                               target="_blank" 
+                               rel="noopener noreferrer">
+                                Watch on YouTube
+                                <i class="fas fa-external-link-alt ms-2"></i>
+                            </a>
+                        </div>
+                    </article>
+                </div>
+            `;
+        }
 
-                // Here you would typically send this to your backend
-                console.log('Newsletter subscription for:', email);
+        function sanitizeHTML(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
 
-                // Clear the input
-                this.querySelector('input[type="email"]').value = '';
+        function formatViewCount(views) {
+            const num = parseInt(views);
+            if (isNaN(num)) return '0';
+            if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
+            if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
+            return num.toString();
+        }
 
-                // Show success message (you can enhance this)
-                alert('Thank you for subscribing!');
-            });
+        function formatCount(count) {
+            const num = parseInt(count);
+            if (isNaN(num)) return '0';
+            if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
+            return num.toString();
+        }
+    });
     </script>
- <!-- AOS Library -->
-    
-    <script>
-        // Initialize AOS
-        AOS.init({
-            duration: 1000,
-            once: true
-        });
 
-        // Navbar scroll effect
-        window.addEventListener('scroll', function () {
-            const navbar = document.querySelector('.navbar');
-            if (window.scrollY > 50) {
-                navbar.style.background = 'rgba(255, 255, 255, 0.95)';
-            } else {
-                navbar.style.background = 'white';
-            }
-        });
-
-
-        document.addEventListener('DOMContentLoaded', function () {
-                const slides = document.querySelectorAll('.testimonial-slide');
-                const dots = document.querySelectorAll('.dot');
-                const prevButton = document.querySelector('.prev-slide');
-                const nextButton = document.querySelector('.next-slide');
-                let currentSlide = 0;
-
-                function showSlide(n) {
-                    slides.forEach(slide => slide.classList.remove('active'));
-                    dots.forEach(dot => dot.classList.remove('active'));
-
-                    currentSlide = (n + slides.length) % slides.length;
-                    slides[currentSlide].classList.add('active');
-                    dots[currentSlide].classList.add('active');
-                }
-
-                function nextSlide() {
-                    showSlide(currentSlide + 1);
-                }
-
-                function previousSlide() {
-                    showSlide(currentSlide - 1);
-                }
-
-                // Event listeners
-                prevButton.addEventListener('click', previousSlide);
-                nextButton.addEventListener('click', nextSlide);
-
-                dots.forEach((dot, index) => {
-                    dot.addEventListener('click', () => showSlide(index));
-                });
-
-                // Auto-advance slides every 5 seconds
-                setInterval(nextSlide, 5000);
-            });
-
-          document.getElementById('newsletterForm').addEventListener('submit', function (e) {
-                e.preventDefault();
-                const email = this.querySelector('input[type="email"]').value;
-
-                // Here you would typically send this to your backend
-                console.log('Newsletter subscription for:', email);
-
-                // Clear the input
-                this.querySelector('input[type="email"]').value = '';
-
-                // Show success message (you can enhance this)
-                alert('Thank you for subscribing!');
-            });
-    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{% static 'books/js/youtube.js' %}" defer></script>
-    
+</body>
+</html>

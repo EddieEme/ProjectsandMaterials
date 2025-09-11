@@ -1,11 +1,13 @@
 {% load static %}
 {% load custom_filters %}
-{% block link %}
-<!-- Remove PDF.js as we'll use iframe instead -->
-{% endblock %}
-
-
-{% block style %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ book.title }} - Book Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         a {
             text-decoration: none;
@@ -371,247 +373,397 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
         }
+        
+        /* New styles for preview tracking */
+        .preview-counter {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #198754;
+        }
+        
+        .preview-limit-reached {
+            background-color: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .preview-limit-reached h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        
+        .buy-now-prompt {
+            background-color: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .global-limit-notice {
+            background-color: #e7f3ff;
+            border-left: 4px solid #0d6efd;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .purchased-notice {
+            background-color: #d4edda;
+            border-left: 4px solid #28a745;
+            color: #155724;
+        }
+        
+        .reset-info {
+            background-color: #f8f9fa;
+            border-left: 4px solid #6c757d;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            margin-top: 10px;
+        }
     </style>
-{% endblock %}
+</head>
+<body>
+    {% comment %} {% include 'includes/header.html' %} {% endcomment %}
+    
+    <div class="container mt-4" style="margin-top: 6.5rem !important;">
+        <h1 class="h2 mb-4" style="color: #2c3e50; font-weight: 600;">{{book.title}}</h1>
 
-<div class="container mt-4" style="margin-top: 6.5rem !important;">
-    <h1 class="h2 mb-4" style="color: #2c3e50; font-weight: 600;">{{book.title}}</h1>
-
-    <div class="row">
-        <div class="col-md-8 project-overview">
-            <ul class="nav nav-tabs mb-4" id="paperTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">Overview</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="citations-tab" data-bs-toggle="tab" data-bs-target="#citations" type="button" role="tab">Cite Work</button>
-                </li>
-            </ul>
-
-            <div class="tab-content" id="paperTabsContent">
-                <div class="tab-pane fade show active" id="overview" role="tabpanel">
-                    <div class="content mb-4">
-                        <p class="lead">{{ book.description|unescape_html|truncatehtml:500|safe }}</p>
-                    </div>
-
-                    <div class="modal fade" id="documentModal" tabindex="-1">
-                        <div class="modal-dialog modal-lg modal-dialog-scrollable">
-                            <div class="modal-content no-select watermarked">
-                                <div class="modal-header">
-                                    <h5 class="modal-title">{{book.title}}</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="pdf-preview-container">
-                                        <iframe class="pdf-preview-iframe" id="pdfPreviewFrame" src="about:blank"></iframe>
-                                    </div>
-                                    <img src="{% static 'books/images/hero_image_1.jpg' %}" alt="advert" style="width: 20%;">
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                    {% if request.user.is_authenticated %}
-                                        <a class="btn btn-success" id="downloadBtn" href="{% url 'subscriptions:buyorsubscribe' book.id %}">
-                                            <i class="fas fa-download"></i> Download
-                                        </a>
-                                    {% else %}
-                                        <a class="btn btn-success" id="downloadBtn" href="{% url 'subscriptions:buyorsubscribe' book.id %}">
-                                            <i class="fas fa-download"></i> Download
-                                        </a>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="ayatutu-definition"></div>
-                    <div class="ayatutu-definition"></div>
-                </div>
-
-                <div class="tab-pane fade" id="citations" role="tabpanel">
-                    <!-- Citations content remains the same -->
-                    <div class="citation-card">
-                        <div class="citation-content">
-                            <h5>Full Citation:</h5>
-                            <p>{{book.author}}. (2021). {{book.title}}.
-    African and General Studies, 40, 14858.</p>
-
-                            <h5 class="mt-3">Citation Formats:</h5>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <h6>APA</h6>
-                                    <pre class="bg-light p-2">{{book.author}}. (2021). {{book.title}}. African and General Studies, 40, 14858.</pre>
-                                </div>
-                                <div class="col-md-4">
-                                    <h6>MLA</h6>
-                                    <pre class="bg-light p-2">{{book.author}}. "{{book.title}}." African and General Studies, vol. 40, 2021, pp. 14858.</pre>
-                                </div>
-                                <div class="col-md-4">
-                                    <h6>Chicago</h6>
-                                    <pre class="bg-light p-2">{{book.author}}. "{{book.title}}." African and General Studies 40 (2021): 14858.</pre>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <!-- Global preview limit notice -->
+        {% if has_purchased %}
+        <div class="global-limit-notice purchased-notice">
+            <i class="fas fa-check-circle me-2"></i>
+            You've purchased this book - unlimited previews available
         </div>
-
-        <div class="col-md-4">
-            <div class="document-details mb-4">
-                <div>
-                        {% if book.cover_image %}
-                        <img src="{{ book.cover_image.url }}" alt="advert" style="width: 100%;">
-                        {% else %}
-                            <img src="{% static 'books/images/advert_cover.jpg' %}" alt="default advert" style="width: 100%;">
-                        {% endif %}
+        {% else %}
+        <div class="global-limit-notice">
+            <i class="fas fa-info-circle me-2"></i>
+            You have <strong>{{ preview_attempts_remaining }}</strong> free previews remaining
+            {% if reset_date %}
+                <div class="reset-info">
+                    <i class="fas fa-sync-alt me-1"></i>
+                    Previews reset on: {{ reset_date|date:"M j, Y" }}
                 </div>
+            {% endif %}
+        </div>
+        {% endif %}
 
-                <div class="document-details-box">
-                    <h4 class="mb-3 title">Document Details</h4>
+        <!-- Preview counter display -->
+        {% if preview_attempts_remaining >= 0 and not has_purchased %}
+        <div class="preview-counter">
+            <span><i class="fas fa-eye me-2"></i> Preview attempts remaining: <strong>{{ preview_attempts_remaining }}</strong></span>
+            <span class="badge bg-{% if preview_attempts_remaining > 1 %}success{% elif preview_attempts_remaining == 1 %}warning{% else %}danger{% endif %}">
+                {% if preview_attempts_remaining > 1 %}
+                    {{ preview_attempts_remaining }} remaining
+                {% elif preview_attempts_remaining == 1 %}
+                    Last preview
+                {% else %}
+                    No previews left
+                {% endif %}
+            </span>
+        </div>
+        {% endif %}
 
-                    <div class="mb-3 detail-item">
-                        <span class="label"><i class="fas fa-users"></i></span>
-                        <span class="value text-uppercase">{{ book.author }}</span>
+        <div class="row">
+            <div class="col-md-8 project-overview">
+                <ul class="nav nav-tabs mb-4" id="paperTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">Overview</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="citations-tab" data-bs-toggle="tab" data-bs-target="#citations" type="button" role="tab">Cite Work</button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="paperTabsContent">
+                    <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                        <div class="content mb-4">
+                            <p class="lead">{{ book.description|unescape_html|truncatehtml:500|safe }}</p>
+                        </div>
+
+                        <div class="modal fade" id="documentModal" tabindex="-1">
+                            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                                <div class="modal-content no-select watermarked">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">{{book.title}}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="pdf-preview-container">
+                                            <iframe class="pdf-preview-iframe" id="pdfPreviewFrame" src="about:blank"></iframe>
+                                        </div>
+                                        <img src="{% static 'books/images/hero_image_1.jpg' %}" alt="advert" style="width: 20%;">
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        {% if request.user.is_authenticated %}
+                                            <a class="btn btn-success" id="downloadBtn" href="{% url 'subscriptions:buyorsubscribe' book.id %}">
+                                                <i class="fas fa-download"></i> Download
+                                            </a>
+                                        {% else %}
+                                            <a class="btn btn-success" id="downloadBtn" href="{% url 'subscriptions:buyorsubscribe' book.id %}">
+                                                <i class="fas fa-download"></i> Download
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ayatutu-definition"></div>
+                        <div class="ayatutu-definition"></div>
                     </div>
 
-                    <div class="mb-3 detail-item">
-                        <span class="label">📁 FIELD:</span>
-                        <span class="value field text-uppercase">{{ book.category.name }}</span>
-                    </div>
+                    <div class="tab-pane fade" id="citations" role="tabpanel">
+                        <!-- Citations content remains the same -->
+                        <div class="citation-card">
+                            <div class="citation-content">
+                                <h5>Full Citation:</h5>
+                                <p>{{book.author}}. (2021). {{book.title}}.
+        African and General Studies, 40, 14858.</p>
 
-                    <div class="mb-3 detail-item">
-                        <span class="label">🏷️ TYPE:</span>
-                        <span class="value type text-uppercase">{{ book.book_type.name }}</span>
-                    </div>
+                                <h5 class="mt-3">Citation Formats:</h5>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <h6>APA</h6>
+                                        <pre class="bg-light p-2">{{book.author}}. (2021). {{book.title}}. African and General Studies, 40, 14858.</pre>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h6>MLA</h6>
+                                        <pre class="bg-light p-2">{{book.author}}. "{{book.title}}." African and General Studies, vol. 40, 2021, pp. 14858.</pre>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h6>Chicago</h6>
+                                        <pre class="bg-light p-2">{{book.author}}. "{{book.title}}." African and General Studies 40 (2021): 14858.</pre>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="citation-card">
+                                <div class="citation-content">
+                                    <h5>Full Citation:</h5>
+                                    <p>{{book.author}}. (2021). {{book.title}}.
+            African and General Studies, 40, 14858.</p>
 
-                    <div class="mb-3 detail-item">
-                        <span class="label"><i class="fas fa-file-alt"></i></span>
-                        <span class="value stats-loading" id="page-count">
-                            <i class="fas fa-file-pdf text-danger me-1"></i>
-                            Loading...
-                        </span>
-                    </div>
-
-                    <div class="mb-3 detail-item">
-                        <span class="label">📘 CHAPTERS:</span>
-                        <span class="value type text-uppercase">1 to 5 CHAPTERS</span>
-                    </div>
-
-                    <div class="action-buttons">
-                        <a href="{% url 'books:preview' slug=book.slug %}" class="btn btn-primary">
-                            <i class="fas fa-eye"></i> Preview Document
-                        </a>
-
-                        {% if request.user.is_authenticated %}
-                            <a class="btn btn-success" id="downloadBtn" href="{% url 'subscriptions:buyorsubscribe' book.id %}">
-                                <i class="fas fa-download"></i> Download
-                            </a>
-                        {% else %}
-                            <a class="btn btn-success" id="downloadBtn" href="{% url 'subscriptions:buyorsubscribe' book.id %}">
-                                <i class="fas fa-download"></i> Download
-                            </a>
-                        {% endif %}
+                                    <h5 class="mt-3">Citation Formats:</h5>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <h6>APA</h6>
+                                            <pre class="bg-light p-2">{{book.author}}. (2021). {{book.title}}. African and General Studies, 40, 14858.</pre>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <h6>MLA</h6>
+                                            <pre class="bg-light p-2">{{book.author}}. "{{book.title}}." African and General Studies, vol. 40, 2021, pp. 14858.</pre>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <h6>Chicago</h6>
+                                            <pre class="bg-light p-2">{{book.author}}. "{{book.title}}." African and General Studies 40 (2021): 14858.</pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            
-            <div class="related-works">
-                <h4 class="mb-3" style="color: #2c3e50;">Related Works</h4>
-                {% for related_book in related_books %}
-                    <li class="related-work">
-                        <a href="{% url 'books:product-details' related_book.slug %}">
-                            {{ related_book.title }}
-                        </a>
-                    </li>
-                {% empty %}
-                    <li class="related-work">No related books found.</li>
-                {% endfor %}
+
+            <div class="col-md-4">
+                <div class="document-details mb-4">
+                    <div>
+                            {% if book.cover_image %}
+                            <img src="{{ book.cover_image.url }}" alt="advert" style="width: 100%;">
+                            {% else %}
+                                <img src="{% static 'books/images/advert_cover.jpg' %}" alt="default advert" style="width: 100%;">
+                            {% endif %}
+                    </div>
+
+                    <div class="document-details-box">
+                        <h4 class="mb-3 title">Document Details</h4>
+
+                        <div class="mb-3 detail-item">
+                            <span class="label"><i class="fas fa-users"></i></span>
+                            <span class="value text-uppercase">{{ book.author }}</span>
+                        </div>
+
+                        <div class="mb-3 detail-item">
+                            <span class="label">📁 FIELD:</span>
+                            <span class="value field text-uppercase">{{ book.category.name }}</span>
+                        </div>
+
+                        <div class="mb-3 detail-item">
+                            <span class="label">🏷️ TYPE:</span>
+                            <span class="value type text-uppercase">{{ book.book_type.name }}</span>
+                        </div>
+
+                        <div class="mb-3 detail-item">
+                            <span class="label"><i class="fas fa-file-alt"></i></span>
+                            <span class="value stats-loading" id="page-count">
+                                <i class="fas fa-file-pdf text-danger me-1"></i>
+                                Loading...
+                            </span>
+                        </div>
+
+                        <div class="mb-3 detail-item">
+                            <span class="label">📘 CHAPTERS:</span>
+                            <span class="value type text-uppercase">1 to 5 CHAPTERS</span>
+                        </div>
+
+                        <div class="action-buttons">
+                            {% if has_purchased %}
+                                <!-- Unlimited previews for purchased books -->
+                                <a href="{% url 'books:preview' slug=book.slug %}" class="btn btn-primary">
+                                    <i class="fas fa-eye"></i> Preview Document
+                                </a>
+                                <a class="btn btn-success" id="downloadBtn" href="{% url 'subscriptions:buyorsubscribe' book.id %}">
+                                    <i class="fas fa-download"></i> Download Now
+                                </a>
+                            {% else %}
+                                <!-- Limited previews for non-purchased books -->
+                                {% if preview_attempts_remaining > 0 %}
+                                    <a href="{% url 'books:preview' slug=book.slug %}" class="btn btn-primary">
+                                        <i class="fas fa-eye"></i> Preview Document
+                                    </a>
+                                {% else %}
+                                    <button class="btn btn-secondary" disabled>
+                                        <i class="fas fa-eye-slash"></i> Preview Limit Reached
+                                    </button>
+                                {% endif %}
+
+                                <!-- Buy now button -->
+                                <a class="btn btn-success" id="downloadBtn" href="{% url 'subscriptions:buyorsubscribe' book.id %}">
+                                    <i class="fas fa-shopping-cart"></i> Buy Now
+                                </a>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Prompt to buy when preview limit is reached -->
+                        {% if preview_attempts_remaining <= 0 and not has_purchased %}
+                        <div class="buy-now-prompt mt-3">
+                            <h5>Want to see more?</h5>
+                            <p>You've reached your free preview limit. 
+                               {% if reset_date %}
+                               Your previews will reset on <strong>{{ reset_date|date:"M j, Y" }}</strong>.
+                               {% endif %}
+                               Purchase now for immediate access.</p>
+                            <a class="btn btn-success" href="{% url 'subscriptions:buyorsubscribe' book.id %}">
+                                <i class="fas fa-shopping-cart"></i> Purchase Now
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="related-works">
+                    <h4 class="mb-3" style="color: #2c3e50;">Related Works</h4>
+                    {% for related_book in related_books %}
+                        <li class="related-work">
+                            <a href="{% url 'books:product-details' related_book.slug %}">
+                                {{ related_book.title }}
+                            </a>
+                        </li>
+                    {% empty %}
+                        <li class="related-work">No related books found.</li>
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Security measures
-    document.body.addEventListener('selectstart', function(e) {
-        e.preventDefault();
-    });
+    {% include 'books/pages/footer.html' %}
 
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'PrintScreen' ||
-            (e.ctrlKey && e.shiftKey && e.key === 'I') ||
-            (e.ctrlKey && e.shiftKey && e.key === 'C') ||
-            (e.ctrlKey && e.key === 'p')) {
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Security measures
+        document.body.addEventListener('selectstart', function(e) {
             e.preventDefault();
-        }
-    });
+        });
 
-    // Load document stats via API
-    function loadDocumentStats() {
-        const bookId = JSON.parse('{{ book.id|safe|escapejs }}');
-        fetch(`/api/books/${bookId}/preview/`)
-            .then(response => {
-                if (!response.ok) throw new Error('Network response was not ok');
-                return response.json();
-            })
-            .then(data => {
-                if (data.page_count && data.word_count) {
-                    document.getElementById('page-count').textContent = 
-                        `${data.page_count} PAGES (${data.word_count} WORDS)`;
-                    document.getElementById('page-count').classList.remove('stats-loading');
-                }
-            })
-            .catch(error => {
-                console.error('Error loading document stats:', error);
-                document.getElementById('page-count').textContent = 'Stats unavailable';
-                document.getElementById('page-count').classList.remove('stats-loading');
-            });
-    }
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'PrintScreen' ||
+                (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+                (e.ctrlKey && e.shiftKey && e.key === 'C') ||
+                (e.ctrlKey && e.key === 'p')) {
+                e.preventDefault();
+            }
+        });
 
-    // Initialize PDF viewer when modal opens
-    function initPDFViewer() {
-        const modal = document.getElementById('documentModal');
-        if (!modal) return;
-
-        modal.addEventListener('shown.bs.modal', function() {
-            const iframe = document.getElementById('pdfPreviewFrame');
-            
-            // Show loading state
-            iframe.src = "about:blank";
-            
-            // Fetch preview data from API
-            fetch(`/api/books/{{ book.id }}/preview/`)
+        // Load document stats via API
+        function loadDocumentStats() {
+            const bookId = JSON.parse('{{ book.id|safe|escapejs }}');
+            fetch(`/api/books/${bookId}/preview/`)
                 .then(response => {
-                    if (!response.ok) throw new Error('Preview not available');
+                    if (!response.ok) throw new Error('Network response was not ok');
                     return response.json();
                 })
                 .then(data => {
-                    if (!data.preview_url) throw new Error('No preview URL returned');
-                    
-                    // Add cache buster
-                    const url = data.preview_url + (data.preview_url.includes('?') ? '&' : '?') + 'v=' + Date.now();
-                    
-                    // Use Google Docs viewer as a free PDF viewer
-                    iframe.src = `https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`;
+                    if (data.page_count && data.word_count) {
+                        document.getElementById('page-count').textContent = 
+                            `${data.page_count} PAGES (${data.word_count} WORDS)`;
+                        document.getElementById('page-count').classList.remove('stats-loading');
+                    }
                 })
                 .catch(error => {
-                    console.error('Error loading PDF preview:', error);
-                    const container = document.querySelector('.modal-body');
-                    container.innerHTML = `
-                        <div class="alert alert-danger">
-                            Failed to load preview. Please try again later.
-                            ${error.message ? `<small>Error: ${error.message}</small>` : ''}
-                        </div>
-                    `;
+                    console.error('Error loading document stats:', error);
+                    document.getElementById('page-count').textContent = 'Stats unavailable';
+                    document.getElementById('page-count').classList.remove('stats-loading');
                 });
-        });
-    }
+        }
 
-    // Initialize everything
-    loadDocumentStats();
-    initPDFViewer();
-});
-</script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+        // Initialize PDF viewer when modal opens
+        function initPDFViewer() {
+            const modal = document.getElementById('documentModal');
+            if (!modal) return;
+
+            modal.addEventListener('shown.bs.modal', function() {
+                const iframe = document.getElementById('pdfPreviewFrame');
+                
+                // Show loading state
+                iframe.src = "about:blank";
+                
+                // Fetch preview data from API
+                fetch(`/api/books/{{ book.id }}/preview/`)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Preview not available');
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (!data.preview_url) throw new Error('No preview URL returned');
+                        
+                        // Add cache buster
+                        const url = data.preview_url + (data.preview_url.includes('?') ? '&' : '?') + 'v=' + Date.now();
+                        
+                        // Use Google Docs viewer as a free PDF viewer
+                        iframe.src = `https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`;
+                    })
+                    .catch(error => {
+                        console.error('Error loading PDF preview:', error);
+                        const container = document.querySelector('.modal-body');
+                        container.innerHTML = `
+                            <div class="alert alert-danger">
+                                Failed to load preview. Please try again later.
+                                ${error.message ? `<small>Error: ${error.message}</small>` : ''}
+                            </div>
+                        `;
+                    });
+            });
+        }
+
+        // Initialize everything
+        loadDocumentStats();
+        initPDFViewer();
+    });
+    </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
