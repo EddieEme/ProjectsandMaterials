@@ -297,10 +297,21 @@ a {
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="input-group">
-                    <input type="text" id="searchInput" class="form-control" placeholder="Search books..." oninput="searchBooks()">
+                  <form method="get" action="{% url 'books:project-list' %}" class="flex w-full max-w-md mx-auto mt-4 input-group">
+                            <input 
+                                type="text" 
+                                name="q" 
+                                placeholder="Search projects..." 
+                                class="search-input form-control"
+                            >
+                            <button type="submit" class="btn btn-primary">
+                                Search
+                            </button>
+                    </form>
+                    {% comment %} <input type="text" id="searchInput" class="form-control" placeholder="Search books..." oninput="searchBooks()">
                     <button class="btn btn-primary" type="button" id="searchButton">
                         <i class="bi bi-search"></i> Search
-                    </button>
+                    </button> {% endcomment %}
                 </div>
             </div>
         </div>

@@ -194,6 +194,7 @@ class HireWriterRequest(models.Model):
         ('Questionnaire', 'Questionnaire'),
         ('Assignment', 'Assignment'),
         ('Serminal', 'Serminal'),
+        ('Hire Developer', 'Hire Developer'),
         ('General', 'General (if the service not included)'),
     ]
     

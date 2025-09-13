@@ -403,7 +403,18 @@
 
 <div class="container container-fluid">
     <div class="search-box">
-        <input type="text" class="form-control" placeholder="Search for research topics..." oninput="searchTopics()" id="searchInput">
+            <form method="get" action="{% url 'books:project-list' %}" class="flex w-full max-w-md mx-auto mt-4">
+                    <input 
+                        type="text" 
+                        name="q" 
+                        placeholder="Search projects..." 
+                        class="search-input"
+                    >
+                    <button type="submit" class="search-btn">
+                        Search
+                    </button>
+        </form>
+        {% comment %} <input type="text" class="form-control" placeholder="Search for research topics..." oninput="searchTopics()" id="searchInput"> {% endcomment %}
     </div>
     <div class="row flex-md-row  main-row">
         <!-- Sidebar -->

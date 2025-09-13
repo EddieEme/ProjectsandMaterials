@@ -38,9 +38,9 @@
                             <li><a class="dropdown-item" href="#">How it works</a></li>
                         </ul>
                     </li>
-                    <li class="nav-item">
+                    {% comment %} <li class="nav-item">
                         <a class="nav-link" href="{% url 'books:login-subscription' %}">Subscription</a>
-                    </li>
+                    </li> {% endcomment %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                             {{user.first_name}}

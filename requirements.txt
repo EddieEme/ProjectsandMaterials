@@ -18,7 +18,7 @@ cryptography==44.0.0
 python-decouple==3.8
 
 # PDF & DOCX
-Pillow==9.5.0
+# Pillow==9.5.0
 python-docx==1.1.2
 reportlab==4.3.1
 pymupdf==1.22.3
@@ -45,8 +45,8 @@ certifi==2024.12.14
 
 # DB Adapters
 psycopg2-binary==2.9.10
-mysqlclient==2.2.4
-pymysql==1.1.0
+mysqlclient==2.2.4; sys_platform != "win32"
+pymysql==1.1.0                                
 
 # Compiler / Dep support
 cffi==1.17.1

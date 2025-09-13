@@ -6,18 +6,18 @@
 {% block style %}
     {% load custom_filters %}
     <style>
-         :root {
-            --primary-color: #4f46e5;
-            --secondary-color: #f8fafc;
-            --accent-color: #06b6d4;
-            --text-dark: #1e293b;
-            --text-light: #64748b;
-            --border-color: #e2e8f0;
+       :root {
+            --primary-color: #d97706;
+            --secondary-color: #fef7ed;
+            --accent-color: #92400e;
+            --text-dark: #451a03;
+            --text-light: #78716c;
+            --border-color: #e7e5e4;
             --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
             --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
             --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --gradient-accent: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-primary: linear-gradient(135deg, #d97706 0%, #92400e 100%);
+            --gradient-accent: linear-gradient(135deg, #fed7aa 0%, #ea580c 100%);
         }
 
         * {
@@ -404,8 +404,20 @@
 </div>
 
 <div class="container container-fluid">
+
     <div class="search-box">
-        <input type="text" class="form-control" placeholder="Search..." oninput="searchTopics()" id="searchInput">
+        <form method="get" action="{% url 'books:project-list' %}" class="flex w-full max-w-md mx-auto mt-4">
+                <input 
+                    type="text" 
+                    name="q" 
+                    placeholder="Search projects..." 
+                    class="search-input"
+                >
+                <button type="submit" class="search-btn">
+                    Search
+                </button>
+        </form>
+        {% comment %} <input type="text" class="form-control" placeholder="Search..." oninput="searchTopics()" id="searchInput"> {% endcomment %}
     </div>
     <div class="row  flex-md-row">
         <!-- Sidebar -->
