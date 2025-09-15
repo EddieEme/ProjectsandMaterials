@@ -49,7 +49,7 @@ auth_patterns = [
     path('api/auth/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     # path('api/most-viewed-videos/<str:channel_id>/', MostViewedVideos.as_view(), name='most-viewed-videos'),
-    path('api/most-viewed-videos/<str:channel_id>/', most_viewed_videos, name='most-viewed-videos'),
+    # path('api/most-viewed-videos/<str:channel_id>/', most_viewed_videos, name='most-viewed-videos'),
     path("preview/<int:book_id>/", serve_preview, name="preview"),
     path("api/books/<slug:slug>/preview/", book_details_api, name="book-preview"),
 ]

@@ -173,13 +173,13 @@ CSRF_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_SAMESITE = 'Lax'
 
-# Database Configuration
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-#}
+#Database Configuration
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
 
 # DATABASE_URL = config("DATABASE_URL", default="")
 # if DATABASE_URL:
@@ -187,19 +187,19 @@ CSRF_COOKIE_SAMESITE = 'Lax'
 
 
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'projtpyy_projectandmaterials_db',   # <- correct one
-        'USER': 'projtpyy_projectandmaterials_db',
-        'PASSWORD': 'OY-l#vbX+Jq~',
-        'HOST': 'localhost',
-        'PORT': '3306',
-        'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-        },
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'projtpyy_projectandmaterials_db',   # <- correct one
+#         'USER': 'projtpyy_projectandmaterials_db',
+#         'PASSWORD': 'OY-l#vbX+Jq~',
+#         'HOST': 'localhost',
+#         'PORT': '3306',
+#         'OPTIONS': {
+#             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+#         },
+#     }
+# }
 
 
 GCS_CREDENTIALS_PATH = config("GOOGLE_APPLICATION_CREDENTIALS")
