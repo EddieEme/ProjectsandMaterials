@@ -67,13 +67,13 @@ def user_login(request):
                 'next': request.POST.get('next', request.GET.get('next', '')),
                 'email': email,  # Preserve email input
             }
-            return render(request, 'users/login.html', context)
+            return render(request, 'books/user-login.html', context)
 
     # GET request: render login form
     context = {
         'next': request.GET.get('next', ''),
     }
-    return render(request, 'books/login.html', context)
+    return render(request, 'books/user-login.html', context)
 
 
 
