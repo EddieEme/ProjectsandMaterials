@@ -174,30 +174,32 @@ SESSION_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_SAMESITE = 'Lax'
 
 # Database Configuration
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+#}
 
 # DATABASE_URL = config("DATABASE_URL", default="")
 # if DATABASE_URL:
 #     DATABASES["default"] = dj_database_url.parse(DATABASE_URL)
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'projec24_projectandmaterials_db',
-#         'USER': 'projec24_projectandmaterials_db',
-#         'PASSWORD': 'materialsProject@2025',  # the new password
-#         'HOST': 'localhost',
-#         'PORT': '3306',
-#         'OPTIONS': {
-#            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-#         },
-#     }
-# }
+
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'projtpyy_projectandmaterials_db',   # <- correct one
+        'USER': 'projtpyy_projectandmaterials_db',
+        'PASSWORD': 'OY-l#vbX+Jq~',
+        'HOST': 'localhost',
+        'PORT': '3306',
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
+    }
+}
 
 
 GCS_CREDENTIALS_PATH = config("GOOGLE_APPLICATION_CREDENTIALS")
