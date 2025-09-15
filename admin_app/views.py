@@ -31,7 +31,6 @@ def gcs_blob_exists(gcs_path):
         return False
 
 
-
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def batch_upload_books(request):
@@ -45,8 +44,40 @@ def batch_upload_books(request):
             }, status=400)
 
         try:
-            decoded_file = csv_file.read().decode('utf-8').splitlines()
+            # Read and decode the file, handling BOM
+            file_content = csv_file.read()
+            
+            # Remove BOM if present
+            if file_content.startswith(b'\xef\xbb\xbf'):
+                file_content = file_content[3:]
+            
+            decoded_file = file_content.decode('utf-8').splitlines()
+            
             reader = csv.DictReader(decoded_file)
+
+            # Validate CSV structure
+            if not reader.fieldnames:
+                return JsonResponse({
+                    "success": False,
+                    "message": "CSV file is empty or invalid format"
+                }, status=400)
+
+            # Clean fieldnames by removing BOM and whitespace
+            cleaned_fieldnames = [fieldname.strip().replace('\ufeff', '') for fieldname in reader.fieldnames]
+            
+            # Create mapping from cleaned to original fieldnames
+            fieldname_mapping = {}
+            for original, cleaned in zip(reader.fieldnames, cleaned_fieldnames):
+                fieldname_mapping[cleaned] = original
+
+            required_columns = ['title', 'file_path', 'book_type', 'category']
+            missing_columns = [col for col in required_columns if col not in cleaned_fieldnames]
+            
+            if missing_columns:
+                return JsonResponse({
+                    "success": False,
+                    "message": f"CSV missing required columns: {missing_columns}. Found: {cleaned_fieldnames}"
+                }, status=400)
 
             errors = []
             success_count = 0
@@ -59,14 +90,21 @@ def batch_upload_books(request):
 
             for row_num, row in enumerate(reader, start=1):
                 try:
+                    # Skip empty rows
+                    if not any(row.values()):
+                        continue
+
                     with transaction.atomic():
-                        title = row.get("title", "").strip()
-                        file_path = row.get("file_path", "").strip()
-                        book_type_name = row.get("book_type", "").strip()
-                        category_name = row.get("category", "").strip()
+                        # Use the mapping to get correct field names
+                        title = row.get(fieldname_mapping['title'], "").strip()
+                        file_path = row.get(fieldname_mapping['file_path'], "").strip()
+                        book_type_name = row.get(fieldname_mapping['book_type'], "").strip()
+                        category_name = row.get(fieldname_mapping['category'], "").strip()
+                        author = row.get(fieldname_mapping.get('author', 'author'), "").strip() or ""
 
                         # Validate required fields
-                        if not all([title, file_path, book_type_name, category_name]):
+                        required_fields = [title, file_path, book_type_name, category_name]
+                        if not all(required_fields):
                             errors.append(f"Row {row_num}: Missing required fields")
                             continue
 
@@ -90,16 +128,21 @@ def batch_upload_books(request):
                             defaults={"book_type": book_type}
                         )
 
+                        # Handle is_approved field
+                        is_approved_field = fieldname_mapping.get('is_approved', 'is_approved')
+                        is_approved_str = row.get(is_approved_field, "False").strip().lower()
+                        is_approved = is_approved_str == "true" if is_approved_str else False
+
                         # Create book record
                         book = Book.objects.create(
                             title=title,
-                            description=row.get("description", ""),
-                            author=row.get("author", "").strip(),
+                            description=row.get(fieldname_mapping.get('description', 'description'), ""),
+                            author=author,
                             book_type=book_type,
                             category=category,
                             price=5000,
                             file=file_path,
-                            is_approved=row.get("is_approved", "False").strip().lower() == "true",
+                            is_approved=is_approved,
                             user=request.user
                         )
 
@@ -143,7 +186,6 @@ def batch_upload_books(request):
             }, status=500)
 
     return render(request, "admin_app/batch_upload_books.html")
-
 
 
 

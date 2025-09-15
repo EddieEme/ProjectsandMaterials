@@ -48,7 +48,7 @@ def upload_to_gcs(local_path, destination_folder, content_type=None, public=Fals
             # For private files, return just the blob path (not gs:// URI)
             return blob_path, None
         
-    except GoogleCloudError as e:
+    except GoogleCloudError as e:  # pyright: ignore[reportUndefinedVariable]
         logger.error(f"GCS upload error: {str(e)}")
         return None, f"Google Cloud Storage error: {str(e)}"
     except Exception as e:
