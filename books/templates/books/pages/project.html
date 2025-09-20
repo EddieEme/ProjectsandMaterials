@@ -456,10 +456,10 @@
                                             <span class="badge bg-primary category-badge">
                                                 {{ book.category.name }}
                                             </span>
-                                            <span>
+                                            {% comment %} <span>
                                                 <i class="bi bi-eye"></i> {{ book.views|default:20 }} views
                                                 <i class="bi bi-chat ms-2"></i> {{ book.comments|default:20 }} comments
-                                            </span>
+                                            </span> {% endcomment %}
                                         </span>
                                     </div>
                                 </div>
