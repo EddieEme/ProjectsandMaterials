@@ -725,7 +725,7 @@ def preview_pdf(request, slug):
     preview_data = get_preview_data(request)
     
     # Check if user has exceeded global preview limit
-    if preview_data['count'] >= 3:
+    if preview_data['count'] >= 100:
         messages.warning(request, 'You have reached the maximum preview limit. Your previews will reset on {}.'.format(
             preview_data['reset_date'].strftime('%Y-%m-%d at %H:%M')
         ))
@@ -744,7 +744,7 @@ def preview_pdf(request, slug):
         "page_count": stats["pages"],
         "word_count": stats["words"],
         'stats': stats,
-        'preview_attempts_remaining': 3 - preview_data['count'],
+        'preview_attempts_remaining': 100 - preview_data['count'],
         'reset_date': preview_data['reset_date'],
     }
    
