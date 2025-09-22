@@ -51,6 +51,10 @@ a {
     position: relative;
 }
 
+ .card-title{
+            text-transform:uppercase;
+        }
+
 .search-section::before {
     content: '';
     position: absolute;
@@ -210,6 +214,11 @@ a {
 .pagination {
     justify-content: center;
     margin: 2rem 0;
+    flex-wrap: wrap;
+}
+
+.page-item {
+    margin: 2px;
 }
 
 .page-link {
@@ -235,6 +244,44 @@ a {
     background: var(--primary-color);
     color: white;
     box-shadow: var(--shadow-md);
+}
+
+/* Mobile-specific pagination */
+@media (max-width: 768px) {
+    .pagination .page-item:not(.active):not(:first-child):not(:last-child):not(.dots) {
+        display: none;
+    }
+    
+    .pagination .page-item.dots {
+        display: block;
+        pointer-events: none;
+    }
+    
+    .pagination .page-item.active ~ .page-item:not(:last-child):not(.dots),
+    .pagination .page-item.active ~ .page-item.dots ~ .page-item:not(:last-child) {
+        display: none;
+    }
+    
+    .pagination .page-item.active,
+    .pagination .page-item:first-child,
+    .pagination .page-item:last-child {
+        display: block;
+    }
+    
+    /* Show 1-2 pages before and after current page on slightly larger screens */
+    @media (min-width: 576px) {
+        .pagination .page-item.active,
+        .pagination .page-item.active-1,
+        .pagination .page-item.active-2,
+        .pagination .page-item:first-child,
+        .pagination .page-item:last-child {
+            display: block;
+        }
+        
+        .pagination .page-item.dots {
+            display: block;
+        }
+    }
 }
 
 /* Responsive Design */
@@ -356,25 +403,47 @@ a {
     </div>
     
     <!-- Pagination -->
+    {% if books.has_other_pages %}
     <nav aria-label="Books pagination" class="my-4">
         <ul class="pagination">
             {% if books.has_previous %}
-                <li class="page-item"><a class="page-link" href="?page={{ books.previous_page_number }}">Previous</a></li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ books.previous_page_number }}">Previous</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Previous</span>
+                </li>
             {% endif %}
-            
+
             {% for num in books.paginator.page_range %}
-                {% if books.number == num %}
-                    <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
-                {% else %}
-                    <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                {% if num == books.number %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                {% elif num <= 3 or num >= books.paginator.num_pages|add:"-2" or num == books.number|add:"-1" or num == books.number|add:"1" %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                {% elif num == books.number|add:"-2" or num == books.number|add:"2" %}
+                    <li class="page-item dots">
+                        <span class="page-link">...</span>
+                    </li>
                 {% endif %}
             {% endfor %}
-            
+
             {% if books.has_next %}
-                <li class="page-item"><a class="page-link" href="?page={{ books.next_page_number }}">Next</a></li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ books.next_page_number }}">Next</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Next</span>
+                </li>
             {% endif %}
         </ul>
     </nav>
+    {% endif %}
 </div>
 
 <script>
@@ -406,10 +475,34 @@ function searchBooks() {
 
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize search on page load
-    searchBooks();
+    if (document.getElementById('searchInput')) {
+        searchBooks();
+    }
     
     // Add click event for search button
-    document.getElementById('searchButton').addEventListener('click', searchBooks);
+    if (document.getElementById('searchButton')) {
+        document.getElementById('searchButton').addEventListener('click', searchBooks);
+    }
+    
+    // Add responsive classes to pagination items for mobile
+    const paginationItems = document.querySelectorAll('.pagination .page-item');
+    const activeItem = document.querySelector('.pagination .page-item.active');
+    
+    if (activeItem) {
+        const activeIndex = Array.from(paginationItems).indexOf(activeItem);
+        
+        paginationItems.forEach((item, index) => {
+            if (index === activeIndex - 1) {
+                item.classList.add('active-1');
+            } else if (index === activeIndex - 2) {
+                item.classList.add('active-2');
+            } else if (index === activeIndex + 1) {
+                item.classList.add('active+1');
+            } else if (index === activeIndex + 2) {
+                item.classList.add('active+2');
+            }
+        });
+    }
 });
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>

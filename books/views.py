@@ -352,11 +352,15 @@ def product_details(request, slug):
 
     # Get preview attempts with 24-hour time-based reset
     preview_data = get_preview_data(request)
+    stats = book.get_file_statistics()
     preview_attempts_remaining = max(0, 100 - preview_data['count'])
     reset_date = preview_data['reset_date']
     
     context = {
         "book": book,
+        "page_count": stats["pages"],
+        "word_count": stats["words"],
+        'stats': stats,
         "related_books": related_books,
         "preview_attempts_remaining": preview_attempts_remaining,
         "reset_date": reset_date,

@@ -609,10 +609,7 @@
 
                         <div class="mb-3 detail-item">
                             <span class="label"><i class="fas fa-file-alt"></i></span>
-                            <span class="value stats-loading" id="page-count">
-                                <i class="fas fa-file-pdf text-danger me-1"></i>
-                                Loading...
-                            </span>
+                            <span class="tag" id="stat-pages">{{page_count}} Pages ({{word_count}} words)</span>
                         </div>
 
                         <div class="mb-3 detail-item">
@@ -698,7 +695,7 @@
         });
 
         // Load document stats via API
-        function loadDocumentStats() {
+      /**  function loadDocumentStats() {
             const bookId = JSON.parse('{{ book.id|safe|escapejs }}');
             fetch(`/api/books/${bookId}/preview/`)
                 .then(response => {
@@ -717,7 +714,7 @@
                     document.getElementById('page-count').textContent = 'Stats unavailable';
                     document.getElementById('page-count').classList.remove('stats-loading');
                 });
-        }
+        } **/
 
         // Initialize PDF viewer when modal opens
         function initPDFViewer() {
