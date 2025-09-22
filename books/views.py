@@ -352,7 +352,7 @@ def product_details(request, slug):
 
     # Get preview attempts with 24-hour time-based reset
     preview_data = get_preview_data(request)
-    preview_attempts_remaining = max(0, 3 - preview_data['count'])
+    preview_attempts_remaining = max(0, 100 - preview_data['count'])
     reset_date = preview_data['reset_date']
     
     context = {

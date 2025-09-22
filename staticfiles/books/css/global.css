@@ -1,119 +1,86 @@
-/* Base font size for scaling */
+/* Base font scaling */
 html {
   font-size: 16px;
-  /* Default for larger screens */
+  /* Default for desktops */
 }
 
-/* Desktop Heading Sizes */
+/* Headings */
 h1 {
   font-size: 2.5rem;
+  font-weight: 700;
 }
 
 /* 40px */
 h2 {
   font-size: 2rem;
+  font-weight: 600;
 }
 
 /* 32px */
 h3 {
   font-size: 1.75rem;
+  font-weight: 600;
 }
 
 /* 28px */
 h4 {
   font-size: 1.5rem;
+  font-weight: 600;
 }
 
 /* 24px */
 h5 {
   font-size: 1.25rem;
+  font-weight: 500;
 }
 
 /* 20px */
 h6 {
   font-size: 1rem;
+  font-weight: 500;
 }
 
 /* 16px */
 
-/* Body Text */
+/* Body text */
 p,
 a,
 li,
 span {
   font-size: 1rem;
   /* 16px */
+  font-weight: 400;
+  /* Normal for readability */
   line-height: 1.6;
+  color: #333;
 }
 
-/* 🔹 Responsive Adjustments for Mobile */
-@media (max-width: 768px) {
+/* Responsive adjustments */
+@media (max-width: 1023px) {
+
+  /* Tablets */
   html {
-    font-size: 14px;
-    /* Slightly smaller base size */
+    font-size: 15px;
   }
 
   h1 {
     font-size: 2rem;
   }
 
-  /* 32px */
   h2 {
     font-size: 1.75rem;
   }
 
-  /* 28px */
   h3 {
     font-size: 1.5rem;
   }
 
-  /* 24px */
   h4 {
     font-size: 1.25rem;
   }
 
-  /* 20px */
   h5 {
     font-size: 1.1rem;
-  }
-
-  /* 18px */
-  h6 {
-    font-size: 1rem;
-  }
-
-  /* 16px */
-
-  /* Body Text */
-  p,
-  a,
-  li {
-    font-size: 0.95rem;
-    /* 15px */
-    line-height: 1.5;
-  }
-}
-
-/* Larger screens */
-@media (min-width: 1024px) {
-  h1 {
-    font-size: 2.5rem;
-  }
-
-  h2 {
-    font-size: 2rem;
-  }
-
-  h3 {
-    font-size: 1.75rem;
-  }
-
-  h4 {
-    font-size: 1.5rem;
-  }
-
-  h5 {
-    font-size: 1.25rem;
   }
 
   h6 {
@@ -124,46 +91,17 @@ span {
   a,
   li,
   span {
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
 }
 
-/* Tablet screens */
-@media (max-width: 1023px) {
-  h1 {
-    font-size: 2rem;
-  }
-
-  h2 {
-    font-size: 1.75rem;
-  }
-
-  h3 {
-    font-size: 1.5rem;
-  }
-
-  h4 {
-    font-size: 1.25rem;
-  }
-
-  h5 {
-    font-size: 1.1rem;
-  }
-
-  h6 {
-    font-size: 1rem;
-  }
-
-  p,
-  a,
-  li,
-  {
-  font-size: 0.95rem;
-}
-}
-
-/* Mobile screens */
 @media (max-width: 768px) {
+
+  /* Mobiles */
+  html {
+    font-size: 14px;
+  }
+
   h1 {
     font-size: 1.75rem;
   }
@@ -191,12 +129,13 @@ span {
   p,
   a,
   li,
-  {
-  font-size: 0.9rem;
-}
+  span {
+    font-size: 0.9rem;
+  }
 }
 
-/* Set the same font family and style for all elements */
+/* Universal font family */
+body,
 h1,
 h2,
 h3,
@@ -208,64 +147,5 @@ a,
 li,
 span {
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif;
-  font-weight: 400;
-  /* Normal weight */
   font-style: normal;
-  /* Regular style */
-  font-size: 100%;
-  /* Default size */
-  color: #333;
-  /* Optional: Set a universal color */
-}
-
-/* Larger screens */
-@media (min-width: 1024px) {
-
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6,
-  p,
-  a,
-  li,
-  span {
-    font-size: 1rem;
-    /* Adjust as needed */
-  }
-}
-
-/* Tablet screens */
-@media (max-width: 1023px) {
-
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6,
-  p,
-  a,
-  li,
-  span {
-    font-size: 0.95rem;
-  }
-}
-
-/* Mobile screens */
-@media (max-width: 768px) {
-
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6,
-  p,
-  a,
-  li,
-  span {
-    font-size: 0.9rem;
-  }
 }

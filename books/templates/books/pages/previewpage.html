@@ -2,317 +2,199 @@
 {% block link %} 
 {% endblock %}
 {% block style %}
-  <style>
-       a {
+<style>
+    a {
         text-decoration:none;
-       }
-       .doc-preview {
-           background-color: #f5f7fa;
-            min-height: 100vh;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 48px;
-       }
-        
-        .content-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .breadcrumb {
-            width: 100%;
-            max-width: 1200px;
-            margin-bottom: 15px;
-            font-size: 14px;
-            color: #666;
-        }
-        
-        .breadcrumb a {
-            color: #4a6fa5;
-            text-decoration: none;
-        }
-        
-        .breadcrumb a:hover {
-            text-decoration: underline;
-        }
-        
-        .doc-container {
-            width: 100%;
-            max-width: 1200px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            margin-top: 10px;
-        }
-        
-        .paper-header {
-            padding: 20px;
-            border-bottom: 1px solid #eaeaea;
-        }
-        
-        .paper-title {
-            font-size: 24px;
-            color: #2c3e50;
-            margin-bottom: 10px;
-            line-height: 1.4;
-        }
-        
-        .paper-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 15px;
-            font-size: 14px;
-            color: #666;
-        }
-        
-        .paper-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 15px;
-        }
-        
-        .tag {
-            background-color: #e8f0fe;
-            color: #4a6fa5;
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-        }
-        
-        .paper-actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        
-        .action-btn {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            padding: 8px 15px;
-            background-color: #f0f4f8;
-            border: 1px solid #dce4ec;
-            border-radius: 4px;
-            color: #4a6fa5;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .action-btn:hover {
-            background-color: #e4eaf1;
-        }
-        
-        .action-btn i {
-            font-size: 14px;
-        }
-        
-        .stats {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-left: auto;
-            color: #666;
-            font-size: 14px;
-        }
-        
-        .viewer-section {
-            padding: 20px;
-        }
-        
-        .pdf-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        
-        .zoom-controls {
-            display: flex;
-            gap: 5px;
-        }
-        
-        .control-btn {
-            padding: 6px 12px;
-            background-color: #f0f4f8;
-            border: 1px solid #dce4ec;
-            border-radius: 4px;
-            color: #4a6fa5;
-            font-size: 13px;
-            cursor: pointer;
-        }
-        
-        .page-info {
-            font-size: 14px;
-            color: #666;
-        }
-        
-        .pdf-container {
-            width: 100%;
-            height: 100vh;
-            border: 1px solid #e0e0e0;
-            border-radius: 6px;
-            overflow: hidden;
-            background-color: #f9f9f9;
-        }
-        
-        #pdf-viewer {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-        
-        .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-            flex-direction: column;
-            gap: 15px;
-        }
-        
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #4a6fa5;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        /* Afribary Signup Banner Styles */
+    }
+    .doc-preview {
+        background-color: #f5f7fa;
+        min-height: 100vh;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 48px;
+    }
+    .doc-container {
+        width: 100%;
+        max-width: 1200px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin-top: 10px;
+    }
+    .paper-header {
+        padding: 20px;
+        border-bottom: 1px solid #eaeaea;
+    }
+    .paper-title {
+        font-size: 24px;
+        color: #2c3e50;
+        margin-bottom: 10px;
+        line-height: 1.4;
+    }
+    .paper-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 15px;
+        font-size: 14px;
+        color: #666;
+    }
+    .tag {
+        background-color: #e8f0fe;
+        color: #4a6fa5;
+        padding: 4px 10px;
+        border-radius: 4px;
+        font-size: 12px;
+    }
+    .paper-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 15px;
+    }
+    .action-btn {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 8px 15px;
+        background-color: #f0f4f8;
+        border: 1px solid #dce4ec;
+        border-radius: 4px;
+        color: #4a6fa5;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .action-btn:hover {
+        background-color: #e4eaf1;
+    }
+    .viewer-section {
+        padding: 20px;
+    }
+    .pdf-container {
+        width: 100%;
+        min-height: 80vh;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        overflow-y: auto;
+        background-color: #f9f9f9;
+        padding: 10px;
+    }
+    .pdf-page {
+        display: block;
+        margin: 10px auto;
+        max-width: 100%;
+        height: auto;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        border-radius: 4px;
+    }
+    .loading {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 200px;
+        flex-direction: column;
+        gap: 15px;
+    }
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #4a6fa5;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    .signup-banner {
+        background: linear-gradient(135deg,rgb(145, 154, 163) 0%,rgb(128, 157, 201) 100%);
+        color: white;
+        padding: 40px 20px;
+        text-align: center;
+        margin-top: 30px;
+        border-radius: 8px;
+    }
+    .signup-banner h2 {
+        font-size: 28px;
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+    .signup-banner p {
+        font-size: 18px;
+        margin-bottom: 25px;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+        line-height: 1.6;
+    }
+    .signup-banner ul {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 30px 0;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 30px;
+    }
+    .signup-banner li {
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .signup-banner li i {
+        color: #27ae60;
+        font-size: 20px;
+    }
+    .signup-btn {
+        background-color: #27ae60;
+        color: white;
+        border: none;
+        padding: 15px 40px;
+        border-radius: 50px;
+        font-size: 18px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+    }
+    .signup-btn:hover {
+        background-color: #219653;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+    }
+    @media (max-width: 768px) {
         .signup-banner {
-            background: linear-gradient(135deg,rgb(145, 154, 163) 0%,rgb(128, 157, 201) 100%);
-            color: white;
-            padding: 40px 20px;
-            text-align: center;
-            margin-top: 30px;
-            border-radius: 8px;
+            padding: 30px 15px;
         }
-        
         .signup-banner h2 {
-            font-size: 28px;
-            margin-bottom: 20px;
-            font-weight: 600;
+            font-size: 22px;
         }
-        
         .signup-banner p {
-            font-size: 18px;
-            margin-bottom: 25px;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-            line-height: 1.6;
+            font-size: 15px;
         }
-        
         .signup-banner ul {
-            list-style: none;
-            padding: 0;
-            margin: 0 0 30px 0;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 30px;
+            flex-direction: column;
+            gap: 15px;
         }
-        
-        .signup-banner li {
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .signup-banner li i {
-            color: #27ae60;
-            font-size: 20px;
-        }
-        
         .signup-btn {
-            background-color: #27ae60;
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            border-radius: 50px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+            padding: 12px 30px;
+            font-size: 16px;
         }
-        
-        .signup-btn:hover {
-            background-color: #219653;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
-        }
-        
-        @media (max-width: 768px) {
-            .signup-banner {
-                padding: 30px 15px;
-            }
-            
-            .signup-banner h2 {
-                font-size: 24px;
-            }
-            
-            .signup-banner p {
-                font-size: 16px;
-            }
-            
-            .signup-banner ul {
-                flex-direction: column;
-                gap: 15px;
-            }
-            
-            .signup-btn {
-                padding: 12px 30px;
-                font-size: 16px;
-            }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        @media (max-width: 600px) {
-            .paper-actions {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .stats {
-                margin-left: 0;
-                margin-top: 10px;
-                width: 100%;
-                justify-content: space-between;
-            }
-            
-            .pdf-controls {
-                flex-direction: column;
-                gap: 10px;
-                align-items: flex-start;
-            }
-        }
-    </style>
-    {% endblock %}
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+{% endblock %}
 {% block content %}
 
 <div class="doc-preview">
-       {% comment %} <div class="breadcrumb">
-        <a href="#">Home</a> / <a href="#">Browse Works</a> / <a href="#">Art & Humanities</a> / A representation of Zimbabwe's socio-politics...
-    </div> {% endcomment %}
-    
     <div class="doc-container">
         <div class="paper-header">
             <h1 class="paper-title">{{book.title}}</h1>
-            
             <div class="paper-meta paper-tags">
                 <span class="tag">{{book.author}}</span>
                 <span class="tag">Chapter 1 - 5</span>
@@ -320,84 +202,76 @@
                 <span class="tag">{{book.category.name}}</span>
                 <span class="tag" id="stat-pages">{{page_count}} Pages ({{word_count}} words)</span>
             </div>
-            
             <div class="paper-actions">
-                {% if request.user.is_authenticated %}
-                    <a class="action-btn" href="{% url 'subscriptions:buyorsubscribe' book.id %}">
-                        <i class="fas fa-download"></i> Download
-                    </a>
-                {% else %}
-                    <a class="action-btn" href="{% url 'subscriptions:buyorsubscribe' book.id %}">
-                        <i class="fas fa-download"></i> Download
-                    </a>
-                {% endif %}
+                <a class="action-btn" href="{% url 'subscriptions:buyorsubscribe' book.id %}">
+                    <i class="fas fa-download"></i> Download
+                </a>
             </div>
         </div>
-        
         <div class="viewer-section">
-
-        {% comment %} <div class="pdf-controls">
-                    <div class="zoom-controls">
-                        <button class="control-btn" id="zoom-in"><i class="fas fa-search-plus"></i></button>
-                        <button class="control-btn" id="zoom-out"><i class="fas fa-search-minus"></i></button>
-                        <button class="control-btn" id="fit-width">Fit to Width</button>
-                        <span class="stat-value" id="stat-words">--</span>
-                    </div>
-                    
-                    <div class="page-info">Page 1 of <span id="total-pages">--</span></div>
-                </div>
-             {% endcomment %}
-            <div class="pdf-container">
-                <div class="loading" id="loading">
-                    <div class="spinner"></div>
-                    <p>Loading document preview...</p>
-                </div>
-                <object id="pdf-viewer" data="{{book.preview_url}}" type="application/pdf" style="display:none;">
-                    <p>Your browser does not support PDF viewing. Please <a href="{{book.preview_url}}">download the PDF</a> to view it.</p>
-                </object>
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>Loading document preview...</p>
             </div>
+            <div id="pdf-container" class="pdf-container"></div>
         </div>
     </div>
-
-     <div class="signup-banner">
-                    <h2>Join ProjectandMaterials to Unlock Full Content</h2>
-                    <p>Access thousands of academic, business, and legal documents. Share your quality papers and documents with a global community.</p>
-                    <ul>
-                        <li><i class="fas fa-check-circle"></i> Access to thousands of documents</li>
-                        <li><i class="fas fa-check-circle"></i> Share your work globally</li>
-                        <li><i class="fas fa-check-circle"></i> Connect with researchers</li>
-                    </ul>
-                      {% if request.user.is_authenticated %}
-                    <a class="signup-btn" href="{% url 'subscriptions:buyorsubscribe' book.id %}">
-                        Join For Free
-                    </a>
-                {% else %}
-                    <a class="signup-btn" href="{% url 'subscriptions:buyorsubscribe' book.id %}">
-                        Join For Free
-                    </a>
-                {% endif %}
-
+    <div class="signup-banner">
+        <h2>Join ProjectandMaterials to Unlock Full Content</h2>
+        <p>Access thousands of academic, business, and legal documents. Share your quality papers and documents with a global community.</p>
+        <ul>
+            <li><i class="fas fa-check-circle"></i> Access to thousands of documents</li>
+            <li><i class="fas fa-check-circle"></i> Share your work globally</li>
+            <li><i class="fas fa-check-circle"></i> Connect with researchers</li>
+        </ul>
+        <a class="signup-btn" href="{% url 'subscriptions:buyorsubscribe' book.id %}">Join For Free</a>
     </div>
 </div>
 
-      <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const pdfViewer = document.getElementById('pdf-viewer');
-            const loadingElement = document.getElementById('loading');
-            
-            // Show the PDF viewer when it's loaded
-            pdfViewer.onload = function() {
-                loadingElement.style.display = 'none';
-                pdfViewer.style.display = 'block';
-            };
-            
-            // Fallback in case the object element doesn't fire onload
-            setTimeout(function() {
-                loadingElement.style.display = 'none';
-                pdfViewer.style.display = 'block';
-            }, 2000);
-        });
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- PDF.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const url = "{{book.preview_url}}";
+        const pdfjsLib = window['pdfjs-dist/build/pdf'];
+        pdfjsLib.GlobalWorkerOptions.workerSrc =
+            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        const container = document.getElementById('pdf-container');
+        const loading = document.getElementById('loading');
+
+        function renderPDF() {
+            container.innerHTML = ""; // clear old canvases
+            pdfjsLib.getDocument(url).promise.then(function (pdf) {
+                loading.style.display = 'none';
+
+                for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                    pdf.getPage(pageNum).then(function (page) {
+                        const viewport = page.getViewport({ scale: 1 });
+                        const scale = container.clientWidth / viewport.width; // fit to container width
+                        const scaledViewport = page.getViewport({ scale: scale });
+
+                        const canvas = document.createElement('canvas');
+                        canvas.className = 'pdf-page';
+                        const context = canvas.getContext('2d');
+                        canvas.height = scaledViewport.height;
+                        canvas.width = scaledViewport.width;
+
+                        container.appendChild(canvas);
+
+                        page.render({
+                            canvasContext: context,
+                            viewport: scaledViewport
+                        });
+                    });
+                }
+            });
+        }
+
+        renderPDF();
+        window.addEventListener('resize', renderPDF); // re-render on resize
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 {% endblock %}
