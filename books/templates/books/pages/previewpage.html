@@ -74,13 +74,19 @@
     .viewer-section {
         padding: 20px;
     }
-    .pdf-container {
+    .pdf-object {
+        width: 100%;
+        min-height: 80vh;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+    }
+    .pdf-fallback {
         width: 100%;
         min-height: 80vh;
         border: 1px solid #e0e0e0;
         border-radius: 6px;
         overflow-y: auto;
-        background-color: #f9f9f9;
+        background: #f9f9f9;
         padding: 10px;
     }
     .pdf-page {
@@ -90,22 +96,6 @@
         height: auto;
         box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         border-radius: 4px;
-    }
-    .loading {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 200px;
-        flex-direction: column;
-        gap: 15px;
-    }
-    .spinner {
-        width: 40px;
-        height: 40px;
-        border: 4px solid #f3f3f3;
-        border-top: 4px solid #4a6fa5;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
     }
     .signup-banner {
         background: linear-gradient(135deg,rgb(145, 154, 163) 0%,rgb(128, 157, 201) 100%);
@@ -182,10 +172,9 @@
             padding: 12px 30px;
             font-size: 16px;
         }
-    }
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
+        .pdf-object, .pdf-fallback {
+            min-height: 70vh;
+        }
     }
 </style>
 {% endblock %}
@@ -209,11 +198,13 @@
             </div>
         </div>
         <div class="viewer-section">
-            <div id="loading" class="loading">
-                <div class="spinner"></div>
-                <p>Loading document preview...</p>
-            </div>
-            <div id="pdf-container" class="pdf-container"></div>
+            <!-- Native PDF object -->
+            <object id="pdf-object" class="pdf-object" data="{{book.preview_url}}" type="application/pdf">
+                <p>Your browser does not support inline PDFs.</p>
+            </object>
+
+            <!-- Fallback container (hidden initially) -->
+            <div id="pdf-fallback" class="pdf-fallback" style="display:none;"></div>
         </div>
     </div>
     <div class="signup-banner">
@@ -228,60 +219,47 @@
     </div>
 </div>
 
-<!-- PDF.js -->
+<!-- PDF.js for fallback -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener("DOMContentLoaded", function () {
+        const pdfObject = document.getElementById("pdf-object");
+        const fallback = document.getElementById("pdf-fallback");
         const url = "{{book.preview_url}}";
-        const pdfjsLib = window['pdfjs-dist/build/pdf'];
-        pdfjsLib.GlobalWorkerOptions.workerSrc =
-            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-        const container = document.getElementById('pdf-container');
-        const loading = document.getElementById('loading');
+        // Small trick: check if object loads
+        let pdfTest = setTimeout(() => {
+            if (!pdfObject.contentDocument || pdfObject.contentDocument.body.childElementCount === 0) {
+                // Hide object, show fallback
+                pdfObject.style.display = "none";
+                fallback.style.display = "block";
 
-        function renderPDF() {
-            container.innerHTML = ""; // clear old canvases
-            pdfjsLib.getDocument(url).promise.then(function (pdf) {
-                loading.style.display = 'none';
+                // Load PDF.js
+                const pdfjsLib = window['pdfjs-dist/build/pdf'];
+                pdfjsLib.GlobalWorkerOptions.workerSrc =
+                    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-                for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-                    pdf.getPage(pageNum).then(function (page) {
-                        const viewport = page.getViewport({ scale: 1 });
+                pdfjsLib.getDocument(url).promise.then(pdf => {
+                    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                        pdf.getPage(pageNum).then(page => {
+                            const viewport = page.getViewport({ scale: 1.5 });
+                            const canvas = document.createElement("canvas");
+                            canvas.className = "pdf-page";
+                            const context = canvas.getContext("2d");
+                            canvas.height = viewport.height;
+                            canvas.width = viewport.width;
 
-                        // Scale for container width and device pixel ratio
-                        const desiredWidth = container.clientWidth;
-                        const scale = (desiredWidth / viewport.width) * window.devicePixelRatio;
-                        const scaledViewport = page.getViewport({ scale: scale });
+                            fallback.appendChild(canvas);
 
-                        // Create canvas
-                        const canvas = document.createElement('canvas');
-                        canvas.className = 'pdf-page';
-                        const context = canvas.getContext('2d');
-
-                        // Set actual render size (hiDPI)
-                        canvas.width = scaledViewport.width;
-                        canvas.height = scaledViewport.height;
-
-                        // Set CSS display size
-                        canvas.style.width = (scaledViewport.width / window.devicePixelRatio) + "px";
-                        canvas.style.height = (scaledViewport.height / window.devicePixelRatio) + "px";
-
-                        container.appendChild(canvas);
-
-                        page.render({
-                            canvasContext: context,
-                            viewport: scaledViewport
+                            page.render({
+                                canvasContext: context,
+                                viewport: viewport
+                            });
                         });
-                    });
-                }
-            });
-        }
-
-        renderPDF();
-        window.addEventListener('resize', renderPDF); // re-render on resize
+                    }
+                });
+            }
+        }, 2000); // wait 2s to detect
     });
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 {% endblock %}
