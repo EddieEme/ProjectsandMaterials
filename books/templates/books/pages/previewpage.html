@@ -3,7 +3,9 @@
 {% endblock %}
 {% block style %}
 <style>
-    a { text-decoration:none; }
+    a {
+        text-decoration:none;
+    }
     .doc-preview {
         background-color: #f5f7fa;
         min-height: 100vh;
@@ -22,75 +24,169 @@
         overflow: hidden;
         margin-top: 10px;
     }
-    .paper-header { padding: 20px; border-bottom: 1px solid #eaeaea; }
-    .paper-title { font-size: 24px; color: #2c3e50; margin-bottom: 10px; line-height: 1.4; }
+    .paper-header {
+        padding: 20px;
+        border-bottom: 1px solid #eaeaea;
+    }
+    .paper-title {
+        font-size: 24px;
+        color: #2c3e50;
+        margin-bottom: 10px;
+        line-height: 1.4;
+    }
     .paper-meta {
-        display: flex; flex-wrap: wrap; gap: 15px;
-        margin-bottom: 15px; font-size: 14px; color: #666;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 15px;
+        font-size: 14px;
+        color: #666;
     }
     .tag {
-        background-color: #e8f0fe; color: #4a6fa5;
-        padding: 4px 10px; border-radius: 4px; font-size: 12px;
+        background-color: #e8f0fe;
+        color: #4a6fa5;
+        padding: 4px 10px;
+        border-radius: 4px;
+        font-size: 12px;
     }
-    .paper-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
+    .paper-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 15px;
+    }
     .action-btn {
-        display: flex; align-items: center; gap: 5px;
-        padding: 8px 15px; background-color: #f0f4f8;
-        border: 1px solid #dce4ec; border-radius: 4px;
-        color: #4a6fa5; font-size: 14px; cursor: pointer; transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 8px 15px;
+        background-color: #f0f4f8;
+        border: 1px solid #dce4ec;
+        border-radius: 4px;
+        color: #4a6fa5;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s;
     }
-    .action-btn:hover { background-color: #e4eaf1; }
-    .viewer-section { padding: 20px; }
-
-    /* PDF Fallback Viewer */
-    .pdf-fallback { width: 100%; min-height: 80vh; }
-    .pdf-page { position: relative; margin: 20px auto; max-width: 100%; }
-    .pdf-page canvas {
-        width: 100%; height: auto; display: block;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.1); border-radius: 4px;
+    .action-btn:hover {
+        background-color: #e4eaf1;
     }
-    .textLayer {
-        position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-        pointer-events: none; opacity: 0.2;
+    .viewer-section {
+        padding: 20px;
     }
-
+    .pdf-object {
+        width: 100%;
+        min-height: 80vh;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+    }
+    .pdf-fallback {
+        width: 100%;
+        min-height: 80vh;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        overflow-y: auto;
+        background: #f9f9f9;
+        padding: 10px;
+    }
+    .pdf-page {
+        display: block;
+        margin: 10px auto;
+        max-width: 100%;
+        height: auto;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        border-radius: 4px;
+    }
     .signup-banner {
-        background: linear-gradient(135deg,rgb(145,154,163) 0%,rgb(128,157,201) 100%);
-        color: white; padding: 40px 20px; text-align: center;
-        margin-top: 30px; border-radius: 8px;
+        background: linear-gradient(135deg,rgb(145, 154, 163) 0%,rgb(128, 157, 201) 100%);
+        color: white;
+        padding: 40px 20px;
+        text-align: center;
+        margin-top: 30px;
+        border-radius: 8px;
     }
-    .signup-banner h2 { font-size: 28px; margin-bottom: 20px; font-weight: 600; }
-    .signup-banner p { font-size: 18px; margin-bottom: 25px; max-width: 800px; margin-left:auto; margin-right:auto; line-height:1.6; }
+    .signup-banner h2 {
+        font-size: 28px;
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+    .signup-banner p {
+        font-size: 18px;
+        margin-bottom: 25px;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+        line-height: 1.6;
+    }
     .signup-banner ul {
-        list-style: none; padding: 0; margin: 0 0 30px 0;
-        display: flex; flex-wrap: wrap; justify-content: center; gap: 30px;
+        list-style: none;
+        padding: 0;
+        margin: 0 0 30px 0;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 30px;
     }
-    .signup-banner li { font-size: 16px; display: flex; align-items: center; gap: 10px; }
-    .signup-banner li i { color: #27ae60; font-size: 20px; }
+    .signup-banner li {
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .signup-banner li i {
+        color: #27ae60;
+        font-size: 20px;
+    }
     .signup-btn {
-        background-color: #27ae60; color: white; border: none;
-        padding: 15px 40px; border-radius: 50px; font-size: 18px;
-        font-weight: 600; cursor: pointer; transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(39,174,96,0.3);
+        background-color: #27ae60;
+        color: white;
+        border: none;
+        padding: 15px 40px;
+        border-radius: 50px;
+        font-size: 18px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
     }
     .signup-btn:hover {
-        background-color: #219653; transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(39,174,96,0.4);
+        background-color: #219653;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
     }
-
     @media (max-width: 768px) {
-        .signup-banner { padding: 30px 15px; }
-        .signup-banner h2 { font-size: 22px; }
-        .signup-banner p { font-size: 15px; }
-        .signup-banner ul { flex-direction: column; gap: 15px; }
-        .signup-btn { padding: 12px 30px; font-size: 16px; }
-        .viewer-section { padding: 0;}
-        .doc-preview { padding: 0; }
+        .signup-banner {
+            padding: 30px 15px;
+        }
+        .signup-banner h2 {
+            font-size: 22px;
+        }
+        .signup-banner p {
+            font-size: 15px;
+        }
+        .signup-banner ul {
+            flex-direction: column;
+            gap: 15px;
+        }
+        .signup-btn {
+            padding: 12px 30px;
+            font-size: 16px;
+        }
+        .pdf-object, .pdf-fallback {
+            min-height: 70vh;
+        }
+        .viewer-section{
+            padding:0;
+        }
+
+        .doc-preview{
+            padding:0;
+        }
     }
 </style>
 {% endblock %}
-
 {% block content %}
+
 <div class="doc-preview">
     <div class="doc-container">
         <div class="paper-header">
@@ -108,12 +204,16 @@
                 </a>
             </div>
         </div>
-
         <div class="viewer-section">
-            <div id="pdf-fallback" class="pdf-fallback"></div>
+            <!-- Native PDF object -->
+            <object id="pdf-object" class="pdf-object" data="{{book.preview_url}}" type="application/pdf">
+                <p>Your browser does not support inline PDFs.</p>
+            </object>
+
+            <!-- Fallback container (hidden initially) -->
+            <div id="pdf-fallback" class="pdf-fallback" style="display:none;"></div>
         </div>
     </div>
-
     <div class="signup-banner">
         <h2>Join ProjectandMaterials to Unlock Full Content</h2>
         <p>Access thousands of academic, business, and legal documents. Share your quality papers and documents with a global community.</p>
@@ -126,63 +226,47 @@
     </div>
 </div>
 
-<!-- PDF.js -->
+<!-- PDF.js for fallback -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf_viewer.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf_viewer.min.css"/>
-
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    const url = "{{book.preview_url}}";
-    const container = document.getElementById("pdf-fallback");
-    const pdfjsLib = window['pdfjs-dist/build/pdf'];
-    pdfjsLib.GlobalWorkerOptions.workerSrc =
-        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+    document.addEventListener("DOMContentLoaded", function () {
+        const pdfObject = document.getElementById("pdf-object");
+        const fallback = document.getElementById("pdf-fallback");
+        const url = "{{book.preview_url}}";
 
-    let pdfDoc = null;
-    const PREVIEW_LIMIT = 10; // show first 10 pages
+        // Small trick: check if object loads
+        let pdfTest = setTimeout(() => {
+            if (!pdfObject.contentDocument || pdfObject.contentDocument.body.childElementCount === 0) {
+                // Hide object, show fallback
+                pdfObject.style.display = "none";
+                fallback.style.display = "block";
 
-    async function renderPage(pageNum) {
-        const page = await pdfDoc.getPage(pageNum);
-        const viewport = page.getViewport({ scale: 1 });
-        const scale = container.clientWidth / viewport.width;
-        const scaledViewport = page.getViewport({ scale: scale });
+                // Load PDF.js
+                const pdfjsLib = window['pdfjs-dist/build/pdf'];
+                pdfjsLib.GlobalWorkerOptions.workerSrc =
+                    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-        const pageDiv = document.createElement("div");
-        pageDiv.className = "pdf-page";
-        container.appendChild(pageDiv);
+                pdfjsLib.getDocument(url).promise.then(pdf => {
+                    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                        pdf.getPage(pageNum).then(page => {
+                            const viewport = page.getViewport({ scale: 1.5 });
+                            const canvas = document.createElement("canvas");
+                            canvas.className = "pdf-page";
+                            const context = canvas.getContext("2d");
+                            canvas.height = viewport.height;
+                            canvas.width = viewport.width;
 
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
-        canvas.width = scaledViewport.width;
-        canvas.height = scaledViewport.height;
-        pageDiv.appendChild(canvas);
+                            fallback.appendChild(canvas);
 
-        await page.render({ canvasContext: ctx, viewport: scaledViewport }).promise;
-
-        // text layer
-        const textContent = await page.getTextContent();
-        const textLayerDiv = document.createElement("div");
-        textLayerDiv.className = "textLayer";
-        textLayerDiv.style.width = canvas.style.width;
-        textLayerDiv.style.height = canvas.style.height;
-        pageDiv.appendChild(textLayerDiv);
-
-        pdfjsLib.renderTextLayer({
-            textContent,
-            container: textLayerDiv,
-            viewport: scaledViewport,
-            textDivs: []
-        });
-    }
-
-    pdfjsLib.getDocument(url).promise.then(pdf => {
-        pdfDoc = pdf;
-        const totalPages = Math.min(pdf.numPages, PREVIEW_LIMIT);
-        for (let i = 1; i <= totalPages; i++) {
-            renderPage(i);
-        }
+                            page.render({
+                                canvasContext: context,
+                                viewport: viewport
+                            });
+                        });
+                    }
+                });
+            }
+        }, 2000); // wait 2s to detect
     });
-});
 </script>
 {% endblock %}
