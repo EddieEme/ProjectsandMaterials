@@ -90,11 +90,11 @@
             </form>
 
             <!-- Flutterwave Payment Form -->
-            <form class="payment-method" action="{% url 'payments:pay_with_flutterwave' book.id %}" method="post">
+            {% comment %} <form class="payment-method" action="{% url 'payments:pay_with_flutterwave' book.id %}" method="post">
                 {% csrf_token %}
                 <img src="{% static 'books/images/flutterwave.png' %}" alt="Flutterwave">
                 <button type="submit">Pay with Flutterwave</button>
-            </form>
+            </form> {% endcomment %}
 
             <div class="text-center mt-4">
                 <button class="btn btn-secondary" onclick="window.history.back()">Cancel</button>

@@ -36,6 +36,16 @@
             border: none;
         }
 
+   .breadcrumb {
+            background: none;
+            padding: 0;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .breadcrumb-item a {
+            color: #3498db;
+        }
         .nav-tabs .nav-link.active {
             color: #198754;
             border-bottom: 3px solid #198754;
@@ -372,6 +382,62 @@
             margin-bottom: 20px;
         }
         
+         .tab-content {
+            margin-top: 20px;
+        }
+
+        .document-details {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .document-details img {
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .document-details h4 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            text-transform: uppercase;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 8px;
+        }
+
+        /* table styling inside document details */
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 15px;
+            margin-bottom: 15px;
+        }
+
+        .details-table th {
+            width: 40%;
+            font-weight: 600;
+            background: #f8f9fa;
+            color: #495057;
+            padding: 10px;
+            text-align: left;
+            vertical-align: middle;
+            border: 1px solid #dee2e6;
+        }
+
+        .details-table td {
+            padding: 10px;
+            color: #2c3e50;
+            vertical-align: middle;
+            border: 1px solid #dee2e6;
+        }
+
+        .details-table tr:nth-child(even) {
+            background: #fafafa;
+        }
         /* New styles for preview tracking */
         .preview-counter {
             background-color: #f8f9fa;
@@ -436,6 +502,14 @@
     {% comment %} {% include 'includes/header.html' %} {% endcomment %}
     
     <div class="container mt-4" style="margin-top: 6.5rem !important;">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'books:home' %}">Home</a></li>
+                <li class="breadcrumb-item"><a href="#">{{ book.category.name }}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ book.title }}</li>
+            </ol>
+        </nav>
+
         <h1 class="h2 mb-4" style="color: #2c3e50; font-weight: 600;">{{book.title}}</h1>
 
         <!-- Global preview limit notice -->
@@ -518,21 +592,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <div class="ayatutu-definition">
-                           <ins class="adsbygoogle"
-                            style="display:block"
-                            data-ad-client="ca-pub-9522930547476630"
-                            data-ad-slot="1234567890"
-                            data-ad-format="auto"
-                            data-full-width-responsive="true"></ins>
-                        <script>
-                            (adsbygoogle = window.adsbygoogle || []).push({});
-                        </script>
-                        
-                        
-                        </div>
-                        <div class="ayatutu-definition"></div>
                     </div>
 
                     <div class="tab-pane fade" id="citations" role="tabpanel">
@@ -598,32 +657,31 @@
                     </div>
 
                     <div class="document-details-box">
-                        <h4 class="mb-3 title">Document Details</h4>
-
-                        <div class="mb-3 detail-item">
-                            <span class="label"><i class="fas fa-users"></i></span>
-                            <span class="value text-uppercase">{{ book.author }}</span>
-                        </div>
-
-                        <div class="mb-3 detail-item">
-                            <span class="label">📁 FIELD:</span>
-                            <span class="value field text-uppercase">{{ book.category.name }}</span>
-                        </div>
-
-                        <div class="mb-3 detail-item">
-                            <span class="label">🏷️ TYPE:</span>
-                            <span class="value type text-uppercase">{{ book.book_type.name }}</span>
-                        </div>
-
-                        <div class="mb-3 detail-item">
-                            <span class="label"><i class="fas fa-file-alt"></i></span>
-                            <span class="tag" id="stat-pages">{{page_count}} Pages ({{word_count}} words)</span>
-                        </div>
-
-                        <div class="mb-3 detail-item">
-                            <span class="label">📘 CHAPTERS:</span>
-                            <span class="value type text-uppercase">1 to 5 CHAPTERS</span>
-                        </div>
+                      <h4 class="title">Document Details</h4>
+                        <table class="details-table">
+                            <tbody>
+                                <tr>
+                                    <th><i class="fas fa-user"></i> Author</th>
+                                    <td>{{ book.author }}</td>
+                                </tr>
+                                <tr>
+                                    <th>📁 Field</th>
+                                    <td class="text-success">{{ book.category.name }}</td>
+                                </tr>
+                                <tr>
+                                    <th>🏷️ Type</th>
+                                    <td class="text-primary">{{ book.book_type.name }}</td>
+                                </tr>
+                                <tr>
+                                    <th><i class="fas fa-file-alt"></i> Pages</th>
+                                    <td>{{ page_count }} Pages ({{ word_count }} words)</td>
+                                </tr>
+                                <tr>
+                                    <th>📘 Chapters</th>
+                                    <td>1 to 5 Chapters</td>
+                                </tr>
+                            </tbody>
+                        </table>
 
                         <div class="action-buttons">
                             {% if has_purchased %}
@@ -648,7 +706,7 @@
 
                                 <!-- Buy now button -->
                                 <a class="btn btn-success" id="downloadBtn" href="{% url 'subscriptions:buyorsubscribe' book.id %}">
-                                    <i class="fas fa-shopping-cart"></i> Buy Now
+                                    <i class="fas fa-shopping-cart"></i>  Download Now
                                 </a>
                             {% endif %}
                         </div>
