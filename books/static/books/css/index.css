@@ -14,7 +14,7 @@ body {
     text-align: left;
 }
 
-:root {
+/* :root {
     --primary-color: var(--hard-cover);
     --secondary-color: #00b8ff;
     --accent-color: #0099ff;
@@ -28,6 +28,34 @@ body {
     --google-red: #db4437;
     --project-yellow: #b2b420;
     --hard-cover: rgb(10, 61, 10);
+} */
+
+
+:root {
+    --primary-color: #013220;
+    --secondary-color: #fef7ed;
+    --accent-color: #d97706;
+    --highlight-color: #92400e;
+
+    --text-dark: #1a1f1a;
+    --text-light: #f5f3e7;
+
+    --success-color: #198754;
+    --info-color: #0dcaf0;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+
+    --border-color: #e7e5e4;
+    --background-color: #013220;
+
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1),
+        0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1),
+        0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+    --gradient-primary: linear-gradient(135deg, #013220 0%, #045d34 100%);
+    --gradient-accent: linear-gradient(135deg, #d97706 0%, #92400e 100%);
 }
 
 :root {

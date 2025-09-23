@@ -1,4 +1,4 @@
-:root {
+/* :root {
     --primary-color: #4f46e5;
     --secondary-color: #f8fafc;
     --accent-color: #06b6d4;
@@ -10,7 +10,7 @@
     --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
     --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     --gradient-accent: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-}
+} */
 
 * {
     margin: 0;

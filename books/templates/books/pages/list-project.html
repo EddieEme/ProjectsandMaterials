@@ -2,7 +2,7 @@
 {% block style %}
 {% load custom_filters %}
 <style>
-:root {
+{% comment %} :root {
     --primary-color: #d97706;
     --success-color: #198754;
     --info-color: #0dcaf0;
@@ -13,7 +13,7 @@
     --border-color: #e7e5e4;
     --shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
     --shadow-lg: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-}
+} {% endcomment %}
 
 /* General Styles */
 body {
