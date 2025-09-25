@@ -82,7 +82,7 @@ class Book(models.Model):
     description = models.TextField()
     book_type = models.ForeignKey(BookType, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='book')
-    file = models.FileField(upload_to='book_files/', blank=True, null=True)
+    file = models.FileField(upload_to='book_files/', max_length=1000, blank=True, null=True)
     preview_url = models.URLField(blank=True, null=True)
     author = models.CharField(max_length=50)
     slug = models.SlugField(max_length=2000, unique=True, blank=True)
