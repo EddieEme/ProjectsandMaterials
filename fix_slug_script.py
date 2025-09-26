@@ -2,16 +2,18 @@ import os
 import django
 
 # Setup Django environment
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'projectsandmaterial.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'projectsandmaterials.settings')
 django.setup()
 
 from django.utils.text import slugify
 from django.utils.crypto import get_random_string
 from books.models import Book, BookType, Category
+from payments.models import Payment
+
 
 def fix_slugs():
     print('Fixing duplicate slugs...')
-    
+
     # Fix BookType slugs
     print('Fixing BookType slugs...')
     book_types = BookType.objects.all()
@@ -19,8 +21,7 @@ def fix_slugs():
         if not book_type.slug:
             base_slug = slugify(book_type.name) or "booktype"
             book_type.slug = base_slug
-        
-        # Check for duplicates and make unique
+
         counter = 1
         original_slug = book_type.slug
         while BookType.objects.filter(slug=book_type.slug).exclude(id=book_type.id).exists():
@@ -29,10 +30,10 @@ def fix_slugs():
             if counter > 100:
                 book_type.slug = f"{original_slug}-{get_random_string(4).lower()}"
                 break
-        
+
         book_type.save()
         print(f'  Fixed: {book_type.name} -> {book_type.slug}')
-    
+
     # Fix Category slugs
     print('Fixing Category slugs...')
     categories = Category.objects.all()
@@ -40,8 +41,7 @@ def fix_slugs():
         if not category.slug:
             base_slug = slugify(category.name) or "category"
             category.slug = base_slug
-        
-        # Check for duplicates and make unique
+
         counter = 1
         original_slug = category.slug
         while Category.objects.filter(slug=category.slug).exclude(id=category.id).exists():
@@ -50,10 +50,10 @@ def fix_slugs():
             if counter > 100:
                 category.slug = f"{original_slug}-{get_random_string(4).lower()}"
                 break
-        
+
         category.save()
         print(f'  Fixed: {category.name} -> {category.slug}')
-    
+
     # Fix Book slugs
     print('Fixing Book slugs...')
     books = Book.objects.all()
@@ -61,8 +61,7 @@ def fix_slugs():
         if not book.slug:
             base_slug = slugify(book.title) or "book"
             book.slug = base_slug
-        
-        # Check for duplicates and make unique
+
         counter = 1
         original_slug = book.slug
         while Book.objects.filter(slug=book.slug).exclude(id=book.id).exists():
@@ -71,11 +70,32 @@ def fix_slugs():
             if counter > 100:
                 book.slug = f"{original_slug}-{get_random_string(6).lower()}"
                 break
-        
+
         book.save()
         print(f'  Fixed: {book.title} -> {book.slug}')
-    
+
+    # Fix Payment slugs
+    print('Fixing Payment slugs...')
+    payments = Payment.objects.all()
+    for payment in payments:
+        if not payment.slug:
+            base_slug = slugify(payment.transaction_id) or "payment"
+            payment.slug = base_slug
+
+        counter = 1
+        original_slug = payment.slug
+        while Payment.objects.filter(slug=payment.slug).exclude(id=payment.id).exists():
+            payment.slug = f"{original_slug}-{counter}"
+            counter += 1
+            if counter > 100:
+                payment.slug = f"{original_slug}-{get_random_string(6).lower()}"
+                break
+
+        payment.save()
+        print(f'  Fixed: Payment {payment.transaction_id} -> {payment.slug}')
+
     print('Successfully fixed all slugs!')
+
 
 if __name__ == '__main__':
     fix_slugs()

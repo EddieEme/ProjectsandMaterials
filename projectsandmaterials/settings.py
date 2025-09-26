@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'django.contrib.sitemaps',
     'corsheaders',
     'allauth',
     'allauth.account',
@@ -54,6 +55,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'users',
     'storages',
+   
     
 ]
 

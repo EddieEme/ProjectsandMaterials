@@ -47,6 +47,10 @@ class BookType(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def get_absolute_url(self):
+        return reverse("faculty", args=[self.slug])
+
 
 class Category(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -75,6 +79,9 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def get_absolute_url(self):
+        return reverse("category_books", args=[self.slug])
 
 class Book(models.Model):
     cover_image = models.ImageField(upload_to='book_covers', blank=True, null=True)
@@ -94,6 +101,9 @@ class Book(models.Model):
 
     def __str__(self):
         return self.title
+    
+    def get_absolute_url(self):
+        return reverse("product-details", args=[self.slug])
 
     def get_file_statistics(self):
         """Returns page count and word count of the file, ensuring fresh updates."""

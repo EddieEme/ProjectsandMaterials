@@ -19,6 +19,17 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+from django.contrib.sitemaps.views import sitemap
+from .sitemaps import StaticViewSitemap, BookSitemap, CategorySitemap, FacultySitemap, PaymentOptionSitemap
+
+sitemaps_dict = {
+    "static": StaticViewSitemap,
+    "books": BookSitemap,
+    "categories": CategorySitemap,
+    "faculties": FacultySitemap,
+    "payments": PaymentOptionSitemap,
+}
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
@@ -27,6 +38,7 @@ urlpatterns = [
     path('payments/', include(('payments.urls', 'payments'), namespace='payments')),
     path('admin_app/', include(('admin_app.urls', 'admin_app'), namespace='admin_app')),
     path('subscriptions/', include(('subscriptions.urls', 'subscriptions'), namespace='subscriptions')),
+    path("sitemap.xml", sitemap, {"sitemaps": sitemaps_dict}, name="django-sitemap"),
    
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

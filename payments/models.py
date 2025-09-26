@@ -1,5 +1,7 @@
 from django.db import models
 from django.conf import settings
+from django.utils.crypto import get_random_string
+from django.utils.text import slugify
 from books.models import Book
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -7,6 +9,8 @@ from django.core.mail import send_mail
 from django.urls import reverse
 import uuid
 import logging
+
+import payments
 
 
 logger = logging.getLogger(__name__)
@@ -41,23 +45,57 @@ class Order(models.Model):
 
 
 class Payment(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='payments')
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='payments')
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='payments'
+    )
+    order = models.ForeignKey(
+        Order,
+        on_delete=models.CASCADE,
+        related_name='payments'
+    )
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     payment_method = models.CharField(
         max_length=20,
-        choices=[('paystack', 'Paystack'), ('credit_card', 'Credit Card'), ('paypal', 'PayPal')]
+        choices=[('paystack', 'Paystack'),
+                 ('credit_card', 'Credit Card'),
+                 ('paypal', 'PayPal')]
     )
     status = models.CharField(
-        max_length=20, 
-        choices=[('pending', 'Pending'), ('completed', 'Completed'), ('failed', 'Failed')], 
+        max_length=20,
+        choices=[('pending', 'Pending'),
+                 ('completed', 'Completed'),
+                 ('failed', 'Failed')],
         default='pending'
     )
     transaction_id = models.CharField(max_length=255, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    slug = models.SlugField(max_length=2000, unique=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            # use transaction_id (or order.id) for slug instead of non-existent 'name'
+            base_slug = slugify(self.transaction_id)
+            if not base_slug:
+                base_slug = "payment"
+            
+            self.slug = base_slug
+            counter = 1
+            while Payment.objects.filter(slug=self.slug).exclude(id=self.id).exists():
+                self.slug = f"{base_slug}-{counter}"
+                counter += 1
+                if counter > 100:
+                    self.slug = f"{base_slug}-{get_random_string(4).lower()}"
+                    break
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Payment {self.transaction_id} by {self.user.email}"
+
+    def get_absolute_url(self):
+        return reverse("books:payment-method", args=[self.slug])
+
     
     
     
