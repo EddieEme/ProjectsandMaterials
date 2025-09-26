@@ -394,6 +394,45 @@
                 transform: translateY(0);
             }
         }
+
+        /* Improved Pagination for Mobile */
+@media (max-width: 768px) {
+    .pagination {
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+    
+    .page-item {
+        margin: 2px;
+    }
+    
+    .page-link {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+        min-width: 40px;
+        text-align: center;
+    }
+    
+    /* Hide some page numbers on very small screens */
+    @media (max-width: 480px) {
+        .page-item:nth-child(n+4):nth-child(-n+{{ books.paginator.num_pages|add:-2 }}) {
+            display: none;
+        }
+        
+        .page-item:first-child,
+        .page-item:last-child,
+        .page-item.active,
+        .page-item.active-1,
+        .page-item.active+1 {
+            display: block !important;
+        }
+    }
+}
+
+/* Ensure pagination items don't break awkwardly */
+.page-item {
+    flex-shrink: 0;
+}
     </style>
 {% endblock %}
 
@@ -479,6 +518,7 @@
             </div>
             
             <!-- Pagination -->
+           <!-- Pagination - Simple Version -->
 {% if books.has_other_pages %}
     <nav aria-label="Page navigation">
         <ul class="pagination" style="margin-top: 25px;">
@@ -492,40 +532,14 @@
                 </li>
             {% endif %}
 
-            {% comment %} Show first page and ellipsis if needed {% endcomment %}
-            {% if books.number > 3 %}
-                <li class="page-item">
-                    <a class="page-link" href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">1</a>
-                </li>
-                {% if books.number > 4 %}
-                    <li class="page-item disabled">
-                        <span class="page-link">...</span>
-                    </li>
-                {% endif %}
-            {% endif %}
-
-            {% comment %} Show current page and surrounding pages {% endcomment %}
+            {% comment %} Show only 5 pages around current page {% endcomment %}
             {% for num in books.paginator.page_range %}
-                {% if num >= books.number|add:-2 and num <= books.number|add:2 %}
-                    {% if books.number == num %}
-                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-                    {% else %}
-                        <li class="page-item"><a class="page-link" href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ num }}</a></li>
-                    {% endif %}
+                {% if num == books.number %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% elif num > books.number|add:-3 and num < books.number|add:3 %}
+                    <li class="page-item"><a class="page-link" href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ num }}</a></li>
                 {% endif %}
             {% endfor %}
-
-            {% comment %} Show last page and ellipsis if needed {% endcomment %}
-            {% if books.number < books.paginator.num_pages|add:-2 %}
-                {% if books.number < books.paginator.num_pages|add:-3 %}
-                    <li class="page-item disabled">
-                        <span class="page-link">...</span>
-                    </li>
-                {% endif %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ books.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ books.paginator.num_pages }}</a>
-                </li>
-            {% endif %}
 
             {% if books.has_next %}
                 <li class="page-item">
