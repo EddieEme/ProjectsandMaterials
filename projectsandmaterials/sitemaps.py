@@ -1,37 +1,50 @@
 # sitemaps.py
 from django.contrib.sitemaps import Sitemap
 from django.urls import reverse
+from django.conf import settings
 from books.models import Book, Category, BookType
-from payments.models import Payment  # change this if your model is PaymentOption or similar
+from payments.models import Payment
 
-# 1. Static pages (just fixed paths, no slugs here)
-class StaticViewSitemap(Sitemap):
+
+class BaseSitemap(Sitemap):
+    protocol = "https"  # force https
+    domain = settings.SITE_URL.replace("http://", "").replace("https://", "").rstrip("/")
+
+    def get_urls(self, page=1, site=None, protocol=None):
+        return super().get_urls(page=page, site=type("Site", (), {
+            "domain": self.domain,
+            "name": self.domain
+        })(), protocol=self.protocol)
+
+
+# 1. Static pages
+class StaticViewSitemap(BaseSitemap):
     changefreq = "weekly"
     priority = 0.8
 
     def items(self):
         return [
-            "/",                
-            "/services/",
-            "/resources/",
-            "/projects/",
-            "/hire/",
-            "/project_faculty/",
-            "/project-list/",
-            "/payment-checkout/",
-            "/login-projects/",
-            "/login-project-list/",
-            "/login-payment-method/",
-            "/verification-error/",
-            "/upload-book/"
+            "books:home",
+            "books:services",
+            "books:resources",
+            "books:projects",
+            "books:hire",
+            "books:project_faculty",
+            "books:project-list",
+            "books:payment-checkout",
+            "books:login-projects",
+            "books:login-project-list",
+            "books:login-payment-method",
+            "books:verification-error",
+            "books:upload-book",
         ]
 
     def location(self, item):
-        return item
+        return reverse(item)
 
 
 # 2. Dynamic pages
-class BookSitemap(Sitemap):
+class BookSitemap(BaseSitemap):
     changefreq = "monthly"
     priority = 0.6
 
@@ -42,10 +55,10 @@ class BookSitemap(Sitemap):
         return reverse("books:product-details", args=[obj.slug])
 
     def lastmod(self, obj):
-        return obj.updated_at if hasattr(obj, "updated_at") else None
+        return getattr(obj, "updated_at", None)
 
 
-class CategorySitemap(Sitemap):
+class CategorySitemap(BaseSitemap):
     changefreq = "weekly"
     priority = 0.6
 
@@ -56,7 +69,7 @@ class CategorySitemap(Sitemap):
         return reverse("books:category_books", args=[obj.slug])
 
 
-class FacultySitemap(Sitemap):
+class FacultySitemap(BaseSitemap):
     changefreq = "weekly"
     priority = 0.6
 
@@ -67,7 +80,7 @@ class FacultySitemap(Sitemap):
         return reverse("books:faculty", args=[obj.slug])
 
 
-class PaymentOptionSitemap(Sitemap):
+class PaymentOptionSitemap(BaseSitemap):
     changefreq = "yearly"
     priority = 0.3
 
