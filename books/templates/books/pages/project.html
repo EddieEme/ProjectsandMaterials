@@ -413,7 +413,7 @@
         text-align: center;
     }
     
-    /* Hide some page numbers on very small screens */
+    {% comment %} /* Hide some page numbers on very small screens */
     @media (max-width: 480px) {
         .page-item:nth-child(n+4):nth-child(-n+{{ books.paginator.num_pages|add:-2 }}) {
             display: none;
@@ -426,7 +426,7 @@
         .page-item.active+1 {
             display: block !important;
         }
-    }
+    } {% endcomment %}
 }
 
 /* Ensure pagination items don't break awkwardly */
